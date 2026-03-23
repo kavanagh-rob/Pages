@@ -2,80 +2,66 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=1920">
 <title>TV Hub</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
   :root {
-    --bg: #0a0a0f;
-    --surface: #13131a;
-    --border: #1e1e2a;
-    --text: #e8e8ec;
-    --text-dim: #8888a0;
-    --accent-racing: #00c853;
-    --accent-weather: #42a5f5;
-    --accent-news: #ff6d00;
-    --accent-sports: #e040fb;
-    --accent-clock: #ffd600;
-    --accent-settings: #78909c;
-    --tile-radius: 18px;
-    --focus-ring: 0 0 0 4px rgba(255,255,255,0.8);
+    --bg: #08090e;
+    --surface: #0f1117;
+    --card: #13151d;
+    --border: #1c1f2e;
+    --text: #d8dae5;
+    --text-mid: #8a8da3;
+    --text-dim: #4e5168;
+    --accent-green: #34d399;
+    --accent-blue: #60a5fa;
+    --accent-orange: #fb923c;
+    --accent-purple: #a78bfa;
+    --accent-amber: #fbbf24;
+    --accent-slate: #94a3b8;
+    --radius: 12px;
   }
-
   html, body {
-    width: 100%; height: 100%;
+    width:1920px; height:1080px;
     background: var(--bg);
     color: var(--text);
-    font-family: 'Source Sans 3', sans-serif;
+    font-family: 'Inter', -apple-system, sans-serif;
     overflow: hidden;
     -webkit-font-smoothing: antialiased;
   }
 
-  /* === TV Navigation System === */
-  .focusable {
-    outline: none;
-    transition: transform 0.25s cubic-bezier(.22,1,.36,1),
-                box-shadow 0.25s cubic-bezier(.22,1,.36,1),
-                border-color 0.25s ease;
-  }
-  .focusable:focus, .focusable.focused {
-    transform: scale(1.05);
-    box-shadow: var(--focus-ring);
-    z-index: 10;
-    border-color: rgba(255,255,255,0.4) !important;
-  }
-
-  /* === Layout === */
-  .page-wrapper {
-    height: 100vh; width: 100vw;
+  .page {
+    width:1920px; height:1080px;
     display: flex; flex-direction: column;
-    padding: 48px 64px;
-    background:
-      radial-gradient(ellipse 80% 60% at 20% 10%, rgba(0,200,83,0.06), transparent),
-      radial-gradient(ellipse 60% 50% at 80% 80%, rgba(224,64,251,0.04), transparent),
-      var(--bg);
+    padding: 28px 48px 20px;
   }
 
-  /* === Header === */
+  /* === Header — compact single row === */
   .header {
     display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 48px; flex-shrink: 0;
+    margin-bottom: 24px; flex-shrink: 0;
+    height: 36px;
   }
   .logo {
-    font-family: 'Oswald', sans-serif;
-    font-size: 42px; font-weight: 700;
-    letter-spacing: 2px; text-transform: uppercase;
-    background: linear-gradient(135deg, #fff 0%, #999 100%);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    font-family: 'Inter', sans-serif;
+    font-size: 20px; font-weight: 700;
+    letter-spacing: 3px; text-transform: uppercase;
+    color: var(--text);
   }
+  .logo span { color: var(--text-dim); font-weight: 400; }
+  .header-right { display: flex; align-items: center; gap: 16px; }
   .clock {
-    font-family: 'Oswald', sans-serif;
-    font-size: 36px; font-weight: 400;
-    color: var(--text-dim);
-    letter-spacing: 3px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px; font-weight: 500;
+    color: var(--text-mid);
+    letter-spacing: 1px;
+  }
+  .date-text {
+    font-size: 13px; color: var(--text-dim);
+    letter-spacing: 0.5px;
   }
 
   /* === Tile Grid === */
@@ -84,221 +70,245 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(2, 1fr);
-    gap: 28px;
+    gap: 16px;
     min-height: 0;
   }
 
   .tile {
     position: relative;
     display: flex; flex-direction: column;
-    justify-content: flex-end;
-    padding: 36px 40px;
-    border-radius: var(--tile-radius);
-    border: 2px solid var(--border);
-    background: var(--surface);
+    justify-content: space-between;
+    padding: 24px 28px;
+    border-radius: var(--radius);
+    border: 1.5px solid var(--border);
+    background: var(--card);
     overflow: hidden;
     cursor: pointer;
     text-decoration: none;
     color: var(--text);
+    outline: none;
+    transition: transform 0.22s cubic-bezier(.22,1,.36,1),
+                box-shadow 0.22s ease,
+                border-color 0.22s ease,
+                background 0.22s ease;
   }
-  .tile::before {
+  .tile::after {
     content: '';
-    position: absolute; inset: 0;
-    opacity: 0;
-    transition: opacity 0.4s ease;
-    border-radius: var(--tile-radius);
+    position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+    opacity: 0; transition: opacity 0.25s ease;
   }
-  .tile:focus::before, .tile.focused::before { opacity: 1; }
-
-  .tile-icon {
-    font-size: 64px;
-    margin-bottom: 18px;
-    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
-    transition: transform 0.3s ease;
+  .tile:focus {
+    transform: scale(1.025);
+    background: #161a26;
+    z-index: 5;
   }
-  .tile:focus .tile-icon { transform: translateY(-4px) scale(1.1); }
+  .tile:focus::after { opacity: 1; }
 
+  .tile-top { display: flex; align-items: center; justify-content: space-between; }
+  .tile-icon-wrap {
+    width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 10px;
+    flex-shrink: 0;
+  }
+  .tile-icon-wrap svg { width: 20px; height: 20px; }
+
+  .tile-bottom { margin-top: auto; }
   .tile-title {
-    font-family: 'Oswald', sans-serif;
-    font-size: 30px; font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    margin-bottom: 6px;
+    font-size: 18px; font-weight: 600;
+    letter-spacing: 0.3px;
+    margin-bottom: 3px;
+    line-height: 1.2;
   }
   .tile-desc {
-    font-size: 17px;
+    font-size: 12px;
     color: var(--text-dim);
-    line-height: 1.4;
+    line-height: 1.3;
+    letter-spacing: 0.2px;
   }
 
-  /* Glow overlays per tile */
-  .tile--racing::before { background: radial-gradient(circle at 30% 70%, rgba(0,200,83,0.15), transparent 70%); }
-  .tile--racing { border-color: rgba(0,200,83,0.15); }
-  .tile--racing:focus { border-color: rgba(0,200,83,0.5) !important; box-shadow: 0 0 0 4px rgba(0,200,83,0.4); }
+  /* Per-tile accents */
+  .tile--racing .tile-icon-wrap { background: rgba(52,211,153,0.1); }
+  .tile--racing .tile-icon-wrap svg { color: var(--accent-green); }
+  .tile--racing::after { background: var(--accent-green); }
+  .tile--racing:focus { border-color: rgba(52,211,153,0.5); box-shadow: 0 0 0 2px rgba(52,211,153,0.2), 0 8px 24px rgba(0,0,0,0.3); }
 
-  .tile--weather::before { background: radial-gradient(circle at 30% 70%, rgba(66,165,245,0.15), transparent 70%); }
-  .tile--weather { border-color: rgba(66,165,245,0.1); }
-  .tile--weather:focus { border-color: rgba(66,165,245,0.5) !important; box-shadow: 0 0 0 4px rgba(66,165,245,0.4); }
+  .tile--weather .tile-icon-wrap { background: rgba(96,165,250,0.1); }
+  .tile--weather .tile-icon-wrap svg { color: var(--accent-blue); }
+  .tile--weather::after { background: var(--accent-blue); }
+  .tile--weather:focus { border-color: rgba(96,165,250,0.5); box-shadow: 0 0 0 2px rgba(96,165,250,0.2), 0 8px 24px rgba(0,0,0,0.3); }
 
-  .tile--news::before { background: radial-gradient(circle at 30% 70%, rgba(255,109,0,0.15), transparent 70%); }
-  .tile--news { border-color: rgba(255,109,0,0.1); }
-  .tile--news:focus { border-color: rgba(255,109,0,0.5) !important; box-shadow: 0 0 0 4px rgba(255,109,0,0.4); }
+  .tile--news .tile-icon-wrap { background: rgba(251,146,60,0.1); }
+  .tile--news .tile-icon-wrap svg { color: var(--accent-orange); }
+  .tile--news::after { background: var(--accent-orange); }
+  .tile--news:focus { border-color: rgba(251,146,60,0.5); box-shadow: 0 0 0 2px rgba(251,146,60,0.2), 0 8px 24px rgba(0,0,0,0.3); }
 
-  .tile--sports::before { background: radial-gradient(circle at 30% 70%, rgba(224,64,251,0.15), transparent 70%); }
-  .tile--sports { border-color: rgba(224,64,251,0.1); }
-  .tile--sports:focus { border-color: rgba(224,64,251,0.5) !important; box-shadow: 0 0 0 4px rgba(224,64,251,0.4); }
+  .tile--sports .tile-icon-wrap { background: rgba(167,139,250,0.1); }
+  .tile--sports .tile-icon-wrap svg { color: var(--accent-purple); }
+  .tile--sports::after { background: var(--accent-purple); }
+  .tile--sports:focus { border-color: rgba(167,139,250,0.5); box-shadow: 0 0 0 2px rgba(167,139,250,0.2), 0 8px 24px rgba(0,0,0,0.3); }
 
-  .tile--clock::before { background: radial-gradient(circle at 30% 70%, rgba(255,214,0,0.12), transparent 70%); }
-  .tile--clock { border-color: rgba(255,214,0,0.1); }
-  .tile--clock:focus { border-color: rgba(255,214,0,0.5) !important; box-shadow: 0 0 0 4px rgba(255,214,0,0.4); }
+  .tile--clock .tile-icon-wrap { background: rgba(251,191,36,0.1); }
+  .tile--clock .tile-icon-wrap svg { color: var(--accent-amber); }
+  .tile--clock::after { background: var(--accent-amber); }
+  .tile--clock:focus { border-color: rgba(251,191,36,0.5); box-shadow: 0 0 0 2px rgba(251,191,36,0.2), 0 8px 24px rgba(0,0,0,0.3); }
 
-  .tile--settings::before { background: radial-gradient(circle at 30% 70%, rgba(120,144,156,0.15), transparent 70%); }
-  .tile--settings { border-color: rgba(120,144,156,0.1); }
-  .tile--settings:focus { border-color: rgba(120,144,156,0.5) !important; box-shadow: 0 0 0 4px rgba(120,144,156,0.4); }
+  .tile--settings .tile-icon-wrap { background: rgba(148,163,184,0.1); }
+  .tile--settings .tile-icon-wrap svg { color: var(--accent-slate); }
+  .tile--settings::after { background: var(--accent-slate); }
+  .tile--settings:focus { border-color: rgba(148,163,184,0.5); box-shadow: 0 0 0 2px rgba(148,163,184,0.2), 0 8px 24px rgba(0,0,0,0.3); }
 
   /* Live badge */
   .live-badge {
-    position: absolute; top: 24px; right: 28px;
-    display: flex; align-items: center; gap: 8px;
-    background: rgba(0,200,83,0.15);
-    border: 1px solid rgba(0,200,83,0.3);
-    padding: 6px 16px;
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(52,211,153,0.1);
+    border: 1px solid rgba(52,211,153,0.2);
+    padding: 3px 10px;
     border-radius: 100px;
-    font-family: 'Oswald', sans-serif;
-    font-size: 14px; font-weight: 600;
+    font-size: 10px; font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 2px;
-    color: var(--accent-racing);
+    letter-spacing: 1.5px;
+    color: var(--accent-green);
   }
   .live-dot {
-    width: 8px; height: 8px;
-    background: var(--accent-racing);
+    width: 6px; height: 6px;
+    background: var(--accent-green);
     border-radius: 50%;
     animation: pulse 1.5s ease-in-out infinite;
   }
   @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.4; transform: scale(0.8); }
+    0%,100% { opacity:1; transform:scale(1); }
+    50% { opacity:0.3; transform:scale(0.7); }
   }
 
-  /* === Entrance animation === */
-  .tile { opacity: 0; transform: translateY(30px); }
-  .tile.show {
-    opacity: 1; transform: translateY(0);
-    transition: opacity 0.5s ease, transform 0.5s cubic-bezier(.22,1,.36,1);
-  }
+  /* Entrance */
+  .tile { opacity:0; transform:translateY(16px); }
+  .tile.show { opacity:1; transform:translateY(0); transition: opacity 0.4s ease, transform 0.4s cubic-bezier(.22,1,.36,1); }
 
-  /* === Footer hint === */
+  /* Footer */
   .nav-hint {
-    flex-shrink: 0;
-    text-align: center;
-    padding-top: 28px;
-    font-size: 15px;
-    color: var(--text-dim);
-    letter-spacing: 1px;
+    flex-shrink: 0; text-align: center; padding-top: 16px;
+    font-size: 11px; color: var(--text-dim); letter-spacing: 0.5px;
   }
   .nav-hint kbd {
-    display: inline-block;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 2px 10px;
-    font-family: 'Source Sans 3', sans-serif;
-    font-size: 14px;
-    margin: 0 2px;
+    display:inline-block; background:var(--surface); border:1px solid var(--border);
+    border-radius:4px; padding:1px 6px; font-family:'JetBrains Mono',monospace;
+    font-size:10px; margin:0 1px;
   }
 </style>
 </head>
 <body>
-
-<div class="page-wrapper">
+<div class="page">
   <header class="header">
-    <div class="logo">TV Hub</div>
-    <div class="clock" id="clock"></div>
+    <div class="logo">TV <span>Hub</span></div>
+    <div class="header-right">
+      <div class="date-text" id="dateText"></div>
+      <div class="clock" id="clock"></div>
+    </div>
   </header>
 
   <div class="tile-grid" id="grid">
-    <a href="racing.html" class="tile tile--racing focusable" data-row="0" data-col="0" tabindex="0">
-      <span class="live-badge"><span class="live-dot"></span> Live</span>
-      <div class="tile-icon">🏇</div>
-      <div class="tile-title">Horse Racing</div>
-      <div class="tile-desc">Live results &amp; fast updates</div>
+    <a href="racing.html" class="tile tile--racing" data-row="0" data-col="0" tabindex="0">
+      <div class="tile-top">
+        <div class="tile-icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        </div>
+        <span class="live-badge"><span class="live-dot"></span>Live</span>
+      </div>
+      <div class="tile-bottom">
+        <div class="tile-title">Horse Racing</div>
+        <div class="tile-desc">Live results & fast updates</div>
+      </div>
     </a>
-    <a href="weather.html" class="tile tile--weather focusable" data-row="0" data-col="1" tabindex="-1">
-      <div class="tile-icon">⛅</div>
-      <div class="tile-title">Weather</div>
-      <div class="tile-desc">Forecast &amp; conditions</div>
+    <a href="weather.html" class="tile tile--weather" data-row="0" data-col="1" tabindex="-1">
+      <div class="tile-top">
+        <div class="tile-icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+        </div>
+      </div>
+      <div class="tile-bottom">
+        <div class="tile-title">Weather</div>
+        <div class="tile-desc">Forecast & conditions</div>
+      </div>
     </a>
-    <a href="news.html" class="tile tile--news focusable" data-row="0" data-col="2" tabindex="-1">
-      <div class="tile-icon">📰</div>
-      <div class="tile-title">News</div>
-      <div class="tile-desc">Headlines &amp; breaking stories</div>
+    <a href="news.html" class="tile tile--news" data-row="0" data-col="2" tabindex="-1">
+      <div class="tile-top">
+        <div class="tile-icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg>
+        </div>
+      </div>
+      <div class="tile-bottom">
+        <div class="tile-title">News</div>
+        <div class="tile-desc">Headlines & breaking stories</div>
+      </div>
     </a>
-    <a href="sports.html" class="tile tile--sports focusable" data-row="1" data-col="0" tabindex="-1">
-      <div class="tile-icon">⚽</div>
-      <div class="tile-title">Sports</div>
-      <div class="tile-desc">Scores &amp; fixtures</div>
+    <a href="sports.html" class="tile tile--sports" data-row="1" data-col="0" tabindex="-1">
+      <div class="tile-top">
+        <div class="tile-icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m9.17 14.83-4.24 4.24"/><circle cx="12" cy="12" r="4"/></svg>
+        </div>
+      </div>
+      <div class="tile-bottom">
+        <div class="tile-title">Sports</div>
+        <div class="tile-desc">Scores & fixtures</div>
+      </div>
     </a>
-    <a href="clock.html" class="tile tile--clock focusable" data-row="1" data-col="1" tabindex="-1">
-      <div class="tile-icon">⏰</div>
-      <div class="tile-title">World Clock</div>
-      <div class="tile-desc">Times across the globe</div>
+    <a href="clock.html" class="tile tile--clock" data-row="1" data-col="1" tabindex="-1">
+      <div class="tile-top">
+        <div class="tile-icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+      </div>
+      <div class="tile-bottom">
+        <div class="tile-title">World Clock</div>
+        <div class="tile-desc">Times across the globe</div>
+      </div>
     </a>
-    <a href="settings.html" class="tile tile--settings focusable" data-row="1" data-col="2" tabindex="-1">
-      <div class="tile-icon">⚙️</div>
-      <div class="tile-title">Settings</div>
-      <div class="tile-desc">Display &amp; preferences</div>
+    <a href="settings.html" class="tile tile--settings" data-row="1" data-col="2" tabindex="-1">
+      <div class="tile-top">
+        <div class="tile-icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+        </div>
+      </div>
+      <div class="tile-bottom">
+        <div class="tile-title">Settings</div>
+        <div class="tile-desc">Display & preferences</div>
+      </div>
     </a>
   </div>
 
   <div class="nav-hint">
-    Use <kbd>←</kbd> <kbd>→</kbd> <kbd>↑</kbd> <kbd>↓</kbd> to navigate &nbsp;·&nbsp; <kbd>Enter</kbd> to select &nbsp;·&nbsp; <kbd>Backspace</kbd> to go back
+    <kbd>&#8592;</kbd><kbd>&#8594;</kbd><kbd>&#8593;</kbd><kbd>&#8595;</kbd> navigate &middot; <kbd>Enter</kbd> select &middot; <kbd>Backspace</kbd> back
   </div>
 </div>
 
 <script>
-  // Clock
   function updateClock() {
-    const now = new Date();
-    document.getElementById('clock').textContent =
-      now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    var now = new Date();
+    document.getElementById('clock').textContent = now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    document.getElementById('dateText').textContent = now.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
   }
-  updateClock();
-  setInterval(updateClock, 10000);
+  updateClock(); setInterval(updateClock, 10000);
 
-  // Entrance animation
-  const tiles = document.querySelectorAll('.tile');
-  tiles.forEach((t, i) => {
-    setTimeout(() => t.classList.add('show'), 100 + i * 80);
-  });
+  var tiles = document.querySelectorAll('.tile');
+  tiles.forEach(function(t,i){ setTimeout(function(){ t.classList.add('show'); }, 80+i*60); });
 
-  // TV Grid Navigation
-  const COLS = 3, ROWS = 2;
-  let curRow = 0, curCol = 0;
-
-  function focusTile(r, c) {
-    curRow = r; curCol = c;
-    const el = document.querySelector(`.tile[data-row="${r}"][data-col="${c}"]`);
-    if (el) el.focus();
+  var COLS=3, ROWS=2, curRow=0, curCol=0;
+  function focusTile(r,c){
+    curRow=r; curCol=c;
+    var el=document.querySelector('.tile[data-row="'+r+'"][data-col="'+c+'"]');
+    if(el) el.focus();
   }
-
-  document.addEventListener('keydown', (e) => {
-    switch (e.key) {
-      case 'ArrowRight': e.preventDefault(); focusTile(curRow, (curCol + 1) % COLS); break;
-      case 'ArrowLeft':  e.preventDefault(); focusTile(curRow, (curCol - 1 + COLS) % COLS); break;
-      case 'ArrowDown':  e.preventDefault(); focusTile((curRow + 1) % ROWS, curCol); break;
-      case 'ArrowUp':    e.preventDefault(); focusTile((curRow - 1 + ROWS) % ROWS, curCol); break;
-      case 'Enter': {
-        const el = document.querySelector(`.tile[data-row="${curRow}"][data-col="${curCol}"]`);
-        if (el) el.click();
-        break;
-      }
+  document.addEventListener('keydown',function(e){
+    switch(e.key){
+      case 'ArrowRight': e.preventDefault(); focusTile(curRow,(curCol+1)%COLS); break;
+      case 'ArrowLeft': e.preventDefault(); focusTile(curRow,(curCol-1+COLS)%COLS); break;
+      case 'ArrowDown': e.preventDefault(); focusTile((curRow+1)%ROWS,curCol); break;
+      case 'ArrowUp': e.preventDefault(); focusTile((curRow-1+ROWS)%ROWS,curCol); break;
+      case 'Enter': var el=document.querySelector('.tile[data-row="'+curRow+'"][data-col="'+curCol+'"]'); if(el) el.click(); break;
     }
   });
-
-  // Auto-focus first tile
-  setTimeout(() => focusTile(0, 0), 600);
+  setTimeout(function(){ focusTile(0,0); },500);
 </script>
-
 </body>
 </html>
