@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Live Horse Racing — TV Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Source+Sans+3:wght@300;400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #060810;
+    --surface: #0e1018;
+    --card: #12141e;
+    --border: #1c1e2e;
+    --text: #e8e8ec;
+    --text-dim: #6e7090;
+    --green: #00c853;
+    --green-dim: rgba(0,200,83,0.12);
+    --gold: #ffd700;
+    --silver: #b0bec5;
+    --bronze: #cd7f32;
+    --red: #ef5350;
+    --radius: 14px;
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Source Sans 3', sans-serif;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    height: 100vh; width: 100vw;
+    display: flex; flex-direction: column;
+    padding: 36px 56px 24px;
+    background:
+      radial-gradient(ellipse 80% 50% at 10% 10%, rgba(0,200,83,0.05), transparent),
+      radial-gradient(ellipse 60% 40% at 90% 90%, rgba(0,100,200,0.03), transparent),
+      var(--bg);
+  }
+
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 28px; flex-shrink: 0;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 20px; }
+  .back-btn {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 22px;
+    color: var(--text-dim);
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 16px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+  .back-btn:focus {
+    outline: none;
+    border-color: var(--green);
+    color: var(--text);
+    box-shadow: 0 0 0 3px rgba(0,200,83,0.3);
+  }
+  .page-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 36px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+  .page-title span { color: var(--green); }
+
+  .topbar-right { display: flex; align-items: center; gap: 24px; }
+  .live-indicator {
+    display: flex; align-items: center; gap: 8px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 15px; font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--green);
+  }
+  .live-dot {
+    width: 10px; height: 10px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 1.5s ease-in-out infinite;
+    box-shadow: 0 0 8px rgba(0,200,83,0.5);
+  }
+  @keyframes pulse {
+    0%,100% { opacity:1; transform:scale(1); }
+    50% { opacity:0.3; transform:scale(0.7); }
+  }
+  .status-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px; color: var(--text-dim);
+  }
+  .clock {
+    font-family: 'Oswald', sans-serif;
+    font-size: 32px; font-weight: 400;
+    color: var(--text-dim); letter-spacing: 2px;
+  }
+
+  .tabs {
+    display: flex; gap: 8px;
+    margin-bottom: 20px;
+    flex-shrink: 0;
+    overflow-x: auto;
+  }
+  .tab {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 28px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 17px; font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+  }
+  .tab:focus { outline: none; border-color: var(--green); color: var(--text); box-shadow: 0 0 0 3px rgba(0,200,83,0.3); }
+  .tab.active { background: var(--green-dim); border-color: rgba(0,200,83,0.4); color: var(--green); }
+
+  .results-scroll {
+    flex: 1; overflow-y: auto; overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+    padding-right: 12px;
+  }
+  .results-scroll::-webkit-scrollbar { width: 6px; }
+  .results-scroll::-webkit-scrollbar-track { background: transparent; }
+  .results-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .race-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 16px;
+    padding: 24px 32px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(12px);
+    animation: fadeIn 0.4s ease forwards;
+  }
+  @keyframes fadeIn {
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .race-card:focus {
+    outline: none;
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(0,200,83,0.25);
+    transform: scale(1.003);
+  }
+  .race-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .race-header-left { display: flex; align-items: center; gap: 16px; }
+  .race-time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px; font-weight: 600;
+    color: var(--green);
+    background: var(--green-dim);
+    padding: 4px 12px;
+    border-radius: 8px;
+  }
+  .race-venue {
+    font-family: 'Oswald', sans-serif;
+    font-size: 22px; font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .race-meta {
+    display: flex; gap: 16px;
+    font-size: 15px; color: var(--text-dim);
+  }
+
+  .horse-row {
+    display: grid;
+    grid-template-columns: 44px 1fr 110px;
+    align-items: center;
+    padding: 10px 0;
+    gap: 16px;
+  }
+  .horse-row + .horse-row { border-top: 1px solid rgba(255,255,255,0.04); }
+
+  .position {
+    width: 38px; height: 38px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 10px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 18px; font-weight: 700;
+  }
+  .pos-1 { background: rgba(255,215,0,0.15); color: var(--gold); border: 1px solid rgba(255,215,0,0.25); }
+  .pos-2 { background: rgba(176,190,197,0.12); color: var(--silver); border: 1px solid rgba(176,190,197,0.2); }
+  .pos-3 { background: rgba(205,127,50,0.12); color: var(--bronze); border: 1px solid rgba(205,127,50,0.2); }
+  .pos-other { background: var(--surface); color: var(--text-dim); border: 1px solid var(--border); }
+
+  .horse-name {
+    font-family: 'Oswald', sans-serif;
+    font-size: 20px; font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+  .horse-row:first-child .horse-name { color: var(--gold); }
+
+  .horse-odds {
+    text-align: right;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 18px; font-weight: 600;
+  }
+  .fav-marker {
+    display: inline-block;
+    color: var(--green);
+    font-size: 11px;
+    font-family: 'Oswald', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-left: 8px;
+    background: var(--green-dim);
+    padding: 1px 6px;
+    border-radius: 4px;
+  }
+
+  .race-details-wrapper {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.35s ease;
+  }
+  .race-details-wrapper.open {
+    max-height: 300px;
+  }
+  .race-details {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 8px 32px;
+  }
+  .detail-row {
+    display: flex; justify-content: space-between;
+    padding: 4px 0; font-size: 15px;
+  }
+  .detail-label { color: var(--text-dim); }
+  .detail-value { font-weight: 600; text-align: right; }
+
+  .state-message {
+    flex: 1;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 20px;
+    min-height: 300px;
+  }
+  .spinner {
+    width: 52px; height: 52px;
+    border: 3px solid var(--border);
+    border-top-color: var(--green);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .state-text {
+    font-family: 'Oswald', sans-serif;
+    font-size: 22px; color: var(--text-dim);
+    text-transform: uppercase; letter-spacing: 2px;
+  }
+  .state-sub {
+    font-size: 16px; color: var(--text-dim);
+    text-align: center; max-width: 560px; line-height: 1.5;
+  }
+  .error-text { color: var(--red); }
+  .retry-btn {
+    background: var(--green-dim);
+    border: 1px solid rgba(0,200,83,0.3);
+    border-radius: 10px;
+    padding: 12px 32px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 17px; font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--green);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .retry-btn:hover, .retry-btn:focus {
+    background: rgba(0,200,83,0.2);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0,200,83,0.3);
+  }
+
+  .nav-hint {
+    flex-shrink: 0;
+    text-align: center;
+    padding-top: 16px;
+    font-size: 14px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+  }
+  .nav-hint kbd {
+    display: inline-block;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 2px 8px;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 13px;
+    margin: 0 2px;
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="index.html" class="back-btn" id="backBtn" tabindex="0">&#8592; Back</a>
+      <div class="page-title">&#127943; <span>Live</span> Racing Results</div>
+    </div>
+    <div class="topbar-right">
+      <div class="live-indicator"><span class="live-dot"></span> Live</div>
+      <div class="status-text" id="statusText">Loading&#8230;</div>
+      <div class="clock" id="clock"></div>
+    </div>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+  <div class="results-scroll" id="results">
+    <div class="state-message">
+      <div class="spinner"></div>
+      <div class="state-text">Fetching live results&#8230;</div>
+      <div class="state-sub">Searching for the latest horse racing results from Sporting Life</div>
+    </div>
+  </div>
+
+  <div class="nav-hint">
+    <kbd>&#8593;</kbd> <kbd>&#8595;</kbd> Navigate &nbsp;&middot;&nbsp; <kbd>Enter</kbd> Expand details &nbsp;&middot;&nbsp; <kbd>Backspace</kbd> Home &nbsp;&middot;&nbsp; <kbd>R</kbd> Refresh
+  </div>
+</div>
+
+<script>
+  // Clock
+  function updateClock() {
+    document.getElementById('clock').textContent =
+      new Date().toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
+  }
+  updateClock();
+  setInterval(updateClock, 10000);
+
+  // State
+  let allRaces = [];
+  let activeFilter = 'all';
+  let isLoading = false;
+  let countdown = 120;
+  let countdownInterval;
+
+  function startCountdown() {
+    countdown = 120;
+    clearInterval(countdownInterval);
+    countdownInterval = setInterval(function() {
+      countdown--;
+      if (countdown <= 0) {
+        countdown = 120;
+        fetchResults();
+      }
+      document.getElementById('statusText').textContent = 'Next update in ' + countdown + 's';
+    }, 1000);
+  }
+
+  // ===== Fetch via Anthropic API + web_search =====
+  async function fetchResults() {
+    if (isLoading) return;
+    isLoading = true;
+
+    document.getElementById('statusText').textContent = 'Searching\u2026';
+    document.getElementById('results').innerHTML =
+      '<div class="state-message">' +
+      '<div class="spinner"></div>' +
+      '<div class="state-text">Fetching live results\u2026</div>' +
+      '<div class="state-sub">Using AI-powered web search to get the latest results</div>' +
+      '</div>';
+
+    try {
+      var resp = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 4000,
+          tools: [{ type: "web_search_20250305", name: "web_search" }],
+          messages: [{
+            role: "user",
+            content: "Search for today's horse racing fast results from sportinglife.com. Find the latest race results for today. Return ONLY a valid JSON array with no markdown, no code fences, no explanation text before or after. Each element:\n{\"time\":\"HH:MM\",\"venue\":\"Venue Name\",\"horses\":[{\"position\":1,\"name\":\"Horse Name\",\"odds\":\"5/1\",\"isFav\":false},{\"position\":2,\"name\":\"Horse Name\",\"odds\":\"3/1\",\"isFav\":true},{\"position\":3,\"name\":\"Horse Name\",\"odds\":\"10/1\",\"isFav\":false}],\"details\":{\"trainer\":\"Name\",\"jockey\":\"Name\",\"runners\":\"8 ran\",\"distances\":\"2, 1.5\"}}\nInclude top 3 placed horses per race. Sort by time descending. Output ONLY the JSON array."
+          }]
+        })
+      });
+
+      var data = await resp.json();
+
+      if (data.error) {
+        throw new Error(data.error.message || 'API error');
+      }
+
+      // Extract all text blocks
+      var text = '';
+      if (data.content && Array.isArray(data.content)) {
+        for (var i = 0; i < data.content.length; i++) {
+          if (data.content[i].type === 'text' && data.content[i].text) {
+            text += data.content[i].text + '\n';
+          }
+        }
+      }
+
+      // Clean up
+      text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+
+      // Find the JSON array
+      var start = text.indexOf('[');
+      var end = text.lastIndexOf(']');
+      if (start === -1 || end === -1) {
+        throw new Error('No race data found in response');
+      }
+      text = text.substring(start, end + 1);
+
+      var races = JSON.parse(text);
+
+      if (!Array.isArray(races) || races.length === 0) {
+        throw new Error('No races returned');
+      }
+
+      allRaces = races;
+      renderTabs();
+      renderResults();
+      startCountdown();
+      document.getElementById('statusText').textContent = allRaces.length + ' races loaded';
+      setTimeout(function() { startCountdown(); }, 2000);
+
+    } catch (err) {
+      console.error('Fetch error:', err);
+      showError(err.message);
+    }
+
+    isLoading = false;
+  }
+
+  // ===== Render Tabs =====
+  function renderTabs() {
+    var tabsEl = document.getElementById('tabs');
+    var venueSet = {};
+    allRaces.forEach(function(r) { venueSet[r.venue] = (venueSet[r.venue] || 0) + 1; });
+    var venues = Object.keys(venueSet).sort();
+
+    var html = '<button class="tab ' + (activeFilter === 'all' ? 'active' : '') + '" data-filter="all" tabindex="0">All (' + allRaces.length + ')</button>';
+    venues.forEach(function(v) {
+      html += '<button class="tab ' + (activeFilter === v ? 'active' : '') + '" data-filter="' + v + '" tabindex="0">' + v + ' (' + venueSet[v] + ')</button>';
+    });
+    tabsEl.innerHTML = html;
+
+    tabsEl.querySelectorAll('.tab').forEach(function(t) {
+      t.addEventListener('click', function() {
+        activeFilter = t.dataset.filter;
+        document.querySelectorAll('.tab').forEach(function(x) { x.classList.remove('active'); });
+        t.classList.add('active');
+        renderResults();
+      });
+    });
+  }
+
+  // ===== Render Results =====
+  function renderResults() {
+    var container = document.getElementById('results');
+    var filtered = activeFilter === 'all'
+      ? allRaces
+      : allRaces.filter(function(r) { return r.venue === activeFilter; });
+
+    if (filtered.length === 0) {
+      container.innerHTML =
+        '<div class="state-message">' +
+        '<div class="state-text">No results yet</div>' +
+        '<div class="state-sub">Results will appear as races finish today</div>' +
+        '</div>';
+      return;
+    }
+
+    var posClasses = ['pos-1','pos-2','pos-3'];
+    var html = '';
+
+    filtered.forEach(function(race, idx) {
+      html += '<div class="race-card" tabindex="0" data-idx="' + idx + '" style="animation-delay:' + (idx * 0.06) + 's">';
+
+      // Header
+      html += '<div class="race-header">';
+      html += '<div class="race-header-left">';
+      html += '<span class="race-time">' + escHtml(race.time) + '</span>';
+      html += '<span class="race-venue">' + escHtml(race.venue) + '</span>';
+      html += '</div>';
+      html += '<div class="race-meta">';
+      if (race.details && race.details.runners) html += '<span>\uD83D\uDC65 ' + escHtml(race.details.runners) + '</span>';
+      if (race.details && race.details.distances) html += '<span>\uD83D\uDCCF ' + escHtml(race.details.distances) + '</span>';
+      html += '</div></div>';
+
+      // Horses
+      var horses = race.horses || [];
+      horses.forEach(function(h, hi) {
+        var pc = hi < 3 ? posClasses[hi] : 'pos-other';
+        html += '<div class="horse-row">';
+        html += '<div class="position ' + pc + '">' + (h.position || hi + 1) + '</div>';
+        html += '<div class="horse-name">' + escHtml(h.name) + '</div>';
+        html += '<div class="horse-odds">' + escHtml(h.odds || '') + (h.isFav ? '<span class="fav-marker">Fav</span>' : '') + '</div>';
+        html += '</div>';
+      });
+
+      // Details
+      var d = race.details || {};
+      var hasDetails = d.trainer || d.jockey || d.distances;
+      if (hasDetails) {
+        html += '<div class="race-details-wrapper" data-details="' + idx + '">';
+        html += '<div class="race-details">';
+        if (d.trainer) html += '<div class="detail-row"><span class="detail-label">Trainer</span><span class="detail-value">' + escHtml(d.trainer) + '</span></div>';
+        if (d.jockey) html += '<div class="detail-row"><span class="detail-label">Jockey</span><span class="detail-value">' + escHtml(d.jockey) + '</span></div>';
+        if (d.runners) html += '<div class="detail-row"><span class="detail-label">Runners</span><span class="detail-value">' + escHtml(d.runners) + '</span></div>';
+        if (d.distances) html += '<div class="detail-row"><span class="detail-label">Distances</span><span class="detail-value">' + escHtml(d.distances) + '</span></div>';
+        html += '</div></div>';
+      }
+
+      html += '</div>';
+    });
+
+    container.innerHTML = html;
+    setupInteractions();
+  }
+
+  function escHtml(s) {
+    if (!s) return '';
+    var d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  function setupInteractions() {
+    document.querySelectorAll('.race-card').forEach(function(card) {
+      var toggle = function() {
+        var w = card.querySelector('.race-details-wrapper');
+        if (w) w.classList.toggle('open');
+      };
+      card.addEventListener('click', toggle);
+      card.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') { e.preventDefault(); toggle(); }
+      });
+    });
+  }
+
+  function showError(msg) {
+    document.getElementById('results').innerHTML =
+      '<div class="state-message">' +
+      '<div class="state-text error-text">Failed to fetch results</div>' +
+      '<div class="state-sub">' + escHtml(msg || 'Something went wrong.') + '</div>' +
+      '<button class="retry-btn" id="retryBtn" tabindex="0">\uD83D\uDD04 Retry Now</button>' +
+      '</div>';
+    document.getElementById('retryBtn').addEventListener('click', fetchResults);
+    startCountdown();
+  }
+
+  // Keyboard nav
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Backspace' && document.activeElement.tagName !== 'INPUT') {
+      e.preventDefault();
+      window.location.href = 'index.html';
+    }
+    if ((e.key === 'r' || e.key === 'R') && document.activeElement.tagName !== 'INPUT') {
+      fetchResults();
+    }
+  });
+
+  document.getElementById('results').addEventListener('keydown', function(e) {
+    var cards = Array.from(document.querySelectorAll('.race-card'));
+    var idx = cards.indexOf(document.activeElement);
+    if (e.key === 'ArrowDown' && idx < cards.length - 1) {
+      e.preventDefault();
+      cards[idx + 1].focus();
+      cards[idx + 1].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (idx > 0) {
+        cards[idx - 1].focus();
+        cards[idx - 1].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } else {
+        var at = document.querySelector('.tab.active');
+        if (at) at.focus();
+      }
+    }
+  });
+
+  document.getElementById('tabs').addEventListener('keydown', function(e) {
+    var tabs = Array.from(document.querySelectorAll('.tab'));
+    var idx = tabs.indexOf(document.activeElement);
+    if (e.key === 'ArrowRight' && idx < tabs.length - 1) { e.preventDefault(); tabs[idx + 1].focus(); }
+    if (e.key === 'ArrowLeft' && idx > 0) { e.preventDefault(); tabs[idx - 1].focus(); }
+    if (e.key === 'ArrowDown') { e.preventDefault(); var c = document.querySelector('.race-card'); if (c) c.focus(); }
+    if (e.key === 'Enter') { if (document.activeElement) document.activeElement.click(); }
+  });
+
+  // Init
+  fetchResults();
+</script>
+
+</body>
+</html>

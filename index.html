@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TV Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --border: #1e1e2a;
+    --text: #e8e8ec;
+    --text-dim: #8888a0;
+    --accent-racing: #00c853;
+    --accent-weather: #42a5f5;
+    --accent-news: #ff6d00;
+    --accent-sports: #e040fb;
+    --accent-clock: #ffd600;
+    --accent-settings: #78909c;
+    --tile-radius: 18px;
+    --focus-ring: 0 0 0 4px rgba(255,255,255,0.8);
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Source Sans 3', sans-serif;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* === TV Navigation System === */
+  .focusable {
+    outline: none;
+    transition: transform 0.25s cubic-bezier(.22,1,.36,1),
+                box-shadow 0.25s cubic-bezier(.22,1,.36,1),
+                border-color 0.25s ease;
+  }
+  .focusable:focus, .focusable.focused {
+    transform: scale(1.05);
+    box-shadow: var(--focus-ring);
+    z-index: 10;
+    border-color: rgba(255,255,255,0.4) !important;
+  }
+
+  /* === Layout === */
+  .page-wrapper {
+    height: 100vh; width: 100vw;
+    display: flex; flex-direction: column;
+    padding: 48px 64px;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 10%, rgba(0,200,83,0.06), transparent),
+      radial-gradient(ellipse 60% 50% at 80% 80%, rgba(224,64,251,0.04), transparent),
+      var(--bg);
+  }
+
+  /* === Header === */
+  .header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 48px; flex-shrink: 0;
+  }
+  .logo {
+    font-family: 'Oswald', sans-serif;
+    font-size: 42px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase;
+    background: linear-gradient(135deg, #fff 0%, #999 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .clock {
+    font-family: 'Oswald', sans-serif;
+    font-size: 36px; font-weight: 400;
+    color: var(--text-dim);
+    letter-spacing: 3px;
+  }
+
+  /* === Tile Grid === */
+  .tile-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 28px;
+    min-height: 0;
+  }
+
+  .tile {
+    position: relative;
+    display: flex; flex-direction: column;
+    justify-content: flex-end;
+    padding: 36px 40px;
+    border-radius: var(--tile-radius);
+    border: 2px solid var(--border);
+    background: var(--surface);
+    overflow: hidden;
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--text);
+  }
+  .tile::before {
+    content: '';
+    position: absolute; inset: 0;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    border-radius: var(--tile-radius);
+  }
+  .tile:focus::before, .tile.focused::before { opacity: 1; }
+
+  .tile-icon {
+    font-size: 64px;
+    margin-bottom: 18px;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+    transition: transform 0.3s ease;
+  }
+  .tile:focus .tile-icon { transform: translateY(-4px) scale(1.1); }
+
+  .tile-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 30px; font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 6px;
+  }
+  .tile-desc {
+    font-size: 17px;
+    color: var(--text-dim);
+    line-height: 1.4;
+  }
+
+  /* Glow overlays per tile */
+  .tile--racing::before { background: radial-gradient(circle at 30% 70%, rgba(0,200,83,0.15), transparent 70%); }
+  .tile--racing { border-color: rgba(0,200,83,0.15); }
+  .tile--racing:focus { border-color: rgba(0,200,83,0.5) !important; box-shadow: 0 0 0 4px rgba(0,200,83,0.4); }
+
+  .tile--weather::before { background: radial-gradient(circle at 30% 70%, rgba(66,165,245,0.15), transparent 70%); }
+  .tile--weather { border-color: rgba(66,165,245,0.1); }
+  .tile--weather:focus { border-color: rgba(66,165,245,0.5) !important; box-shadow: 0 0 0 4px rgba(66,165,245,0.4); }
+
+  .tile--news::before { background: radial-gradient(circle at 30% 70%, rgba(255,109,0,0.15), transparent 70%); }
+  .tile--news { border-color: rgba(255,109,0,0.1); }
+  .tile--news:focus { border-color: rgba(255,109,0,0.5) !important; box-shadow: 0 0 0 4px rgba(255,109,0,0.4); }
+
+  .tile--sports::before { background: radial-gradient(circle at 30% 70%, rgba(224,64,251,0.15), transparent 70%); }
+  .tile--sports { border-color: rgba(224,64,251,0.1); }
+  .tile--sports:focus { border-color: rgba(224,64,251,0.5) !important; box-shadow: 0 0 0 4px rgba(224,64,251,0.4); }
+
+  .tile--clock::before { background: radial-gradient(circle at 30% 70%, rgba(255,214,0,0.12), transparent 70%); }
+  .tile--clock { border-color: rgba(255,214,0,0.1); }
+  .tile--clock:focus { border-color: rgba(255,214,0,0.5) !important; box-shadow: 0 0 0 4px rgba(255,214,0,0.4); }
+
+  .tile--settings::before { background: radial-gradient(circle at 30% 70%, rgba(120,144,156,0.15), transparent 70%); }
+  .tile--settings { border-color: rgba(120,144,156,0.1); }
+  .tile--settings:focus { border-color: rgba(120,144,156,0.5) !important; box-shadow: 0 0 0 4px rgba(120,144,156,0.4); }
+
+  /* Live badge */
+  .live-badge {
+    position: absolute; top: 24px; right: 28px;
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(0,200,83,0.15);
+    border: 1px solid rgba(0,200,83,0.3);
+    padding: 6px 16px;
+    border-radius: 100px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 14px; font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--accent-racing);
+  }
+  .live-dot {
+    width: 8px; height: 8px;
+    background: var(--accent-racing);
+    border-radius: 50%;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+
+  /* === Entrance animation === */
+  .tile { opacity: 0; transform: translateY(30px); }
+  .tile.show {
+    opacity: 1; transform: translateY(0);
+    transition: opacity 0.5s ease, transform 0.5s cubic-bezier(.22,1,.36,1);
+  }
+
+  /* === Footer hint === */
+  .nav-hint {
+    flex-shrink: 0;
+    text-align: center;
+    padding-top: 28px;
+    font-size: 15px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+  }
+  .nav-hint kbd {
+    display: inline-block;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 2px 10px;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 14px;
+    margin: 0 2px;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-wrapper">
+  <header class="header">
+    <div class="logo">TV Hub</div>
+    <div class="clock" id="clock"></div>
+  </header>
+
+  <div class="tile-grid" id="grid">
+    <a href="racing.html" class="tile tile--racing focusable" data-row="0" data-col="0" tabindex="0">
+      <span class="live-badge"><span class="live-dot"></span> Live</span>
+      <div class="tile-icon">🏇</div>
+      <div class="tile-title">Horse Racing</div>
+      <div class="tile-desc">Live results &amp; fast updates</div>
+    </a>
+    <a href="weather.html" class="tile tile--weather focusable" data-row="0" data-col="1" tabindex="-1">
+      <div class="tile-icon">⛅</div>
+      <div class="tile-title">Weather</div>
+      <div class="tile-desc">Forecast &amp; conditions</div>
+    </a>
+    <a href="news.html" class="tile tile--news focusable" data-row="0" data-col="2" tabindex="-1">
+      <div class="tile-icon">📰</div>
+      <div class="tile-title">News</div>
+      <div class="tile-desc">Headlines &amp; breaking stories</div>
+    </a>
+    <a href="sports.html" class="tile tile--sports focusable" data-row="1" data-col="0" tabindex="-1">
+      <div class="tile-icon">⚽</div>
+      <div class="tile-title">Sports</div>
+      <div class="tile-desc">Scores &amp; fixtures</div>
+    </a>
+    <a href="clock.html" class="tile tile--clock focusable" data-row="1" data-col="1" tabindex="-1">
+      <div class="tile-icon">⏰</div>
+      <div class="tile-title">World Clock</div>
+      <div class="tile-desc">Times across the globe</div>
+    </a>
+    <a href="settings.html" class="tile tile--settings focusable" data-row="1" data-col="2" tabindex="-1">
+      <div class="tile-icon">⚙️</div>
+      <div class="tile-title">Settings</div>
+      <div class="tile-desc">Display &amp; preferences</div>
+    </a>
+  </div>
+
+  <div class="nav-hint">
+    Use <kbd>←</kbd> <kbd>→</kbd> <kbd>↑</kbd> <kbd>↓</kbd> to navigate &nbsp;·&nbsp; <kbd>Enter</kbd> to select &nbsp;·&nbsp; <kbd>Backspace</kbd> to go back
+  </div>
+</div>
+
+<script>
+  // Clock
+  function updateClock() {
+    const now = new Date();
+    document.getElementById('clock').textContent =
+      now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  }
+  updateClock();
+  setInterval(updateClock, 10000);
+
+  // Entrance animation
+  const tiles = document.querySelectorAll('.tile');
+  tiles.forEach((t, i) => {
+    setTimeout(() => t.classList.add('show'), 100 + i * 80);
+  });
+
+  // TV Grid Navigation
+  const COLS = 3, ROWS = 2;
+  let curRow = 0, curCol = 0;
+
+  function focusTile(r, c) {
+    curRow = r; curCol = c;
+    const el = document.querySelector(`.tile[data-row="${r}"][data-col="${c}"]`);
+    if (el) el.focus();
+  }
+
+  document.addEventListener('keydown', (e) => {
+    switch (e.key) {
+      case 'ArrowRight': e.preventDefault(); focusTile(curRow, (curCol + 1) % COLS); break;
+      case 'ArrowLeft':  e.preventDefault(); focusTile(curRow, (curCol - 1 + COLS) % COLS); break;
+      case 'ArrowDown':  e.preventDefault(); focusTile((curRow + 1) % ROWS, curCol); break;
+      case 'ArrowUp':    e.preventDefault(); focusTile((curRow - 1 + ROWS) % ROWS, curCol); break;
+      case 'Enter': {
+        const el = document.querySelector(`.tile[data-row="${curRow}"][data-col="${curCol}"]`);
+        if (el) el.click();
+        break;
+      }
+    }
+  });
+
+  // Auto-focus first tile
+  setTimeout(() => focusTile(0, 0), 600);
+</script>
+
+</body>
+</html>
