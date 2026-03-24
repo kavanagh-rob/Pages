@@ -104,6 +104,19 @@
     transform:scale(1.015);background:var(--card-hi);
   }
   .race-card:focus::before{opacity:1}
+
+  /* Show a hint when focused */
+  .race-card .enter-hint{
+    position:absolute;top:12px;right:14px;
+    font-size:10px;font-weight:600;letter-spacing:.5px;
+    color:var(--text-dim);opacity:0;transition:opacity .2s;
+    font-family:'JetBrains Mono',monospace;
+  }
+  .race-card:focus .enter-hint{opacity:.7}
+  /* When expanded, change the hint */
+  .race-card.is-expanded .enter-hint-text::after{content:'ENTER \2190 close'}
+  .race-card:not(.is-expanded) .enter-hint-text::after{content:'ENTER \2192 details'}
+
   .race-card:nth-child(1){animation-delay:.03s}.race-card:nth-child(2){animation-delay:.06s}
   .race-card:nth-child(3){animation-delay:.09s}.race-card:nth-child(4){animation-delay:.12s}
   .race-card:nth-child(5){animation-delay:.15s}.race-card:nth-child(6){animation-delay:.18s}
@@ -198,33 +211,46 @@
 
   /* -- Detail Panel (expandable) -- */
   .card-details{
-    max-height:0;opacity:0;overflow:hidden;
-    transition:max-height .35s cubic-bezier(.22,1,.36,1),opacity .25s ease,padding .25s ease;
-    padding:0 18px;
+    max-height:0;overflow:hidden;
+    transition:max-height .4s cubic-bezier(.22,1,.36,1);
   }
-  .card-details.expanded{
-    max-height:160px;opacity:1;
-    padding:12px 18px 14px;
-    border-top:1px solid var(--border);
+  .card-details-inner{
+    padding:0 18px 0;
+    opacity:0;
+    transition:opacity .25s ease, padding .3s ease;
+  }
+  .race-card.is-expanded .card-details{
+    max-height:250px;
+  }
+  .race-card.is-expanded .card-details-inner{
+    opacity:1;
+    padding:14px 18px 16px;
+  }
+  .card-details-divider{
+    height:1px;background:var(--border);margin:0;
   }
   .details-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:4px 24px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px 0;
   }
   .det-item{
-    display:flex;align-items:baseline;justify-content:space-between;
-    padding:3px 0;
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    width:50%;
+    padding-right:16px;
   }
   .det-label{
-    font-size:11px;font-weight:600;
+    font-size:10px;font-weight:600;
     color:var(--text-dim);
-    text-transform:uppercase;letter-spacing:.8px;
+    text-transform:uppercase;letter-spacing:1px;
+    line-height:1;
   }
   .det-val{
-    font-family:'JetBrains Mono',monospace;
-    font-size:13px;font-weight:600;
+    font-size:14px;font-weight:600;
     color:var(--text);
+    line-height:1.3;
   }
 
   /* ===== FOOTER ===== */
@@ -258,18 +284,20 @@
   <div class="tabs" id="tabs"></div>
   <div class="results-area" id="results"></div>
   <div class="nav-hint">
-    <kbd>&#8592;</kbd><kbd>&#8594;</kbd><kbd>&#8593;</kbd><kbd>&#8595;</kbd> navigate &middot; <kbd>Enter</kbd> expand &middot; <kbd>Backspace</kbd> home &middot; auto-refresh 60s
+    <kbd>&#8592;</kbd><kbd>&#8594;</kbd><kbd>&#8593;</kbd><kbd>&#8595;</kbd> navigate &middot; <kbd>Enter</kbd> expand/collapse &middot; <kbd>Backspace</kbd> home &middot; auto-refresh 60s
   </div>
 </div>
 <script>
 (function(){
 'use strict';
 
+// ===== Clock =====
 function updateClock(){
   document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
 }
 updateClock();setInterval(updateClock,10000);
 
+// ===== Fallback Data =====
 var FALLBACK=[
   {time:"16:12",venue:"Chelmsford City",horses:[{p:1,name:"Campani",draw:"8",odds:"18/1"},{p:2,name:"Secret Road (IRE)",draw:"7",odds:"3/1"},{p:3,name:"Up The Monk",draw:"9",odds:"12/1"}],details:{trainer:"D M Simcock",jockey:"Joey Haynes",runners:"11 ran",dist:"1\u00BC, 2\u00BE",fav:"Kondratiev Wave 15/8"}},
   {time:"16:00",venue:"Fontwell",horses:[{p:1,name:"Bradman",draw:"15",odds:"14/1"},{p:2,name:"Lexie's Moon",draw:"10",odds:"16/1"},{p:3,name:"Motazzen (IRE)",draw:"13",odds:"14/1"}],details:{trainer:"K Bishop",jockey:"James Best",runners:"14 ran",dist:"2, 1",fav:"Activist (FR) 4/1"}},
@@ -282,197 +310,321 @@ var FALLBACK=[
   {time:"13:30",venue:"Punchestown",horses:[{p:1,name:"Jade De Grugy (FR)",draw:"3",odds:"9/4"},{p:2,name:"Rebel Early (IRE)",draw:"1",odds:"7/2"},{p:3,name:"Cape Gentleman (IRE)",draw:"5",odds:"11/1"}],details:{trainer:"W P Mullins",jockey:"P Townend",runners:"8 ran",dist:"4, 2\u00BD"}}
 ];
 
-var allRaces=FALLBACK,activeFilter='all',countdown=60,isLive=false;
-var COLS=3;
+// ===== State =====
+var allRaces = FALLBACK;
+var activeFilter = 'all';
+var countdown = 60;
+var isLive = false;
+var lastDataHash = '';
+var COLS = 3;
 
-renderTabs();renderResults();updateStatus();
+// ===== Initial render =====
+renderTabs();
+renderResults();
+updateStatus();
 attemptLiveFetch();
 
+// ===== Countdown — does NOT re-render, only fetches =====
 setInterval(function(){
-  countdown--;if(countdown<=0){countdown=60;attemptLiveFetch();}
-  document.getElementById('updateTimer').textContent=countdown+'s';
-},1000);
+  countdown--;
+  if(countdown <= 0){ countdown = 60; attemptLiveFetch(); }
+  document.getElementById('updateTimer').textContent = countdown + 's';
+}, 1000);
 
+// ===== Live Fetch — only re-renders if data actually changed =====
 async function attemptLiveFetch(){
-  var PROXIES=['https://api.allorigins.win/raw?url=','https://corsproxy.io/?','https://api.codetabs.com/v1/proxy?quest='];
-  var TARGET='https://www.sportinglife.com/racing/fast-results';
-  try{
-    var html=null;
-    for(var i=0;i<PROXIES.length;i++){
-      try{
-        var c=new AbortController();var t=setTimeout(function(){c.abort()},8000);
-        var r=await fetch(PROXIES[i]+encodeURIComponent(TARGET),{cache:'no-store',signal:c.signal});
-        clearTimeout(t);
-        if(r.ok){html=await r.text();if(html&&html.length>500)break;html=null;}
-      }catch(e){continue;}
+  var PROXIES = ['https://api.allorigins.win/raw?url=','https://corsproxy.io/?','https://api.codetabs.com/v1/proxy?quest='];
+  var TARGET = 'https://www.sportinglife.com/racing/fast-results';
+  try {
+    var html = null;
+    for(var i = 0; i < PROXIES.length; i++){
+      try {
+        var controller = new AbortController();
+        var tid = setTimeout(function(){ controller.abort(); }, 8000);
+        var resp = await fetch(PROXIES[i] + encodeURIComponent(TARGET), { cache:'no-store', signal:controller.signal });
+        clearTimeout(tid);
+        if(resp.ok){ html = await resp.text(); if(html && html.length > 500) break; html = null; }
+      } catch(e){ continue; }
     }
     if(html){
-      var parsed=parseHTML(html);
-      if(parsed&&parsed.length>0){allRaces=parsed;isLive=true;renderTabs();renderResults();updateStatus();return;}
-    }
-  }catch(e){}
-  isLive=false;updateStatus();
-}
-
-function parseHTML(html){
-  try{
-    var doc=new DOMParser().parseFromString(html,'text/html');
-    var races=[],seen={};
-    var links=doc.querySelectorAll('a[href*="/racing/results/"]');
-    for(var i=0;i<links.length;i++){
-      var link=links[i];
-      if(link.textContent.indexOf('Full Result')===-1)continue;
-      var href=link.getAttribute('href')||'';
-      var parts=href.split('/');var slug=parts[4]||'';
-      var venue=slug.replace(/-/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase()});
-      var container=link.parentElement;
-      for(var u=0;u<12;u++){if(!container||!container.parentElement)break;container=container.parentElement;var ct=container.textContent||'';if(ct.indexOf('Winning Trainer')!==-1||ct.indexOf('Tote Win')!==-1)break;}
-      if(!container)continue;
-      var block=container.textContent||'';
-      var tm=block.match(/(\d{2}:\d{2})/);if(!tm)continue;
-      var time=tm[1];var key=time+'|'+venue;if(seen[key])continue;seen[key]=true;
-      var horses=[];var hl=container.querySelectorAll('a[href*="/racing/profiles/horse/"]');var sh={};
-      for(var h=0;h<hl.length;h++){
-        var n=hl[h].textContent.trim();if(!n||sh[n])continue;sh[n]=true;
-        var pt=(hl[h].parentElement?hl[h].parentElement.textContent:'')||'';
-        var an=pt.split(n)[1]||'';var om=an.match(/(\d+\/\d+\s*[fF]?)/);
-        var bn=pt.split(n)[0]||'';var dm=bn.match(/(\d+)\s*$/);
-        horses.push({p:horses.length+1,name:n,draw:dm?dm[1]:'',odds:om?om[1].trim():''});
+      var parsed = parseHTML(html);
+      if(parsed && parsed.length > 0){
+        // Check if data actually changed before re-rendering
+        var newHash = JSON.stringify(parsed.map(function(r){ return r.time + r.venue; }));
+        if(newHash !== lastDataHash){
+          // Save focus position
+          var focusIdx = getFocusedCardIndex();
+          allRaces = parsed;
+          lastDataHash = newHash;
+          isLive = true;
+          renderTabs();
+          renderResults();
+          // Restore focus
+          if(focusIdx >= 0) restoreFocus(focusIdx);
+        }
+        isLive = true;
+        updateStatus();
+        return;
       }
-      var details={};
-      [['trainer',/Winning Trainer:\s*([^\n|]+)/],['jockey',/Winning Jockey:\s*([^\n|]+)/],['runners',/Runners:\s*([^\n|]+)/],['dist',/Distances?:\s*([^\n|]+)/],['fav',/(?:Unpl\.?\s*)?Fav(?:ourite)?:\s*([^\n|]+)/]].forEach(function(p){
-        var m=block.match(p[1]);if(m)details[p[0]]=m[1].trim();
-      });
-      if(horses.length>0)races.push({time:time,venue:venue,horses:horses,details:details});
     }
-    return races.sort(function(a,b){return b.time.localeCompare(a.time)});
-  }catch(e){return[];}
+  } catch(e){}
+  isLive = false;
+  updateStatus();
 }
 
-function updateStatus(){
-  var b=document.getElementById('statusBadge');
-  if(isLive){b.className='status-badge status-live';b.textContent='LIVE';}
-  else{b.className='status-badge status-cached';b.textContent='CACHED';}
-}
-
-function renderTabs(){
-  var vs={};for(var i=0;i<allRaces.length;i++)vs[allRaces[i].venue]=true;
-  var vl=Object.keys(vs).sort();
-  var el=document.getElementById('tabs');
-  var h='<button class="tab'+(activeFilter==='all'?' active':'')+'" data-filter="all" tabindex="0">All</button>';
-  for(var v=0;v<vl.length;v++){
-    h+='<button class="tab'+(activeFilter===vl[v]?' active':'')+'" data-filter="'+vl[v]+'" tabindex="0">'+vl[v]+'</button>';
+function getFocusedCardIndex(){
+  var cards = document.querySelectorAll('.race-card');
+  for(var i = 0; i < cards.length; i++){
+    if(cards[i] === document.activeElement) return i;
   }
-  el.innerHTML=h;
+  return -1;
+}
+
+function restoreFocus(idx){
+  var cards = document.querySelectorAll('.race-card');
+  if(idx >= 0 && idx < cards.length) cards[idx].focus();
+}
+
+// ===== Parser =====
+function parseHTML(html){
+  try {
+    var doc = new DOMParser().parseFromString(html, 'text/html');
+    var races = [], seen = {};
+    var links = doc.querySelectorAll('a[href*="/racing/results/"]');
+    for(var i = 0; i < links.length; i++){
+      var link = links[i];
+      if(link.textContent.indexOf('Full Result') === -1) continue;
+      var href = link.getAttribute('href') || '';
+      var parts = href.split('/'); var slug = parts[4] || '';
+      var venue = slug.replace(/-/g, ' ').replace(/\b\w/g, function(c){ return c.toUpperCase(); });
+      var container = link.parentElement;
+      for(var u = 0; u < 12; u++){
+        if(!container || !container.parentElement) break;
+        container = container.parentElement;
+        var ct = container.textContent || '';
+        if(ct.indexOf('Winning Trainer') !== -1 || ct.indexOf('Tote Win') !== -1) break;
+      }
+      if(!container) continue;
+      var block = container.textContent || '';
+      var tm = block.match(/(\d{2}:\d{2})/); if(!tm) continue;
+      var time = tm[1]; var key = time + '|' + venue; if(seen[key]) continue; seen[key] = true;
+      var horses = []; var hl = container.querySelectorAll('a[href*="/racing/profiles/horse/"]'); var sh = {};
+      for(var h = 0; h < hl.length; h++){
+        var n = hl[h].textContent.trim(); if(!n || sh[n]) continue; sh[n] = true;
+        var pt = (hl[h].parentElement ? hl[h].parentElement.textContent : '') || '';
+        var an = pt.split(n)[1] || ''; var om = an.match(/(\d+\/\d+\s*[fF]?)/);
+        var bn = pt.split(n)[0] || ''; var dm = bn.match(/(\d+)\s*$/);
+        horses.push({ p: horses.length + 1, name: n, draw: dm ? dm[1] : '', odds: om ? om[1].trim() : '' });
+      }
+      var details = {};
+      [['trainer',/Winning Trainer:\s*([^\n|]+)/],['jockey',/Winning Jockey:\s*([^\n|]+)/],['runners',/Runners:\s*([^\n|]+)/],['dist',/Distances?:\s*([^\n|]+)/],['fav',/(?:Unpl\.?\s*)?Fav(?:ourite)?:\s*([^\n|]+)/]].forEach(function(p){
+        var m = block.match(p[1]); if(m) details[p[0]] = m[1].trim();
+      });
+      if(horses.length > 0) races.push({ time:time, venue:venue, horses:horses, details:details });
+    }
+    return races.sort(function(a,b){ return b.time.localeCompare(a.time); });
+  } catch(e){ return []; }
+}
+
+// ===== Status =====
+function updateStatus(){
+  var b = document.getElementById('statusBadge');
+  if(isLive){ b.className = 'status-badge status-live'; b.textContent = 'LIVE'; }
+  else { b.className = 'status-badge status-cached'; b.textContent = 'CACHED'; }
+}
+
+// ===== Render Tabs =====
+function renderTabs(){
+  var vs = {}; for(var i = 0; i < allRaces.length; i++) vs[allRaces[i].venue] = true;
+  var vl = Object.keys(vs).sort();
+  var el = document.getElementById('tabs');
+  var h = '<button class="tab' + (activeFilter === 'all' ? ' active' : '') + '" data-filter="all" tabindex="0">All</button>';
+  for(var v = 0; v < vl.length; v++){
+    h += '<button class="tab' + (activeFilter === vl[v] ? ' active' : '') + '" data-filter="' + vl[v] + '" tabindex="0">' + vl[v] + '</button>';
+  }
+  el.innerHTML = h;
   el.querySelectorAll('.tab').forEach(function(t){
-    t.addEventListener('click',function(){
-      activeFilter=this.getAttribute('data-filter');
-      document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active')});
-      this.classList.add('active');renderResults();
+    t.addEventListener('click', function(){
+      activeFilter = this.getAttribute('data-filter');
+      document.querySelectorAll('.tab').forEach(function(x){ x.classList.remove('active'); });
+      this.classList.add('active');
+      renderResults();
     });
   });
 }
 
+// ===== Render Results =====
 function renderResults(){
-  var container=document.getElementById('results');
-  var filtered=[];
-  for(var i=0;i<allRaces.length;i++){
-    if(activeFilter==='all'||allRaces[i].venue===activeFilter)filtered.push(allRaces[i]);
+  var container = document.getElementById('results');
+  var filtered = [];
+  for(var i = 0; i < allRaces.length; i++){
+    if(activeFilter === 'all' || allRaces[i].venue === activeFilter) filtered.push(allRaces[i]);
   }
-  if(!filtered.length){container.innerHTML='<div class="state-msg">No results available</div>';return;}
+  if(!filtered.length){
+    container.innerHTML = '<div class="state-msg">No results available</div>';
+    return;
+  }
 
-  var h='<div class="results-grid">';
-  for(var r=0;r<filtered.length;r++){
-    var race=filtered[r];var d=race.details;
+  var h = '<div class="results-grid">';
+  for(var r = 0; r < filtered.length; r++){
+    var race = filtered[r]; var d = race.details;
 
-    h+='<div class="race-card" tabindex="0" data-row="'+Math.floor(r/COLS)+'" data-col="'+(r%COLS)+'">';
+    h += '<div class="race-card" tabindex="0" data-row="' + Math.floor(r/COLS) + '" data-col="' + (r%COLS) + '">';
+
+    // Focus hint
+    h += '<div class="enter-hint"><span class="enter-hint-text"></span></div>';
 
     // Header
-    h+='<div class="card-head">';
-    h+='<div class="card-head-left">';
-    h+='<span class="card-time">'+race.time+'</span>';
-    h+='<span class="card-venue">'+race.venue+'</span>';
-    h+='</div>';
-    h+='<div class="card-meta">';
-    if(d.runners) h+='<span class="card-meta-item">'+d.runners+'</span>';
-    if(d.dist){h+='<span class="meta-dot"></span><span class="card-meta-item">'+d.dist+'</span>';}
-    h+='</div>';
-    h+='</div>';
+    h += '<div class="card-head">';
+    h += '<div class="card-head-left">';
+    h += '<span class="card-time">' + race.time + '</span>';
+    h += '<span class="card-venue">' + race.venue + '</span>';
+    h += '</div>';
+    h += '<div class="card-meta">';
+    if(d.runners) h += '<span class="card-meta-item">' + d.runners + '</span>';
+    if(d.dist){ h += '<span class="meta-dot"></span><span class="card-meta-item">' + d.dist + '</span>'; }
+    h += '</div>';
+    h += '</div>';
 
     // Horse rows
-    h+='<div class="horse-rows">';
-    for(var hi=0;hi<race.horses.length;hi++){
-      var hr=race.horses[hi];
-      var pc=hr.p<=3?' pos-'+hr.p:'';
-      var nc=hr.p===1?' winner':'';
-      var isFav=/f$/i.test(hr.odds);
-      var cleanOdds=hr.odds.replace(/\s*f$/i,'').trim();
+    h += '<div class="horse-rows">';
+    for(var hi = 0; hi < race.horses.length; hi++){
+      var hr = race.horses[hi];
+      var pc = hr.p <= 3 ? ' pos-' + hr.p : '';
+      var nc = hr.p === 1 ? ' winner' : '';
+      var isFav = /f$/i.test(hr.odds);
+      var cleanOdds = hr.odds.replace(/\s*f$/i, '').trim();
 
-      h+='<div class="horse-row">';
-      h+='<div class="pos-badge'+pc+'">'+hr.p+'</div>';
-      h+='<div class="horse-info">';
-      if(hr.draw) h+='<span class="draw-num">'+hr.draw+'</span>';
-      h+='<span class="horse-name'+nc+'">'+hr.name+'</span>';
-      h+='</div>';
-      h+='<div class="odds-cell">';
-      h+='<span class="horse-odds">'+cleanOdds+'</span>';
-      if(isFav) h+='<span class="fav-tag">FAV</span>';
-      h+='</div>';
-      h+='</div>';
+      h += '<div class="horse-row">';
+      h += '<div class="pos-badge' + pc + '">' + hr.p + '</div>';
+      h += '<div class="horse-info">';
+      if(hr.draw) h += '<span class="draw-num">' + hr.draw + '</span>';
+      h += '<span class="horse-name' + nc + '">' + hr.name + '</span>';
+      h += '</div>';
+      h += '<div class="odds-cell">';
+      h += '<span class="horse-odds">' + cleanOdds + '</span>';
+      if(isFav) h += '<span class="fav-tag">FAV</span>';
+      h += '</div>';
+      h += '</div>';
     }
-    h+='</div>';
+    h += '</div>';
 
-    // Detail panel — only trainer, jockey, runners, distances, unplaced fav
-    var hasDet=d.trainer||d.jockey||d.fav;
+    // Detail panel — trainer, jockey, runners, distances, unplaced fav
+    var hasDet = d.trainer || d.jockey || d.fav;
     if(hasDet){
-      h+='<div class="card-details"><div class="details-grid">';
-      if(d.trainer) h+='<div class="det-item"><span class="det-label">Trainer</span><span class="det-val">'+d.trainer+'</span></div>';
-      if(d.jockey) h+='<div class="det-item"><span class="det-label">Jockey</span><span class="det-val">'+d.jockey+'</span></div>';
-      if(d.runners) h+='<div class="det-item"><span class="det-label">Runners</span><span class="det-val">'+d.runners+'</span></div>';
-      if(d.dist) h+='<div class="det-item"><span class="det-label">Distances</span><span class="det-val">'+d.dist+'</span></div>';
-      if(d.fav) h+='<div class="det-item"><span class="det-label">Unpl. Fav</span><span class="det-val">'+d.fav+'</span></div>';
-      h+='</div></div>';
+      h += '<div class="card-details">';
+      h += '<div class="card-details-divider"></div>';
+      h += '<div class="card-details-inner">';
+      h += '<div class="details-grid">';
+      if(d.trainer) h += '<div class="det-item"><span class="det-label">Trainer</span><span class="det-val">' + d.trainer + '</span></div>';
+      if(d.jockey) h += '<div class="det-item"><span class="det-label">Jockey</span><span class="det-val">' + d.jockey + '</span></div>';
+      if(d.runners) h += '<div class="det-item"><span class="det-label">Runners</span><span class="det-val">' + d.runners + '</span></div>';
+      if(d.dist) h += '<div class="det-item"><span class="det-label">Distances</span><span class="det-val">' + d.dist + '</span></div>';
+      if(d.fav) h += '<div class="det-item"><span class="det-label">Unpl. Fav</span><span class="det-val">' + d.fav + '</span></div>';
+      h += '</div></div></div>';
     }
 
-    h+='</div>';
+    h += '</div>';
   }
-  h+='</div>';
-  container.innerHTML=h;
+  h += '</div>';
+  container.innerHTML = h;
   setupCards();
 }
 
+// ===== Card Interaction — TV Remote safe =====
 function setupCards(){
   document.querySelectorAll('.race-card').forEach(function(card){
-    function toggle(){var det=card.querySelector('.card-details');if(det)det.classList.toggle('expanded')}
-    card.addEventListener('click',toggle);
-    card.addEventListener('keydown',function(e){if(e.key==='Enter')toggle()});
+    // Use a single toggle function, debounced to prevent double-fire
+    var toggling = false;
+    function toggle(){
+      if(toggling) return;
+      toggling = true;
+      card.classList.toggle('is-expanded');
+      // If expanded, scroll to make sure details are visible
+      if(card.classList.contains('is-expanded')){
+        setTimeout(function(){
+          card.scrollIntoView({ behavior:'smooth', block:'nearest' });
+        }, 100);
+      }
+      setTimeout(function(){ toggling = false; }, 300);
+    }
+
+    // Keyboard: only Enter toggles (not Space to avoid scroll conflicts)
+    card.addEventListener('keydown', function(e){
+      if(e.key === 'Enter'){
+        e.preventDefault();
+        e.stopPropagation();
+        toggle();
+      }
+    });
+
+    // Mouse click: toggle but NOT if user was navigating with keyboard
+    // We detect this by checking if the event was from a real pointer
+    card.addEventListener('click', function(e){
+      // Only toggle on genuine pointer clicks, not synthetic from Enter key
+      if(e.detail > 0){ // detail=0 for keyboard-triggered clicks
+        toggle();
+      }
+    });
   });
 }
 
-// 2D grid navigation
-document.getElementById('results').addEventListener('keydown',function(e){
-  var tiles=Array.prototype.slice.call(document.querySelectorAll('.race-card'));
-  var idx=tiles.indexOf(document.activeElement);if(idx===-1)return;
-  var row=Math.floor(idx/COLS),col=idx%COLS,total=Math.ceil(tiles.length/COLS),ni=-1;
+// ===== 2D Grid Navigation =====
+document.getElementById('results').addEventListener('keydown', function(e){
+  var tiles = Array.prototype.slice.call(document.querySelectorAll('.race-card'));
+  var idx = tiles.indexOf(document.activeElement);
+  if(idx === -1) return;
+  var row = Math.floor(idx / COLS);
+  var col = idx % COLS;
+  var totalRows = Math.ceil(tiles.length / COLS);
+  var ni = -1;
+
   switch(e.key){
-    case'ArrowDown':if(row<total-1){ni=Math.min((row+1)*COLS+col,tiles.length-1)}break;
-    case'ArrowUp':if(row>0){ni=(row-1)*COLS+col}else{e.preventDefault();var at=document.querySelector('.tab.active');if(at)at.focus();return;}break;
-    case'ArrowRight':if(col<COLS-1&&idx+1<tiles.length)ni=idx+1;break;
-    case'ArrowLeft':if(col>0)ni=idx-1;break;
+    case 'ArrowDown':
+      if(row < totalRows - 1){ ni = Math.min((row+1)*COLS + col, tiles.length - 1); }
+      break;
+    case 'ArrowUp':
+      if(row > 0){ ni = (row-1)*COLS + col; }
+      else { e.preventDefault(); var at = document.querySelector('.tab.active'); if(at) at.focus(); return; }
+      break;
+    case 'ArrowRight':
+      if(col < COLS-1 && idx+1 < tiles.length) ni = idx + 1;
+      break;
+    case 'ArrowLeft':
+      if(col > 0) ni = idx - 1;
+      break;
   }
-  if(ni>=0&&ni<tiles.length){e.preventDefault();tiles[ni].focus();tiles[ni].scrollIntoView({behavior:'smooth',block:'nearest'})}
-  else if(e.key==='ArrowDown'||e.key==='ArrowUp')e.preventDefault();
+
+  if(ni >= 0 && ni < tiles.length){
+    e.preventDefault();
+    tiles[ni].focus();
+    tiles[ni].scrollIntoView({ behavior:'smooth', block:'nearest' });
+  } else if(e.key === 'ArrowDown' || e.key === 'ArrowUp'){
+    e.preventDefault();
+  }
 });
 
-document.getElementById('tabs').addEventListener('keydown',function(e){
-  var tabs=Array.prototype.slice.call(document.querySelectorAll('.tab'));var idx=tabs.indexOf(document.activeElement);
-  if(e.key==='ArrowRight'&&idx<tabs.length-1){e.preventDefault();tabs[idx+1].focus()}
-  if(e.key==='ArrowLeft'&&idx>0){e.preventDefault();tabs[idx-1].focus()}
-  if(e.key==='ArrowDown'){e.preventDefault();var f=document.querySelector('.race-card');if(f)f.focus()}
-  if(e.key==='Enter'&&document.activeElement)document.activeElement.click();
+// Tab navigation
+document.getElementById('tabs').addEventListener('keydown', function(e){
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+  var idx = tabs.indexOf(document.activeElement);
+  if(e.key === 'ArrowRight' && idx < tabs.length - 1){ e.preventDefault(); tabs[idx+1].focus(); }
+  if(e.key === 'ArrowLeft' && idx > 0){ e.preventDefault(); tabs[idx-1].focus(); }
+  if(e.key === 'ArrowDown'){
+    e.preventDefault();
+    var f = document.querySelector('.race-card');
+    if(f) f.focus();
+  }
+  if(e.key === 'Enter' && document.activeElement) document.activeElement.click();
 });
 
-document.addEventListener('keydown',function(e){if(e.key==='Backspace'){e.preventDefault();window.location.href='index.html'}});
+// Global back
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Backspace'){
+    e.preventDefault();
+    window.location.href = 'index.html';
+  }
+});
 
 })();
 </script>
