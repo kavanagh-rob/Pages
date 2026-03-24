@@ -4,311 +4,255 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=1920">
 <title>TV Hub</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-  :root {
-    --bg: #08090e;
-    --surface: #0f1117;
-    --card: #13151d;
-    --border: #1c1f2e;
-    --text: #d8dae5;
-    --text-mid: #8a8da3;
-    --text-dim: #4e5168;
-    --accent-green: #34d399;
-    --accent-blue: #60a5fa;
-    --accent-orange: #fb923c;
-    --accent-purple: #a78bfa;
-    --accent-amber: #fbbf24;
-    --accent-slate: #94a3b8;
-    --radius: 12px;
-  }
-  html, body {
-    width:1920px; height:1080px;
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Inter', -apple-system, sans-serif;
-    overflow: hidden;
-    -webkit-font-smoothing: antialiased;
-  }
+@import url('https://fonts.googleapis.com/css2?family=Bitter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#07080d;--s1:#0d0f16;--s2:#12151f;--s3:#181c28;--bdr:#1e2235;--tx:#d4d6e4;--tx2:#868aa5;--tx3:#484c65;--grn:#2dd4a8;--grn2:rgba(45,212,168,.08);--gld:#f5c842;--gld2:rgba(245,200,66,.07);--slv:#8fa3b8;--slv2:rgba(143,163,184,.06);--brz:#c87f30;--brz2:rgba(200,127,48,.06);--blu:#5b9cf5;--blu2:rgba(91,156,245,.08);--org:#e8873a;--org2:rgba(232,135,58,.08);--pur:#9b7cf5;--pur2:rgba(155,124,245,.08);--pnk:#e55ba3;--pnk2:rgba(229,91,163,.08);--red:#e85d5d;--red2:rgba(232,93,93,.08);--amb:#e8c840;--amb2:rgba(232,200,64,.08);--slt:#7a8ba0;--slt2:rgba(122,139,160,.08);--r:10px}
+html,body{width:1920px;height:1080px;background:var(--bg);color:var(--tx);font-family:'Bitter',Georgia,serif;overflow:hidden;-webkit-font-smoothing:antialiased}
+.screen{width:1920px;height:1080px;display:none;flex-direction:column;padding:20px 40px 16px}.screen.active{display:flex}
+button{font-family:inherit;border:none;cursor:pointer}.mono{font-family:'DM Mono',monospace}
+.topbar{display:flex;align-items:center;justify-content:space-between;height:36px;margin-bottom:12px;flex-shrink:0}
+.topbar-l{display:flex;align-items:center;gap:14px}.topbar-r{display:flex;align-items:center;gap:14px}
+.back-btn{display:inline-flex;align-items:center;gap:5px;background:var(--s1);border:1px solid var(--bdr);border-radius:7px;padding:5px 14px;color:var(--tx3);font-size:12px;transition:all .2s}
+.back-btn:focus{outline:none;border-color:var(--grn);color:var(--tx);box-shadow:0 0 0 2px rgba(45,212,168,.2)}
+.pg-title{font-size:17px;font-weight:700;letter-spacing:.4px;text-transform:uppercase}.pg-title em{font-style:normal;color:var(--grn)}
+.clock{font-family:'DM Mono',monospace;font-size:15px;font-weight:500;color:var(--tx2);letter-spacing:1px}
+.tag{font-family:'DM Mono',monospace;font-size:10px;padding:3px 9px;border-radius:5px;letter-spacing:.5px}
+.tag-grn{background:var(--grn2);color:var(--grn);border:1px solid rgba(45,212,168,.15)}
+.tag-gld{background:var(--gld2);color:var(--gld);border:1px solid rgba(245,200,66,.15)}
+.rld{display:inline-flex;align-items:center;gap:4px;background:var(--s1);border:1px solid var(--bdr);border-radius:7px;padding:5px 12px;color:var(--tx3);font-size:11px;font-weight:600;transition:all .2s}
+.rld:focus{outline:none;border-color:var(--grn);color:var(--tx);box-shadow:0 0 0 2px rgba(45,212,168,.2)}
+.rld svg{width:13px;height:13px}.rld.spin svg{animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.tabs{display:flex;gap:5px;margin-bottom:10px;flex-shrink:0;overflow-x:auto}
+.tab{background:var(--s1);border:1px solid var(--bdr);border-radius:7px;padding:5px 18px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--tx3);transition:all .2s;white-space:nowrap}
+.tab:focus{outline:none;border-color:var(--grn);color:var(--tx);box-shadow:0 0 0 2px rgba(45,212,168,.2)}
+.tab.active{background:var(--grn2);border-color:rgba(45,212,168,.25);color:var(--grn)}
+.sa{flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:var(--bdr) transparent}
+.sa::-webkit-scrollbar{width:4px}.sa::-webkit-scrollbar-track{background:transparent}.sa::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:2px}
+.hint{flex-shrink:0;text-align:center;padding-top:8px;font-size:10px;color:var(--tx3)}
+.hint kbd{display:inline-block;background:var(--s1);border:1px solid var(--bdr);border-radius:3px;padding:0 5px;font-family:'DM Mono',monospace;font-size:9px;margin:0 1px}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.7)}}
 
-  .page {
-    width:1920px; height:1080px;
-    display: flex; flex-direction: column;
-    padding: 28px 48px 20px;
-  }
+/* HOME */
+.home .hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;height:34px;flex-shrink:0}
+.logo{font-size:19px;font-weight:700;letter-spacing:3px;text-transform:uppercase}.logo span{color:var(--tx3);font-weight:400}
+.hdr-r{display:flex;align-items:center;gap:14px}.dt{font-size:12px;color:var(--tx3)}
+.tg{flex:1;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(2,1fr);gap:14px;min-height:0}
+.tile{position:relative;display:flex;flex-direction:column;justify-content:space-between;padding:22px 26px;border-radius:var(--r);border:1.5px solid var(--bdr);background:var(--s2);overflow:hidden;cursor:pointer;color:var(--tx);outline:none;transition:transform .22s cubic-bezier(.22,1,.36,1),box-shadow .22s,border-color .22s,background .22s}
+.tile::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;opacity:0;transition:opacity .25s}.tile:focus{transform:scale(1.02);background:var(--s3);z-index:5}.tile:focus::after{opacity:1}
+.tile-top{display:flex;align-items:center;justify-content:space-between}
+.ti{width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:9px}.ti svg{width:18px;height:18px}
+.tile-bottom{margin-top:auto}.tt{font-size:16px;font-weight:600;margin-bottom:2px}.td{font-size:11px;color:var(--tx3)}
+.lb{display:flex;align-items:center;gap:5px;background:var(--grn2);border:1px solid rgba(45,212,168,.2);padding:2px 9px;border-radius:100px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--grn)}
+.ld{width:5px;height:5px;background:var(--grn);border-radius:50%;animation:pulse 1.5s ease-in-out infinite}
+.t-grn .ti{background:var(--grn2)}.t-grn .ti svg{color:var(--grn)}.t-grn::after{background:var(--grn)}.t-grn:focus{border-color:rgba(45,212,168,.4);box-shadow:0 0 0 2px rgba(45,212,168,.15),0 6px 20px rgba(0,0,0,.3)}
+.t-blu .ti{background:var(--blu2)}.t-blu .ti svg{color:var(--blu)}.t-blu::after{background:var(--blu)}.t-blu:focus{border-color:rgba(91,156,245,.4);box-shadow:0 0 0 2px rgba(91,156,245,.15),0 6px 20px rgba(0,0,0,.3)}
+.t-pur .ti{background:var(--pur2)}.t-pur .ti svg{color:var(--pur)}.t-pur::after{background:var(--pur)}.t-pur:focus{border-color:rgba(155,124,245,.4);box-shadow:0 0 0 2px rgba(155,124,245,.15),0 6px 20px rgba(0,0,0,.3)}
+.t-pnk .ti{background:var(--pnk2)}.t-pnk .ti svg{color:var(--pnk)}.t-pnk::after{background:var(--pnk)}.t-pnk:focus{border-color:rgba(229,91,163,.4);box-shadow:0 0 0 2px rgba(229,91,163,.15),0 6px 20px rgba(0,0,0,.3)}
+.t-org .ti{background:var(--org2)}.t-org .ti svg{color:var(--org)}.t-org::after{background:var(--org)}.t-org:focus{border-color:rgba(232,135,58,.4);box-shadow:0 0 0 2px rgba(232,135,58,.15),0 6px 20px rgba(0,0,0,.3)}
+.t-amb .ti{background:var(--amb2)}.t-amb .ti svg{color:var(--amb)}.t-amb::after{background:var(--amb)}.t-amb:focus{border-color:rgba(232,200,64,.4);box-shadow:0 0 0 2px rgba(232,200,64,.15),0 6px 20px rgba(0,0,0,.3)}
+.t-red .ti{background:var(--red2)}.t-red .ti svg{color:var(--red)}.t-red::after{background:var(--red)}.t-red:focus{border-color:rgba(232,93,93,.4);box-shadow:0 0 0 2px rgba(232,93,93,.15),0 6px 20px rgba(0,0,0,.3)}
+.t-slt .ti{background:var(--slt2)}.t-slt .ti svg{color:var(--slt)}.t-slt::after{background:var(--slt)}.t-slt:focus{border-color:rgba(122,139,160,.4);box-shadow:0 0 0 2px rgba(122,139,160,.15),0 6px 20px rgba(0,0,0,.3)}
 
-  /* === Header — compact single row === */
-  .header {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 24px; flex-shrink: 0;
-    height: 36px;
-  }
-  .logo {
-    font-family: 'Inter', sans-serif;
-    font-size: 20px; font-weight: 700;
-    letter-spacing: 3px; text-transform: uppercase;
-    color: var(--text);
-  }
-  .logo span { color: var(--text-dim); font-weight: 400; }
-  .header-right { display: flex; align-items: center; gap: 16px; }
-  .clock {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 16px; font-weight: 500;
-    color: var(--text-mid);
-    letter-spacing: 1px;
-  }
-  .date-text {
-    font-size: 13px; color: var(--text-dim);
-    letter-spacing: 0.5px;
-  }
+/* RACING */
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding-bottom:8px}
+.rc{background:var(--s2);border:1.5px solid var(--bdr);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:all .22s cubic-bezier(.22,1,.36,1);position:relative}
+.rc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--grn),transparent 70%);opacity:0;transition:opacity .2s}
+.rc:focus{outline:none;border-color:var(--grn);box-shadow:0 0 0 2px rgba(45,212,168,.15),0 6px 20px rgba(0,0,0,.3);transform:scale(1.012);background:var(--s3)}.rc:focus::before{opacity:1}
+.rc-h{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 9px;border-bottom:1px solid var(--bdr)}
+.rc-hl{display:flex;align-items:center;gap:9px}
+.rc-t{font-family:'DM Mono',monospace;font-size:15px;font-weight:700;color:var(--grn);background:var(--grn2);padding:2px 9px;border-radius:5px}
+.rc-v{font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.rc-m{font-size:11px;color:var(--tx3);display:flex;gap:10px;align-items:center}
+.d3{width:3px;height:3px;border-radius:50%;background:var(--tx3)}
+.hra{padding:7px 16px 12px}
+.hr{display:grid;grid-template-columns:28px 1fr auto;align-items:center;gap:9px;padding:6px 0}
+.hr+.hr{border-top:1px solid rgba(255,255,255,.03)}
+.pb{width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:6px;font-size:12px;font-weight:700;font-family:'DM Mono',monospace;background:var(--s1);color:var(--tx3);border:1px solid var(--bdr)}
+.pb1{background:var(--gld2);color:var(--gld);border-color:rgba(245,200,66,.2)}.pb2{background:var(--slv2);color:var(--slv);border-color:rgba(143,163,184,.12)}.pb3{background:var(--brz2);color:var(--brz);border-color:rgba(200,127,48,.12)}
+.hn{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hn.w{color:var(--gld);font-weight:600}
+.ho{font-family:'DM Mono',monospace;font-size:14px;font-weight:500;color:var(--tx2);text-align:right;white-space:nowrap}
+.fv{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--grn);background:var(--grn2);border:1px solid rgba(45,212,168,.12);padding:1px 5px;border-radius:3px;margin-left:5px}
+.rc-d{max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(.22,1,.36,1)}
+.rc-di{padding:0 16px;opacity:0;transition:opacity .25s,padding .3s}
+.rc.open .rc-d{max-height:240px}.rc.open .rc-di{opacity:1;padding:12px 16px 14px}
+.ddv{height:1px;background:var(--bdr)}
+.dg{display:flex;flex-wrap:wrap;gap:8px 0}
+.di{display:flex;flex-direction:column;gap:2px;width:50%;padding-right:14px}
+.dl{font-size:9px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.8px}
+.dv{font-size:13px;font-weight:600;color:var(--tx)}
 
-  /* === Tile Grid === */
-  .tile-grid {
-    flex: 1;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    gap: 16px;
-    min-height: 0;
-  }
+/* FOOTBALL */
+.fbc{background:var(--s2);border:1.5px solid var(--bdr);border-radius:var(--r);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:16px;transition:all .2s}
+.fbc:focus{outline:none;border-color:var(--blu);box-shadow:0 0 0 2px rgba(91,156,245,.15);background:var(--s3)}
+.fb-ts{flex:1;display:flex;flex-direction:column;gap:6px}
+.fb-r{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.fb-n{font-size:15px;font-weight:600;flex:1}
+.fb-s{font-family:'DM Mono',monospace;font-size:18px;font-weight:700;width:30px;text-align:center}
+.fb-i{text-align:right;min-width:100px}
+.fb-c{font-size:10px;color:var(--tx3);margin-top:2px}
+.fb-st{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;padding:2px 8px;border-radius:4px;margin-top:4px;display:inline-block}
+.fb-ft{background:var(--grn2);color:var(--grn)}.fb-lv{background:var(--red2);color:var(--red)}.fb-sc{background:var(--blu2);color:var(--blu)}
 
-  .tile {
-    position: relative;
-    display: flex; flex-direction: column;
-    justify-content: space-between;
-    padding: 24px 28px;
-    border-radius: var(--radius);
-    border: 1.5px solid var(--border);
-    background: var(--card);
-    overflow: hidden;
-    cursor: pointer;
-    text-decoration: none;
-    color: var(--text);
-    outline: none;
-    transition: transform 0.22s cubic-bezier(.22,1,.36,1),
-                box-shadow 0.22s ease,
-                border-color 0.22s ease,
-                background 0.22s ease;
-  }
-  .tile::after {
-    content: '';
-    position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
-    opacity: 0; transition: opacity 0.25s ease;
-  }
-  .tile:focus {
-    transform: scale(1.025);
-    background: #161a26;
-    z-index: 5;
-  }
-  .tile:focus::after { opacity: 1; }
+/* MEDIA CARDS (movies + tv) */
+.sec-title{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--tx2);margin:16px 0 10px;padding-left:2px}
+.sec-title:first-child{margin-top:0}
+.mg{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;padding-bottom:6px}
+.mc{background:var(--s2);border:1.5px solid var(--bdr);border-radius:var(--r);overflow:hidden;transition:all .22s;cursor:pointer;display:flex;flex-direction:column}
+.mc:focus{outline:none;border-color:var(--pur);box-shadow:0 0 0 2px rgba(155,124,245,.15);transform:scale(1.015);background:var(--s3)}
+.mc.tv-focus:focus{border-color:var(--pnk);box-shadow:0 0 0 2px rgba(229,91,163,.15)}
+.mp{width:100%;aspect-ratio:2/3;background:var(--s1);object-fit:cover;display:block}
+.mi{padding:10px 14px 12px;flex:1;display:flex;flex-direction:column}
+.mt{font-size:13px;font-weight:600;line-height:1.25;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.mm{font-size:10px;color:var(--tx3);margin-top:auto;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.mr{font-family:'DM Mono',monospace;font-size:10px;font-weight:700;color:var(--gld)}
+.my{font-family:'DM Mono',monospace;font-size:10px}
+.mty{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:1px 5px;border-radius:3px}
+.mty-m{background:var(--pur2);color:var(--pur)}.mty-t{background:var(--pnk2);color:var(--pnk)}
+.mty-new{background:var(--grn2);color:var(--grn)}
+.mty-soon{background:var(--amb2);color:var(--amb)}
 
-  .tile-top { display: flex; align-items: center; justify-content: space-between; }
-  .tile-icon-wrap {
-    width: 40px; height: 40px;
-    display: flex; align-items: center; justify-content: center;
-    border-radius: 10px;
-    flex-shrink: 0;
-  }
-  .tile-icon-wrap svg { width: 20px; height: 20px; }
+/* NASA */
+.nw{flex:1;display:flex;gap:24px;align-items:stretch;min-height:0}
+.ni{flex:1;border-radius:var(--r);overflow:hidden;background:var(--s1);display:flex;align-items:center;justify-content:center}.ni img{width:100%;height:100%;object-fit:contain}
+.nt{width:500px;flex-shrink:0;display:flex;flex-direction:column;gap:12px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--bdr) transparent;padding-right:8px}
+.n-t{font-size:22px;font-weight:700;line-height:1.2}.n-d{font-family:'DM Mono',monospace;font-size:13px;color:var(--tx3)}.n-e{font-size:14px;color:var(--tx2);line-height:1.6}
 
-  .tile-bottom { margin-top: auto; }
-  .tile-title {
-    font-size: 18px; font-weight: 600;
-    letter-spacing: 0.3px;
-    margin-bottom: 3px;
-    line-height: 1.2;
-  }
-  .tile-desc {
-    font-size: 12px;
-    color: var(--text-dim);
-    line-height: 1.3;
-    letter-spacing: 0.2px;
-  }
-
-  /* Per-tile accents */
-  .tile--racing .tile-icon-wrap { background: rgba(52,211,153,0.1); }
-  .tile--racing .tile-icon-wrap svg { color: var(--accent-green); }
-  .tile--racing::after { background: var(--accent-green); }
-  .tile--racing:focus { border-color: rgba(52,211,153,0.5); box-shadow: 0 0 0 2px rgba(52,211,153,0.2), 0 8px 24px rgba(0,0,0,0.3); }
-
-  .tile--weather .tile-icon-wrap { background: rgba(96,165,250,0.1); }
-  .tile--weather .tile-icon-wrap svg { color: var(--accent-blue); }
-  .tile--weather::after { background: var(--accent-blue); }
-  .tile--weather:focus { border-color: rgba(96,165,250,0.5); box-shadow: 0 0 0 2px rgba(96,165,250,0.2), 0 8px 24px rgba(0,0,0,0.3); }
-
-  .tile--news .tile-icon-wrap { background: rgba(251,146,60,0.1); }
-  .tile--news .tile-icon-wrap svg { color: var(--accent-orange); }
-  .tile--news::after { background: var(--accent-orange); }
-  .tile--news:focus { border-color: rgba(251,146,60,0.5); box-shadow: 0 0 0 2px rgba(251,146,60,0.2), 0 8px 24px rgba(0,0,0,0.3); }
-
-  .tile--sports .tile-icon-wrap { background: rgba(167,139,250,0.1); }
-  .tile--sports .tile-icon-wrap svg { color: var(--accent-purple); }
-  .tile--sports::after { background: var(--accent-purple); }
-  .tile--sports:focus { border-color: rgba(167,139,250,0.5); box-shadow: 0 0 0 2px rgba(167,139,250,0.2), 0 8px 24px rgba(0,0,0,0.3); }
-
-  .tile--clock .tile-icon-wrap { background: rgba(251,191,36,0.1); }
-  .tile--clock .tile-icon-wrap svg { color: var(--accent-amber); }
-  .tile--clock::after { background: var(--accent-amber); }
-  .tile--clock:focus { border-color: rgba(251,191,36,0.5); box-shadow: 0 0 0 2px rgba(251,191,36,0.2), 0 8px 24px rgba(0,0,0,0.3); }
-
-  .tile--settings .tile-icon-wrap { background: rgba(148,163,184,0.1); }
-  .tile--settings .tile-icon-wrap svg { color: var(--accent-slate); }
-  .tile--settings::after { background: var(--accent-slate); }
-  .tile--settings:focus { border-color: rgba(148,163,184,0.5); box-shadow: 0 0 0 2px rgba(148,163,184,0.2), 0 8px 24px rgba(0,0,0,0.3); }
-
-  /* Live badge */
-  .live-badge {
-    display: flex; align-items: center; gap: 6px;
-    background: rgba(52,211,153,0.1);
-    border: 1px solid rgba(52,211,153,0.2);
-    padding: 3px 10px;
-    border-radius: 100px;
-    font-size: 10px; font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: var(--accent-green);
-  }
-  .live-dot {
-    width: 6px; height: 6px;
-    background: var(--accent-green);
-    border-radius: 50%;
-    animation: pulse 1.5s ease-in-out infinite;
-  }
-  @keyframes pulse {
-    0%,100% { opacity:1; transform:scale(1); }
-    50% { opacity:0.3; transform:scale(0.7); }
-  }
-
-  /* Entrance */
-  .tile { opacity:0; transform:translateY(16px); }
-  .tile.show { opacity:1; transform:translateY(0); transition: opacity 0.4s ease, transform 0.4s cubic-bezier(.22,1,.36,1); }
-
-  /* Footer */
-  .nav-hint {
-    flex-shrink: 0; text-align: center; padding-top: 16px;
-    font-size: 11px; color: var(--text-dim); letter-spacing: 0.5px;
-  }
-  .nav-hint kbd {
-    display:inline-block; background:var(--surface); border:1px solid var(--border);
-    border-radius:4px; padding:1px 6px; font-family:'JetBrains Mono',monospace;
-    font-size:10px; margin:0 1px;
-  }
+/* RIDDLE */
+.riddle-center{flex:1;display:flex;align-items:center;justify-content:center}
+.riddle-box{max-width:900px;text-align:center}
+.riddle-q{font-size:28px;font-weight:600;line-height:1.5;margin-bottom:30px}
+.riddle-reveal{background:var(--s1);border:1.5px solid var(--bdr);border-radius:var(--r);padding:20px 40px;font-size:22px;font-weight:700;color:var(--amb);cursor:pointer;transition:all .3s}
+.riddle-reveal:focus{outline:none;border-color:var(--amb);box-shadow:0 0 0 2px rgba(232,200,64,.2)}
+.riddle-reveal.show{background:var(--amb2);border-color:rgba(232,200,64,.3)}
+.riddle-num{font-family:'DM Mono',monospace;font-size:13px;color:var(--tx3);margin-bottom:16px}
 </style>
 </head>
 <body>
-<div class="page">
-  <header class="header">
-    <div class="logo">TV <span>Hub</span></div>
-    <div class="header-right">
-      <div class="date-text" id="dateText"></div>
-      <div class="clock" id="clock"></div>
-    </div>
-  </header>
 
-  <div class="tile-grid" id="grid">
-    <a href="racing.html" class="tile tile--racing" data-row="0" data-col="0" tabindex="0">
-      <div class="tile-top">
-        <div class="tile-icon-wrap">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-        </div>
-        <span class="live-badge"><span class="live-dot"></span>Live</span>
-      </div>
-      <div class="tile-bottom">
-        <div class="tile-title">Horse Racing</div>
-        <div class="tile-desc">Live results & fast updates</div>
-      </div>
-    </a>
-    <a href="weather.html" class="tile tile--weather" data-row="0" data-col="1" tabindex="-1">
-      <div class="tile-top">
-        <div class="tile-icon-wrap">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
-        </div>
-      </div>
-      <div class="tile-bottom">
-        <div class="tile-title">Weather</div>
-        <div class="tile-desc">Forecast & conditions</div>
-      </div>
-    </a>
-    <a href="news.html" class="tile tile--news" data-row="0" data-col="2" tabindex="-1">
-      <div class="tile-top">
-        <div class="tile-icon-wrap">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg>
-        </div>
-      </div>
-      <div class="tile-bottom">
-        <div class="tile-title">News</div>
-        <div class="tile-desc">Headlines & breaking stories</div>
-      </div>
-    </a>
-    <a href="sports.html" class="tile tile--sports" data-row="1" data-col="0" tabindex="-1">
-      <div class="tile-top">
-        <div class="tile-icon-wrap">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m9.17 14.83-4.24 4.24"/><circle cx="12" cy="12" r="4"/></svg>
-        </div>
-      </div>
-      <div class="tile-bottom">
-        <div class="tile-title">Sports</div>
-        <div class="tile-desc">Scores & fixtures</div>
-      </div>
-    </a>
-    <a href="clock.html" class="tile tile--clock" data-row="1" data-col="1" tabindex="-1">
-      <div class="tile-top">
-        <div class="tile-icon-wrap">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        </div>
-      </div>
-      <div class="tile-bottom">
-        <div class="tile-title">World Clock</div>
-        <div class="tile-desc">Times across the globe</div>
-      </div>
-    </a>
-    <a href="settings.html" class="tile tile--settings" data-row="1" data-col="2" tabindex="-1">
-      <div class="tile-top">
-        <div class="tile-icon-wrap">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
-        </div>
-      </div>
-      <div class="tile-bottom">
-        <div class="tile-title">Settings</div>
-        <div class="tile-desc">Display & preferences</div>
-      </div>
-    </a>
+<!-- HOME -->
+<div class="screen home active" id="scHome">
+  <header class="hdr"><div class="logo">TV <span>Hub</span></div><div class="hdr-r"><div class="dt" id="dt"></div><div class="clock" id="c0"></div></div></header>
+  <div class="tg" id="hg">
+    <div class="tile t-grn" data-row="0" data-col="0" data-go="Racing" tabindex="0"><div class="tile-top"><div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div><span class="lb"><span class="ld"></span>Live</span></div><div class="tile-bottom"><div class="tt">Horse Racing</div><div class="td">Live results &amp; fast updates</div></div></div>
+    <div class="tile t-blu" data-row="0" data-col="1" data-go="Football" tabindex="-1"><div class="tile-top"><div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24M14.83 9.17l4.24-4.24M14.83 14.83l4.24 4.24M9.17 14.83l-4.24 4.24"/><circle cx="12" cy="12" r="4"/></svg></div></div><div class="tile-bottom"><div class="tt">Football</div><div class="td">Premier League scores</div></div></div>
+    <div class="tile t-pur" data-row="0" data-col="2" data-go="Movies" tabindex="-1"><div class="tile-top"><div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 2v20M17 2v20M2 12h20M2 7h5M2 17h5M17 7h5M17 17h5"/></svg></div></div><div class="tile-bottom"><div class="tt">Movies</div><div class="td">Trending &amp; upcoming</div></div></div>
+    <div class="tile t-pnk" data-row="0" data-col="3" data-go="TvShows" tabindex="-1"><div class="tile-top"><div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="15" rx="2"/><polyline points="17 2 12 7 7 2"/></svg></div></div><div class="tile-bottom"><div class="tt">TV Shows</div><div class="td">Trending &amp; new seasons</div></div></div>
+    <div class="tile t-org" data-row="1" data-col="0" data-go="Nasa" tabindex="-1"><div class="tile-top"><div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg></div></div><div class="tile-bottom"><div class="tt">NASA APOD</div><div class="td">Astronomy picture of the day</div></div></div>
+    <div class="tile t-amb" data-row="1" data-col="1" data-go="Riddle" tabindex="-1"><div class="tile-top"><div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div></div><div class="tile-bottom"><div class="tt">Riddle of the Day</div><div class="td">Test your brain</div></div></div>
+    <div class="tile t-slt" data-row="1" data-col="2" tabindex="-1"><div class="tile-top"><div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div></div><div class="tile-bottom"><div class="tt">World Clock</div><div class="td">Coming soon</div></div></div>
+    <div class="tile t-red" data-row="1" data-col="3" tabindex="-1"><div class="tile-top"><div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></div></div><div class="tile-bottom"><div class="tt">Settings</div><div class="td">Display &amp; preferences</div></div></div>
   </div>
-
-  <div class="nav-hint">
-    <kbd>&#8592;</kbd><kbd>&#8594;</kbd><kbd>&#8593;</kbd><kbd>&#8595;</kbd> navigate &middot; <kbd>Enter</kbd> select &middot; <kbd>Backspace</kbd> back
-  </div>
+  <div class="hint"><kbd>&larr;</kbd><kbd>&rarr;</kbd><kbd>&uarr;</kbd><kbd>&darr;</kbd> navigate &middot; <kbd>Enter</kbd> select</div>
 </div>
 
+<!-- RACING -->
+<div class="screen" id="scRacing"><div class="topbar"><div class="topbar-l"><button class="back-btn" data-back tabindex="0">&larr; Back</button><div class="pg-title"><em>Live</em> Racing</div></div><div class="topbar-r"><button class="rld" id="rcRld" tabindex="0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Reload</button><span class="tag tag-gld" id="rcTag">CACHED</span><div class="clock" id="c1"></div></div></div><div class="tabs" id="rcTabs"></div><div class="sa" id="rcOut"></div><div class="hint"><kbd>&larr;</kbd><kbd>&rarr;</kbd><kbd>&uarr;</kbd><kbd>&darr;</kbd> navigate &middot; <kbd>Enter</kbd> expand &middot; <kbd>Backspace</kbd> home</div></div>
+
+<!-- FOOTBALL -->
+<div class="screen" id="scFootball"><div class="topbar"><div class="topbar-l"><button class="back-btn" data-back tabindex="0">&larr; Back</button><div class="pg-title"><em>Premier League</em> Scores</div></div><div class="topbar-r"><button class="rld" id="fbRld" tabindex="0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Reload</button><div class="clock" id="c2"></div></div></div><div class="sa" id="fbOut"></div><div class="hint"><kbd>&uarr;</kbd><kbd>&darr;</kbd> navigate &middot; <kbd>Backspace</kbd> home</div></div>
+
+<!-- MOVIES -->
+<div class="screen" id="scMovies"><div class="topbar"><div class="topbar-l"><button class="back-btn" data-back tabindex="0">&larr; Back</button><div class="pg-title"><em>Movies</em> &mdash; Trending &amp; Upcoming</div></div><div class="topbar-r"><button class="rld" id="mvRld" tabindex="0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Reload</button><span class="tag tag-grn" style="font-size:9px">TMDB</span><div class="clock" id="c3"></div></div></div><div class="sa" id="mvOut"></div><div class="hint"><kbd>&larr;</kbd><kbd>&rarr;</kbd><kbd>&uarr;</kbd><kbd>&darr;</kbd> navigate &middot; <kbd>Backspace</kbd> home</div></div>
+
+<!-- TV SHOWS -->
+<div class="screen" id="scTvShows"><div class="topbar"><div class="topbar-l"><button class="back-btn" data-back tabindex="0">&larr; Back</button><div class="pg-title"><em>TV Shows</em> &mdash; Trending &amp; New Seasons</div></div><div class="topbar-r"><button class="rld" id="tvRld" tabindex="0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Reload</button><span class="tag tag-grn" style="font-size:9px">TMDB</span><div class="clock" id="c4"></div></div></div><div class="sa" id="tvOut"></div><div class="hint"><kbd>&larr;</kbd><kbd>&rarr;</kbd><kbd>&uarr;</kbd><kbd>&darr;</kbd> navigate &middot; <kbd>Backspace</kbd> home</div></div>
+
+<!-- NASA -->
+<div class="screen" id="scNasa"><div class="topbar"><div class="topbar-l"><button class="back-btn" data-back tabindex="0">&larr; Back</button><div class="pg-title"><em>NASA</em> Astronomy Picture of the Day</div></div><div class="topbar-r"><button class="rld" id="naRld" tabindex="0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Reload</button><div class="clock" id="c5"></div></div></div><div class="nw" id="naOut"><div style="margin:auto;color:var(--tx3)">Loading...</div></div><div class="hint"><kbd>Backspace</kbd> home</div></div>
+
+<!-- RIDDLE -->
+<div class="screen" id="scRiddle"><div class="topbar"><div class="topbar-l"><button class="back-btn" data-back tabindex="0">&larr; Back</button><div class="pg-title"><em>Riddle</em> of the Day</div></div><div class="topbar-r"><div class="clock" id="c6"></div></div></div><div class="riddle-center" id="ridOut"></div><div class="hint"><kbd>Enter</kbd> reveal answer &middot; <kbd>Backspace</kbd> home</div></div>
+
 <script>
-  function updateClock() {
-    var now = new Date();
-    document.getElementById('clock').textContent = now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
-    document.getElementById('dateText').textContent = now.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
-  }
-  updateClock(); setInterval(updateClock, 10000);
+(function(){
+'use strict';
+var E=document.getElementById.bind(document),Q=document.querySelector.bind(document),QA=document.querySelectorAll.bind(document);
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function xhrGet(url,ok,fail){var x=new XMLHttpRequest();x.timeout=10000;x.onload=function(){x.status<300?ok(x.responseText):fail&&fail()};x.onerror=function(){fail&&fail()};x.ontimeout=function(){fail&&fail()};x.open('GET',url);x.send()}
+function xhrJson(url,headers,ok,fail){var x=new XMLHttpRequest();x.timeout=10000;x.onload=function(){try{ok(JSON.parse(x.responseText))}catch(e){fail&&fail()}};x.onerror=function(){fail&&fail()};x.ontimeout=function(){fail&&fail()};x.open('GET',url);if(headers)Object.keys(headers).forEach(function(k){x.setRequestHeader(k,headers[k])});x.send()}
+function proxyUrl(u){return'https://api.allorigins.win/raw?url='+encodeURIComponent(u)}
 
-  var tiles = document.querySelectorAll('.tile');
-  tiles.forEach(function(t,i){ setTimeout(function(){ t.classList.add('show'); }, 80+i*60); });
+/* Clock */
+function tick(){var now=new Date(),t=now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}),d=now.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});['c0','c1','c2','c3','c4','c5','c6'].forEach(function(id){var el=E(id);if(el)el.textContent=t});var dt=E('dt');if(dt)dt.textContent=d}tick();setInterval(tick,30000);
 
-  var COLS=3, ROWS=2, curRow=0, curCol=0;
-  function focusTile(r,c){
-    curRow=r; curCol=c;
-    var el=document.querySelector('.tile[data-row="'+r+'"][data-col="'+c+'"]');
-    if(el) el.focus();
-  }
-  document.addEventListener('keydown',function(e){
-    switch(e.key){
-      case 'ArrowRight': e.preventDefault(); focusTile(curRow,(curCol+1)%COLS); break;
-      case 'ArrowLeft': e.preventDefault(); focusTile(curRow,(curCol-1+COLS)%COLS); break;
-      case 'ArrowDown': e.preventDefault(); focusTile((curRow+1)%ROWS,curCol); break;
-      case 'ArrowUp': e.preventDefault(); focusTile((curRow-1+ROWS)%ROWS,curCol); break;
-      case 'Enter': var el=document.querySelector('.tile[data-row="'+curRow+'"][data-col="'+curCol+'"]'); if(el) el.click(); break;
-    }
+/* Screens */
+function show(id){QA('.screen').forEach(function(s){s.classList.remove('active')});E(id).classList.add('active')}
+var inits={Racing:iRc,Football:iFb,Movies:iMv,TvShows:iTv,Nasa:iNa,Riddle:iRd};
+
+/* Home nav */
+var HC=4,HR=2,hR=0,hC=0;
+function fh(r,c){hR=r;hC=c;var el=Q('.tile[data-row="'+r+'"][data-col="'+c+'"]');if(el)el.focus()}
+E('hg').addEventListener('keydown',function(e){switch(e.key){case'ArrowRight':e.preventDefault();fh(hR,(hC+1)%HC);break;case'ArrowLeft':e.preventDefault();fh(hR,(hC-1+HC)%HC);break;case'ArrowDown':e.preventDefault();fh((hR+1)%HR,hC);break;case'ArrowUp':e.preventDefault();fh((hR-1+HR)%HR,hC);break;case'Enter':var g=document.activeElement&&document.activeElement.dataset.go;if(g){show('sc'+g);if(inits[g])inits[g]()}break}});
+QA('.tile').forEach(function(t){t.addEventListener('click',function(){var g=this.dataset.go;if(g){show('sc'+g);if(inits[g])inits[g]()}})});
+setTimeout(function(){fh(0,0)},200);
+QA('[data-back]').forEach(function(b){b.addEventListener('click',function(){show('scHome');setTimeout(function(){fh(hR,hC)},50)})});
+document.addEventListener('keydown',function(e){if(e.key==='Backspace'&&!E('scHome').classList.contains('active')){e.preventDefault();show('scHome');setTimeout(function(){fh(hR,hC)},50)}});
+function gridNav(cid,sel,cols){E(cid).addEventListener('keydown',function(e){var t=Array.prototype.slice.call(QA(sel)),i=t.indexOf(document.activeElement);if(i<0)return;var r=Math.floor(i/cols),c=i%cols,tr=Math.ceil(t.length/cols),n=-1;switch(e.key){case'ArrowDown':if(r<tr-1)n=Math.min((r+1)*cols+c,t.length-1);break;case'ArrowUp':if(r>0)n=(r-1)*cols+c;break;case'ArrowRight':if(i+1<t.length)n=i+1;break;case'ArrowLeft':if(i>0)n=i-1;break}if(n>=0){e.preventDefault();t[n].focus();t[n].scrollIntoView({behavior:'smooth',block:'nearest'})}})}
+function listNav(cid,sel){E(cid).addEventListener('keydown',function(e){var t=Array.prototype.slice.call(QA(sel)),i=t.indexOf(document.activeElement);if(i<0)return;if(e.key==='ArrowDown'&&i<t.length-1){e.preventDefault();t[i+1].focus();t[i+1].scrollIntoView({behavior:'smooth',block:'nearest'})}if(e.key==='ArrowUp'&&i>0){e.preventDefault();t[i-1].focus();t[i-1].scrollIntoView({behavior:'smooth',block:'nearest'})}})}
+function rldBtn(id,fn){E(id).addEventListener('click',function(){var b=E(id);b.classList.add('spin');b.disabled=true;fn(function(){b.classList.remove('spin');b.disabled=false})})}
+
+/* =========== RACING =========== */
+var RD=[{t:"16:12",v:"Chelmsford City",h:[{p:1,n:"Campani",d:"8",o:"18/1"},{p:2,n:"Secret Road (IRE)",d:"7",o:"3/1"},{p:3,n:"Up The Monk",d:"9",o:"12/1"}],x:{a:"D M Simcock",b:"Joey Haynes",c:"11 ran",d:"1\u00BC, 2\u00BE",e:"Kondratiev Wave 15/8"}},{t:"16:00",v:"Fontwell",h:[{p:1,n:"Bradman",d:"15",o:"14/1"},{p:2,n:"Lexie's Moon",d:"10",o:"16/1"},{p:3,n:"Motazzen (IRE)",d:"13",o:"14/1"}],x:{a:"K Bishop",b:"James Best",c:"14 ran",d:"2, 1",e:"Activist (FR) 4/1"}},{t:"15:42",v:"Chelmsford City",h:[{p:1,n:"North View",d:"5",o:"11/2"},{p:2,n:"Diamondonthehill",d:"1",o:"4/1 f"},{p:3,n:"Monsieur Kodi (IRE)",d:"9",o:"9/1"}],x:{a:"S C Williams",b:"Gina Mangan",c:"11 ran",d:"\u00BE, 1\u00BE"}},{t:"15:30",v:"Fontwell",h:[{p:1,n:"Alright Dai (IRE)",d:"1",o:"7/4 f"},{p:2,n:"Hatos (FR)",d:"7",o:"11/2"}],x:{a:"N P Mulholland",b:"C O'Farrell",c:"6 ran",d:"6\u00BD"}},{t:"15:12",v:"Chelmsford City",h:[{p:1,n:"Dream Composer (IRE)",d:"4",o:"5/2"},{p:2,n:"Spirit Dancer",d:"2",o:"7/2"},{p:3,n:"Harbour Front",d:"6",o:"10/1"}],x:{a:"J Tuite",b:"R Havlin",c:"9 ran",d:"2, nk"}},{t:"15:00",v:"Fontwell",h:[{p:1,n:"Sizing Cusimano (IRE)",d:"3",o:"6/4 f"},{p:2,n:"Our Doris",d:"5",o:"9/2"},{p:3,n:"Bagatelle (FR)",d:"1",o:"7/1"}],x:{a:"G L Moore",b:"J J Burke",c:"7 ran",d:"3\u00BD, 8"}},{t:"14:30",v:"Punchestown",h:[{p:1,n:"Doyen Breed (IRE)",d:"2",o:"11/4"},{p:2,n:"Firm Footings (IRE)",d:"6",o:"5/1"},{p:3,n:"Inca Prince (IRE)",d:"4",o:"8/1"}],x:{a:"W P Mullins",b:"P Townend",c:"11 ran",d:"1\u00BD, 3\u00BC"}},{t:"14:00",v:"Punchestown",h:[{p:1,n:"Harbour Lake (IRE)",d:"1",o:"4/6 f"},{p:2,n:"Ballybrown (IRE)",d:"3",o:"5/1"}],x:{a:"H De Bromhead",b:"R Blackmore",c:"5 ran",d:"12"}},{t:"13:30",v:"Punchestown",h:[{p:1,n:"Jade De Grugy (FR)",d:"3",o:"9/4"},{p:2,n:"Rebel Early (IRE)",d:"1",o:"7/2"},{p:3,n:"Cape Gentleman (IRE)",d:"5",o:"11/1"}],x:{a:"W P Mullins",b:"P Townend",c:"8 ran",d:"4, 2\u00BD"}}],rF='all';
+function iRc(){rF='all';bRcT();bRcC();tryRcL();setTimeout(function(){var f=Q('.rc');if(f)f.focus()},60)}
+function bRcT(){var vs={};RD.forEach(function(r){vs[r.v]=1});var vl=Object.keys(vs).sort(),h='<button class="tab active" data-f="all" tabindex="0">All</button>';vl.forEach(function(v){h+='<button class="tab" data-f="'+v+'" tabindex="0">'+v+'</button>'});E('rcTabs').innerHTML=h;E('rcTabs').querySelectorAll('.tab').forEach(function(t){t.addEventListener('click',function(){rF=this.dataset.f;QA('#rcTabs .tab').forEach(function(x){x.classList.remove('active')});this.classList.add('active');bRcC()})})}
+function bRcC(){var list=RD.filter(function(r){return rF==='all'||r.v===rF}),s='<div class="g3">';list.forEach(function(rc,r){var x=rc.x||{};s+='<div class="rc" tabindex="0" data-row="'+Math.floor(r/3)+'" data-col="'+(r%3)+'"><div class="rc-h"><div class="rc-hl"><span class="rc-t">'+esc(rc.t)+'</span><span class="rc-v">'+esc(rc.v)+'</span></div><div class="rc-m">';if(x.c)s+='<span>'+esc(x.c)+'</span>';if(x.d)s+='<span class="d3"></span><span>'+esc(x.d)+'</span>';s+='</div></div><div class="hra">';rc.h.forEach(function(hr){var fav=/f$/i.test(hr.o),odds=hr.o.replace(/\s*f$/i,'');s+='<div class="hr"><div class="pb'+(hr.p<=3?' pb'+hr.p:'')+'">'+hr.p+'</div><div style="display:flex;align-items:center;gap:7px;min-width:0">';if(hr.d)s+='<span class="mono" style="font-size:10px;color:var(--tx3)">'+esc(hr.d)+'</span>';s+='<span class="hn'+(hr.p===1?' w':'')+'">'+esc(hr.n)+'</span></div><div style="display:flex;align-items:center;gap:5px;justify-content:flex-end"><span class="ho">'+esc(odds)+'</span>';if(fav)s+='<span class="fv">FAV</span>';s+='</div></div>'});s+='</div>';var fl=[];if(x.a)fl.push(['Trainer',x.a]);if(x.b)fl.push(['Jockey',x.b]);if(x.c)fl.push(['Runners',x.c]);if(x.d)fl.push(['Distances',x.d]);if(x.e)fl.push(['Unpl. Fav',x.e]);if(fl.length){s+='<div class="rc-d"><div class="ddv"></div><div class="rc-di"><div class="dg">';fl.forEach(function(f){s+='<div class="di"><span class="dl">'+f[0]+'</span><span class="dv">'+esc(f[1])+'</span></div>'});s+='</div></div></div>'}s+='</div>'});s+='</div>';E('rcOut').innerHTML=s;QA('.rc').forEach(function(c){var b=false;function tog(){if(b)return;b=true;c.classList.toggle('open');setTimeout(function(){b=false},300)}c.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();e.stopPropagation();tog()}});c.addEventListener('click',function(e){if(e.detail>0)tog()})})}
+gridNav('rcOut','.rc',3);
+var JRE=/[\u00A3\u20AC\$]|tote|trifecta|tricast|swingers|placepot|watch|replay|video|Race Details/i,RMAP={'winning trainer':'a','winning jockey':'b','runners':'c','distances':'d','distance':'d','unpl.fav':'e','unpl. fav':'e','unplaced fav':'e','unpl fav':'e'};
+function tryRcL(cb){var done=cb||function(){};xhrGet(proxyUrl('https://www.sportinglife.com/racing/fast-results'),function(html){try{var doc=(new DOMParser()).parseFromString(html,'text/html'),out=[],seen={};doc.querySelectorAll('a[href*="/racing/results/"]').forEach(function(lnk){if(lnk.textContent.indexOf('Full Result')===-1)return;var slug=(lnk.getAttribute('href')||'').split('/')[4]||'';if(!slug)return;var venue=slug.replace(/-/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase()});var box=lnk.parentElement;for(var u=0;u<10;u++){if(!box||!box.parentElement)break;box=box.parentElement;var hc=box.querySelectorAll('a[href*="/racing/profiles/horse/"]').length;if(hc>=1&&hc<=5)break}if(!box)return;var tm=(box.textContent||'').match(/(\d{2}:\d{2})/);if(!tm)return;var key=tm[1]+'|'+venue;if(seen[key])return;seen[key]=true;var horses=[],hS={};box.querySelectorAll('a[href*="/racing/profiles/horse/"]').forEach(function(hl){var n=(hl.textContent||'').trim();if(!n||n.length<2||n.length>50||hS[n]||JRE.test(n))return;hS[n]=true;var pt=(hl.parentElement?hl.parentElement.textContent:'')||'',af=pt.split(n)[1]||'',bf=pt.split(n)[0]||'',om=af.match(/^[^\d]*?(\d+\/\d+)\s*([fF])?/),dm=bf.match(/(\d{1,2})\s*$/),o=om?(om[1]+(om[2]?' f':'')).trim():'',d=dm?dm[1]:'';if(o&&!/^\d+\/\d+(\s*f)?$/.test(o))o='';if(d&&!/^\d{1,2}$/.test(d))d='';horses.push({p:horses.length+1,n:n,d:d,o:o})});if(horses.length<1||horses.length>5)return;var det={};box.querySelectorAll('tr').forEach(function(tr){var tds=tr.querySelectorAll('td');if(tds.length<2)return;var lab=(tds[0].textContent||'').trim().toLowerCase().replace(/:$/,'').trim(),val=(tds[1].textContent||'').trim();if(!lab||!val||val.length>60||JRE.test(val))return;var k=RMAP[lab];if(!k)return;if(k==='e')val=val.replace(/\s*F\s*$/,'').trim();det[k]=val});out.push({t:tm[1],v:venue,h:horses,x:det})});out.sort(function(a,b){return b.t.localeCompare(a.t)});if(out.length>=3){RD=out;E('rcTag').textContent='LIVE';E('rcTag').className='tag tag-grn';rF='all';bRcT();bRcC();setTimeout(function(){var f=Q('.rc');if(f)f.focus()},60)}}catch(e){}done()},done)}
+rldBtn('rcRld',tryRcL);
+
+/* =========== FOOTBALL =========== */
+var FBD=[{h:"Arsenal",a:"Chelsea",hs:2,as:1,st:"FT"},{h:"Liverpool",a:"Man City",hs:3,as:2,st:"FT"},{h:"Man Utd",a:"Tottenham",hs:1,as:1,st:"FT"},{h:"Newcastle",a:"Aston Villa",hs:2,as:0,st:"FT"},{h:"Brighton",a:"West Ham",hs:1,as:0,st:"FT"},{h:"Everton",a:"Fulham",hs:0,as:2,st:"FT"},{h:"Wolves",a:"Crystal Palace",hs:1,as:3,st:"FT"},{h:"Bournemouth",a:"Nott'm Forest",hs:2,as:2,st:"FT"},{h:"Brentford",a:"Leicester",hs:3,as:1,st:"FT"},{h:"Ipswich",a:"Southampton",hs:1,as:0,st:"FT"}];
+function iFb(){bFb();setTimeout(function(){var f=Q('.fbc');if(f)f.focus()},60)}
+function bFb(){var s='<div style="display:flex;flex-direction:column;gap:8px;padding-bottom:8px">';FBD.forEach(function(m){var sc=m.st==='FT'?'fb-ft':m.st==='LIVE'?'fb-lv':'fb-sc';s+='<div class="fbc" tabindex="0"><div class="fb-ts"><div class="fb-r"><span class="fb-n">'+esc(m.h)+'</span><span class="fb-s">'+m.hs+'</span></div><div class="fb-r"><span class="fb-n">'+esc(m.a)+'</span><span class="fb-s">'+m.as+'</span></div></div><div class="fb-i"><div class="fb-c">Premier League</div><span class="fb-st '+sc+'">'+esc(m.st)+'</span></div></div>'});s+='</div>';E('fbOut').innerHTML=s}
+listNav('fbOut','.fbc');rldBtn('fbRld',function(d){iFb();d()});
+
+/* =========== TMDB CONFIG =========== */
+/* Replace with your own TMDB read access token from themoviedb.org/settings/api */
+var TMDB='eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkNmQ0NmIwOGQ1NGRlNjBlMzAzMjcxOGYzMDdhOGJiZCIsInN1YiI6IjY3NDdjMjZhYTVmNGVlNDQ1MGNkZDA2NSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.placeholder';
+var TMDB_H={'Authorization':'Bearer '+TMDB,'Accept':'application/json'};
+var TMDB_IMG='https://image.tmdb.org/t/p/w342';
+function tmdbGet(path,ok,fail){xhrJson('https://api.themoviedb.org/3'+path,TMDB_H,ok,fail||function(){})}
+
+/* =========== MOVIES =========== */
+var MV_TREND=[{title:"Thunderbolts*",year:"2025",rating:7.2,poster:""},{title:"The Amateur",year:"2025",rating:6.8,poster:""},{title:"Sinners",year:"2025",rating:7.5,poster:""},{title:"Havoc",year:"2025",rating:6.9,poster:""},{title:"Mission Impossible 8",year:"2025",rating:8.1,poster:""}];
+var MV_UP=[{title:"Jurassic World Rebirth",year:"2025",rating:0,poster:"",tag:"Coming Soon"},{title:"Superman",year:"2025",rating:0,poster:"",tag:"Coming Soon"},{title:"The Fantastic Four",year:"2025",rating:0,poster:"",tag:"Coming Soon"},{title:"Blade",year:"2025",rating:0,poster:"",tag:"Coming Soon"},{title:"Wicked Part Two",year:"2025",rating:0,poster:"",tag:"Coming Soon"}];
+function iMv(){renderMv();tryMvApi()}
+function renderMv(){var s='<div class="sec-title">Trending This Week</div><div class="mg">';MV_TREND.forEach(function(m){s+=mvCard(m,'movie')});s+='</div><div class="sec-title">Upcoming Releases</div><div class="mg">';MV_UP.forEach(function(m){s+=mvCard(m,'movie',m.tag)});s+='</div>';E('mvOut').innerHTML=s}
+function mvCard(m,type,tag){var s='<div class="mc" tabindex="0">';if(m.poster)s+='<img class="mp" src="'+esc(m.poster)+'" alt="" loading="lazy">';else s+='<div class="mp" style="display:flex;align-items:center;justify-content:center;font-size:36px;color:var(--tx3)">&#127910;</div>';s+='<div class="mi"><div class="mt">'+esc(m.title)+'</div><div class="mm">';if(m.rating>0)s+='<span class="mr">\u2605 '+m.rating.toFixed(1)+'</span>';s+='<span class="my">'+esc(m.year)+'</span>';if(tag==='NEW')s+='<span class="mty mty-new">NEW</span>';else if(tag)s+='<span class="mty mty-soon">'+esc(tag)+'</span>';else s+='<span class="mty mty-m">Movie</span>';s+='</div></div></div>';return s}
+function tryMvApi(){
+  var now=new Date(),y=now.getFullYear(),mo=String(now.getMonth()+1).padStart(2,'0'),gte=y+'-'+mo+'-01',lte=y+'-'+mo+'-28';
+  tmdbGet('/trending/movie/week?language=en-US',function(d){if(d.results&&d.results.length>=5)MV_TREND=d.results.slice(0,5).map(function(m){return{title:m.title||'',year:(m.release_date||'').slice(0,4),rating:m.vote_average||0,poster:m.poster_path?TMDB_IMG+m.poster_path:''}});
+    tmdbGet('/movie/upcoming?language=en-US&region=GB',function(d2){if(d2.results&&d2.results.length>=3)MV_UP=d2.results.slice(0,5).map(function(m){var rd=m.release_date||'';var isOut=new Date(rd)<=now;return{title:m.title||'',year:rd.slice(0,4),rating:m.vote_average||0,poster:m.poster_path?TMDB_IMG+m.poster_path:'',tag:isOut?'NEW':'Coming Soon'}});renderMv()},function(){renderMv()});
   });
-  setTimeout(function(){ focusTile(0,0); },500);
+}
+gridNav('mvOut','.mc',5);rldBtn('mvRld',function(d){tryMvApi();d()});
+
+/* =========== TV SHOWS =========== */
+var TV_TREND=[{title:"Adolescence",year:"2025",rating:8.9,poster:""},{title:"The Last of Us",year:"2025",rating:8.6,poster:""},{title:"Daredevil: Born Again",year:"2025",rating:7.8,poster:""},{title:"White Lotus",year:"2025",rating:7.4,poster:""},{title:"Reacher",year:"2025",rating:8.1,poster:""}];
+var TV_NEW=[{title:"Stranger Things S5",year:"2025",rating:0,poster:"",tag:"Coming Soon"},{title:"Severance S2",year:"2025",rating:8.7,poster:"",tag:"NEW"},{title:"The Bear S4",year:"2025",rating:0,poster:"",tag:"Coming Soon"},{title:"Squid Game S3",year:"2025",rating:0,poster:"",tag:"Coming Soon"},{title:"Wednesday S2",year:"2025",rating:0,poster:"",tag:"Coming Soon"}];
+function iTv(){renderTv();tryTvApi()}
+function renderTv(){var s='<div class="sec-title">Trending This Week</div><div class="mg">';TV_TREND.forEach(function(m){s+=tvCard(m)});s+='</div><div class="sec-title">New &amp; Upcoming Seasons</div><div class="mg">';TV_NEW.forEach(function(m){s+=tvCard(m,m.tag)});s+='</div>';E('tvOut').innerHTML=s}
+function tvCard(m,tag){var s='<div class="mc tv-focus" tabindex="0">';if(m.poster)s+='<img class="mp" src="'+esc(m.poster)+'" alt="" loading="lazy">';else s+='<div class="mp" style="display:flex;align-items:center;justify-content:center;font-size:36px;color:var(--tx3)">&#128250;</div>';s+='<div class="mi"><div class="mt">'+esc(m.title)+'</div><div class="mm">';if(m.rating>0)s+='<span class="mr">\u2605 '+m.rating.toFixed(1)+'</span>';s+='<span class="my">'+esc(m.year)+'</span>';if(tag==='NEW')s+='<span class="mty mty-new">NEW</span>';else if(tag)s+='<span class="mty mty-soon">'+esc(tag)+'</span>';else s+='<span class="mty mty-t">TV</span>';s+='</div></div></div>';return s}
+function tryTvApi(){
+  tmdbGet('/trending/tv/week?language=en-US',function(d){if(d.results&&d.results.length>=5)TV_TREND=d.results.slice(0,5).map(function(m){return{title:m.name||'',year:(m.first_air_date||'').slice(0,4),rating:m.vote_average||0,poster:m.poster_path?TMDB_IMG+m.poster_path:''}});
+    tmdbGet('/tv/on_the_air?language=en-US',function(d2){if(d2.results&&d2.results.length>=3)TV_NEW=d2.results.slice(0,5).map(function(m){return{title:m.name||'',year:(m.first_air_date||'').slice(0,4),rating:m.vote_average||0,poster:m.poster_path?TMDB_IMG+m.poster_path:'',tag:'NEW'}});renderTv()},function(){renderTv()});
+  });
+}
+gridNav('tvOut','.mc',5);rldBtn('tvRld',function(d){tryTvApi();d()});
+
+/* =========== NASA =========== */
+function iNa(){loadNa()}
+function loadNa(){E('naOut').innerHTML='<div style="margin:auto;color:var(--tx3)">Loading...</div>';xhrGet('https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY',function(txt){try{var d=JSON.parse(txt);if(d.media_type==='image')E('naOut').innerHTML='<div class="ni"><img src="'+esc(d.url)+'" alt=""></div><div class="nt"><div class="n-t">'+esc(d.title)+'</div><div class="n-d">'+esc(d.date)+'</div><div class="n-e">'+esc(d.explanation)+'</div></div>';else E('naOut').innerHTML='<div class="nt" style="max-width:800px;margin:auto"><div class="n-t">'+esc(d.title)+'</div><div class="n-d">'+esc(d.date)+'</div><div class="n-e">'+esc(d.explanation)+'</div></div>'}catch(e){E('naOut').innerHTML='<div style="margin:auto;color:var(--tx3)">Failed to load</div>'}},function(){E('naOut').innerHTML='<div style="margin:auto;color:var(--tx3)">Failed to load</div>'})}
+rldBtn('naRld',function(d){loadNa();d()});
+
+/* =========== RIDDLE =========== */
+var RID=[{q:"I have cities, but no houses. I have mountains, but no trees. I have water, but no fish. What am I?",a:"A map"},{q:"What has hands but can\u2019t clap?",a:"A clock"},{q:"The more you take, the more you leave behind. What am I?",a:"Footsteps"},{q:"I speak without a mouth and hear without ears. I have no body, but I come alive with the wind. What am I?",a:"An echo"},{q:"What can travel around the world while staying in a corner?",a:"A stamp"},{q:"I have keys but no locks. I have space but no room. You can enter but can\u2019t go inside. What am I?",a:"A keyboard"},{q:"What gets wetter the more it dries?",a:"A towel"},{q:"I can be cracked, made, told, and played. What am I?",a:"A joke"},{q:"What has a head, a tail, is brown, and has no legs?",a:"A penny"},{q:"What disappears as soon as you say its name?",a:"Silence"},{q:"I\u2019m tall when I\u2019m young, and I\u2019m short when I\u2019m old. What am I?",a:"A candle"},{q:"What has one eye but can\u2019t see?",a:"A needle"},{q:"What begins with T, finishes with T, and has T in it?",a:"A teapot"},{q:"What building has the most stories?",a:"A library"},{q:"What goes up but never comes down?",a:"Your age"},{q:"What invention lets you look right through a wall?",a:"A window"},{q:"What has 13 hearts, but no other organs?",a:"A deck of cards"},{q:"What can fill a room but takes up no space?",a:"Light"},{q:"I shave every day, but my beard stays the same. What am I?",a:"A barber"},{q:"What has many teeth but can\u2019t bite?",a:"A comb"},{q:"What runs around the whole yard without moving?",a:"A fence"},{q:"What has four wheels and flies?",a:"A garbage truck"},{q:"What can you catch but not throw?",a:"A cold"},{q:"What has a bottom at the top?",a:"Your legs"},{q:"What tastes better than it smells?",a:"Your tongue"},{q:"Forward I am heavy, but backward I am not. What am I?",a:"The word \u2018ton\u2019"},{q:"What is seen in the middle of March and April that can\u2019t be seen at the beginning or end of either month?",a:"The letter R"},{q:"What word in the dictionary is always spelled incorrectly?",a:"Incorrectly"},{q:"A man who was outside in the rain without an umbrella or hat didn\u2019t get a single hair on his head wet. Why?",a:"He was bald"},{q:"What can you break, even if you never pick it up or touch it?",a:"A promise"},{q:"What goes through cities and fields, but never moves?",a:"A road"}];
+function iRd(){var day=Math.floor(Date.now()/86400000)%RID.length,r=RID[day];E('ridOut').innerHTML='<div class="riddle-box"><div class="riddle-num">Riddle #'+(day+1)+' of '+RID.length+'</div><div class="riddle-q">'+esc(r.q)+'</div><button class="riddle-reveal" id="ridBtn" tabindex="0">Tap to reveal answer</button></div>';var btn=E('ridBtn'),sh=false;function rev(){sh=!sh;btn.textContent=sh?r.a:'Tap to reveal answer';btn.classList.toggle('show',sh)}btn.addEventListener('click',rev);btn.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();rev()}});setTimeout(function(){btn.focus()},60)}
+
+})();
 </script>
 </body>
 </html>
