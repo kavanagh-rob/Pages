@@ -5,236 +5,1166 @@
 <meta name="viewport" content="width=1920">
 <title>TV Hub</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Bitter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#07080d;--s1:#0d0f16;--s2:#12151f;--s3:#181c28;--bdr:#1e2235;--tx:#d4d6e4;--tx2:#868aa5;--tx3:#484c65;--grn:#2dd4a8;--grn2:rgba(45,212,168,.08);--gld:#f5c842;--gld2:rgba(245,200,66,.07);--slv:#8fa3b8;--slv2:rgba(143,163,184,.06);--brz:#c87f30;--brz2:rgba(200,127,48,.06);--blu:#5b9cf5;--blu2:rgba(91,156,245,.08);--org:#e8873a;--org2:rgba(232,135,58,.08);--pur:#9b7cf5;--pur2:rgba(155,124,245,.08);--pnk:#e55ba3;--pnk2:rgba(229,91,163,.08);--red:#e85d5d;--red2:rgba(232,93,93,.08);--amb:#e8c840;--amb2:rgba(232,200,64,.08);--slt:#7a8ba0;--slt2:rgba(122,139,160,.08);--r:10px}
-html,body{width:1920px;height:1080px;background:var(--bg);color:var(--tx);font-family:'Bitter',Georgia,serif;overflow:hidden;-webkit-font-smoothing:antialiased}
-.screen{width:1920px;height:1080px;display:none;flex-direction:column;padding:20px 40px 16px}.screen.active{display:flex}
-button{font-family:inherit;border:none;cursor:pointer}.mono{font-family:'DM Mono',monospace}
-.topbar{display:flex;align-items:center;justify-content:space-between;height:36px;margin-bottom:12px;flex-shrink:0}
-.topbar-l{display:flex;align-items:center;gap:14px}.topbar-r{display:flex;align-items:center;gap:14px}
-.back-btn{display:inline-flex;align-items:center;gap:5px;background:var(--s1);border:1px solid var(--bdr);border-radius:7px;padding:6px 16px;color:var(--tx3);font-size:13px;font-weight:600;transition:all .2s}
-.back-btn:focus{outline:none;border-color:var(--grn);color:var(--tx);box-shadow:0 0 0 2px rgba(45,212,168,.2)}
-.pg-title{font-size:17px;font-weight:700;letter-spacing:.4px;text-transform:uppercase}.pg-title em{font-style:normal;color:var(--grn)}
-.clock{font-family:'DM Mono',monospace;font-size:15px;font-weight:500;color:var(--tx2);letter-spacing:1px}
-.tag{font-family:'DM Mono',monospace;font-size:10px;padding:3px 9px;border-radius:5px;letter-spacing:.5px}
-.tag-grn{background:var(--grn2);color:var(--grn);border:1px solid rgba(45,212,168,.15)}
-.tag-gld{background:var(--gld2);color:var(--gld);border:1px solid rgba(245,200,66,.15)}
-.rld{display:inline-flex;align-items:center;gap:5px;background:var(--s1);border:1px solid var(--bdr);border-radius:7px;padding:6px 14px;color:var(--tx3);font-size:12px;font-weight:600;transition:all .2s}
-.rld:focus{outline:none;border-color:var(--grn);color:var(--tx);box-shadow:0 0 0 2px rgba(45,212,168,.2)}
-.rld svg{width:14px;height:14px}.rld.spin svg{animation:sp .7s linear infinite}
-@keyframes sp{to{transform:rotate(360deg)}}
-.tabs{display:flex;gap:5px;margin-bottom:10px;flex-shrink:0}
-.tab{background:var(--s1);border:1px solid var(--bdr);border-radius:7px;padding:5px 18px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--tx3);transition:all .2s;white-space:nowrap}
-.tab:focus{outline:none;border-color:var(--grn);color:var(--tx);box-shadow:0 0 0 2px rgba(45,212,168,.2)}
-.tab.active{background:var(--grn2);border-color:rgba(45,212,168,.25);color:var(--grn)}
-.sa{flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:var(--bdr) transparent}
-.sa::-webkit-scrollbar{width:4px}.sa::-webkit-scrollbar-track{background:transparent}.sa::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:2px}
-.hint{flex-shrink:0;text-align:center;padding-top:8px;font-size:10px;color:var(--tx3)}
-.hint kbd{display:inline-block;background:var(--s1);border:1px solid var(--bdr);border-radius:3px;padding:0 5px;font-family:'DM Mono',monospace;font-size:9px;margin:0 1px}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.7)}}
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
-/* HOME — bigger icons */
-.home .hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;height:34px;flex-shrink:0}
-.logo{font-size:19px;font-weight:700;letter-spacing:3px;text-transform:uppercase}.logo span{color:var(--tx3);font-weight:400}
-.hdr-r{display:flex;align-items:center;gap:14px}.dt{font-size:12px;color:var(--tx3)}
-.tg{flex:1;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(2,1fr);gap:14px;min-height:0}
-.tile{position:relative;display:flex;flex-direction:column;justify-content:space-between;padding:22px 26px;border-radius:var(--r);border:1.5px solid var(--bdr);background:var(--s2);overflow:hidden;cursor:pointer;color:var(--tx);outline:none;transition:transform .22s cubic-bezier(.22,1,.36,1),box-shadow .22s,border-color .22s,background .22s}
-.tile::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;opacity:0;transition:opacity .25s}.tile:focus{transform:scale(1.02);background:var(--s3);z-index:5}.tile:focus::after{opacity:1}
-.tile-top{display:flex;align-items:center;justify-content:space-between}
-.ti{width:52px;height:52px;display:flex;align-items:center;justify-content:center;border-radius:12px}.ti svg{width:28px;height:28px}
-.tile-bottom{margin-top:auto}.tt{font-size:17px;font-weight:600;margin-bottom:2px}.td{font-size:11px;color:var(--tx3)}
-.lb{display:flex;align-items:center;gap:5px;background:var(--grn2);border:1px solid rgba(45,212,168,.2);padding:2px 9px;border-radius:100px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--grn)}
-.ld{width:5px;height:5px;background:var(--grn);border-radius:50%;animation:pulse 1.5s ease-in-out infinite}
-.t-grn .ti{background:var(--grn2)}.t-grn .ti svg{color:var(--grn)}.t-grn::after{background:var(--grn)}.t-grn:focus{border-color:rgba(45,212,168,.4);box-shadow:0 0 0 2px rgba(45,212,168,.15),0 6px 20px rgba(0,0,0,.3)}
-.t-blu .ti{background:var(--blu2)}.t-blu .ti svg{color:var(--blu)}.t-blu::after{background:var(--blu)}.t-blu:focus{border-color:rgba(91,156,245,.4);box-shadow:0 0 0 2px rgba(91,156,245,.15),0 6px 20px rgba(0,0,0,.3)}
-.t-pur .ti{background:var(--pur2)}.t-pur .ti svg{color:var(--pur)}.t-pur::after{background:var(--pur)}.t-pur:focus{border-color:rgba(155,124,245,.4);box-shadow:0 0 0 2px rgba(155,124,245,.15),0 6px 20px rgba(0,0,0,.3)}
-.t-pnk .ti{background:var(--pnk2)}.t-pnk .ti svg{color:var(--pnk)}.t-pnk::after{background:var(--pnk)}.t-pnk:focus{border-color:rgba(229,91,163,.4);box-shadow:0 0 0 2px rgba(229,91,163,.15),0 6px 20px rgba(0,0,0,.3)}
-.t-org .ti{background:var(--org2)}.t-org .ti svg{color:var(--org)}.t-org::after{background:var(--org)}.t-org:focus{border-color:rgba(232,135,58,.4);box-shadow:0 0 0 2px rgba(232,135,58,.15),0 6px 20px rgba(0,0,0,.3)}
-.t-amb .ti{background:var(--amb2)}.t-amb .ti svg{color:var(--amb)}.t-amb::after{background:var(--amb)}.t-amb:focus{border-color:rgba(232,200,64,.4);box-shadow:0 0 0 2px rgba(232,200,64,.15),0 6px 20px rgba(0,0,0,.3)}
-.t-red .ti{background:var(--red2)}.t-red .ti svg{color:var(--red)}.t-red::after{background:var(--red)}.t-red:focus{border-color:rgba(232,93,93,.4);box-shadow:0 0 0 2px rgba(232,93,93,.15),0 6px 20px rgba(0,0,0,.3)}
-.t-slt .ti{background:var(--slt2)}.t-slt .ti svg{color:var(--slt)}.t-slt::after{background:var(--slt)}.t-slt:focus{border-color:rgba(122,139,160,.4);box-shadow:0 0 0 2px rgba(122,139,160,.15),0 6px 20px rgba(0,0,0,.3)}
+  :root {
+    --bg: #0a0a0f;
+    --card: #12131a;
+    --card-hover: #1a1b25;
+    --border: #1e2030;
+    --text: #e8e8ed;
+    --text-dim: #6b6d80;
+    --accent-gold: #f0b429;
+    --accent-green: #34d399;
+    --accent-blue: #60a5fa;
+    --accent-red: #f87171;
+    --accent-purple: #a78bfa;
+    --accent-cyan: #22d3ee;
+    --accent-orange: #fb923c;
+    --accent-pink: #f472b6;
+    --radius: 16px;
+    --glow-gold: 0 0 30px rgba(240,180,41,0.15);
+    --glow-green: 0 0 30px rgba(52,211,153,0.15);
+    --glow-blue: 0 0 30px rgba(96,165,250,0.15);
+    --glow-red: 0 0 30px rgba(248,113,113,0.15);
+    --glow-purple: 0 0 30px rgba(167,139,250,0.15);
+    --glow-cyan: 0 0 30px rgba(34,211,238,0.15);
+    --glow-orange: 0 0 30px rgba(251,146,60,0.15);
+    --glow-pink: 0 0 30px rgba(244,114,182,0.15);
+  }
 
-/* RACING — bigger font */
-.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding-bottom:8px}
-.rc{background:var(--s2);border:1.5px solid var(--bdr);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:all .22s cubic-bezier(.22,1,.36,1);position:relative}
-.rc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--grn),transparent 70%);opacity:0;transition:opacity .2s}
-.rc:focus{outline:none;border-color:var(--grn);box-shadow:0 0 0 2px rgba(45,212,168,.15),0 6px 20px rgba(0,0,0,.3);transform:scale(1.012);background:var(--s3)}.rc:focus::before{opacity:1}
-.rc-h{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 9px;border-bottom:1px solid var(--bdr)}
-.rc-hl{display:flex;align-items:center;gap:9px}
-.rc-t{font-family:'DM Mono',monospace;font-size:17px;font-weight:700;color:var(--grn);background:var(--grn2);padding:2px 9px;border-radius:5px}
-.rc-v{font-size:16px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
-.rc-m{font-size:12px;color:var(--tx3);display:flex;gap:10px;align-items:center}
-.d3{width:3px;height:3px;border-radius:50%;background:var(--tx3)}
-.hra{padding:7px 16px 12px}
-.hr{display:grid;grid-template-columns:28px 1fr auto;align-items:center;gap:9px;padding:6px 0}
-.hr+.hr{border-top:1px solid rgba(255,255,255,.03)}
-.pb{width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:6px;font-size:13px;font-weight:700;font-family:'DM Mono',monospace;background:var(--s1);color:var(--tx3);border:1px solid var(--bdr)}
-.pb1{background:var(--gld2);color:var(--gld);border-color:rgba(245,200,66,.2)}.pb2{background:var(--slv2);color:var(--slv);border-color:rgba(143,163,184,.12)}.pb3{background:var(--brz2);color:var(--brz);border-color:rgba(200,127,48,.12)}
-.hn{font-size:16px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hn.w{color:var(--gld);font-weight:600}
-.ho{font-family:'DM Mono',monospace;font-size:16px;font-weight:600;color:var(--tx2);text-align:right;white-space:nowrap}
-.fv{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--grn);background:var(--grn2);border:1px solid rgba(45,212,168,.12);padding:1px 5px;border-radius:3px;margin-left:5px}
-.rc-d{max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(.22,1,.36,1)}
-.rc-di{padding:0 16px;opacity:0;transition:opacity .25s,padding .3s}
-.rc.open .rc-d{max-height:240px}.rc.open .rc-di{opacity:1;padding:12px 16px 14px}
-.ddv{height:1px;background:var(--bdr)}.dg{display:flex;flex-wrap:wrap;gap:8px 0}
-.di{display:flex;flex-direction:column;gap:2px;width:50%;padding-right:14px}
-.dl{font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.8px}
-.dv{font-size:14px;font-weight:600;color:var(--tx)}
+  * { margin:0; padding:0; box-sizing:border-box; }
 
-/* FOOTBALL */
-.fbc{background:var(--s2);border:1.5px solid var(--bdr);border-radius:var(--r);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:16px;transition:all .2s}
-.fbc:focus{outline:none;border-color:var(--blu);box-shadow:0 0 0 2px rgba(91,156,245,.15);background:var(--s3)}
-.fb-ts{flex:1;display:flex;flex-direction:column;gap:6px}.fb-r{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.fb-n{font-size:15px;font-weight:600;flex:1}.fb-s{font-family:'DM Mono',monospace;font-size:18px;font-weight:700;width:30px;text-align:center}
-.fb-i{text-align:right;min-width:100px}.fb-c{font-size:10px;color:var(--tx3);margin-top:2px}
-.fb-st{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;padding:2px 8px;border-radius:4px;margin-top:4px;display:inline-block}
-.fb-ft{background:var(--grn2);color:var(--grn)}.fb-lv{background:var(--red2);color:var(--red)}.fb-sc{background:var(--blu2);color:var(--blu)}
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    position: relative;
+  }
 
-/* MEDIA CARDS — shorter tiles */
-.sec-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--tx2);margin:14px 0 8px;padding-left:2px}.sec-title:first-child{margin-top:0}
-.mg{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;padding-bottom:4px}
-.mc{background:var(--s2);border:1.5px solid var(--bdr);border-radius:var(--r);overflow:hidden;transition:all .22s;cursor:pointer;display:flex;flex-direction:column}
-.mc:focus{outline:none;border-color:var(--pur);box-shadow:0 0 0 2px rgba(155,124,245,.15);transform:scale(1.015);background:var(--s3)}
-.mc.tv-f:focus{border-color:var(--pnk);box-shadow:0 0 0 2px rgba(229,91,163,.15)}
-.mp{width:100%;aspect-ratio:2/3;background:var(--s1);object-fit:cover;display:block}
-.mp-ph{width:100%;aspect-ratio:2/3;background:linear-gradient(135deg,var(--s1) 0%,var(--s3) 100%);display:flex;align-items:center;justify-content:center;font-size:44px;color:var(--tx3)}
-.mi{padding:9px 12px 10px;flex:1;display:flex;flex-direction:column}
-.mt{font-size:13px;font-weight:600;line-height:1.2;margin-bottom:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.mm{font-size:10px;color:var(--tx3);margin-top:auto;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
-.mr{font-family:'DM Mono',monospace;font-size:10px;font-weight:700;color:var(--gld)}
-.my{font-family:'DM Mono',monospace;font-size:10px}
-.mty{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:1px 5px;border-radius:3px}
-.mty-m{background:var(--pur2);color:var(--pur)}.mty-t{background:var(--pnk2);color:var(--pnk)}.mty-new{background:var(--grn2);color:var(--grn)}.mty-soon{background:var(--amb2);color:var(--amb)}
+  /* Background atmosphere */
+  body::before {
+    content: '';
+    position: fixed;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(ellipse at 20% 20%, rgba(96,165,250,0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(240,180,41,0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(167,139,250,0.02) 0%, transparent 60%);
+    z-index: 0;
+    pointer-events: none;
+  }
 
-/* NASA */
-.nw{flex:1;display:flex;gap:24px;align-items:stretch;min-height:0}
-.ni{flex:1;border-radius:var(--r);overflow:hidden;background:var(--s1);display:flex;align-items:center;justify-content:center}.ni img{width:100%;height:100%;object-fit:contain}
-.nt{width:500px;flex-shrink:0;display:flex;flex-direction:column;gap:12px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--bdr) transparent;padding-right:8px}
-.n-t{font-size:22px;font-weight:700;line-height:1.2}.n-d{font-family:'DM Mono',monospace;font-size:13px;color:var(--tx3)}.n-e{font-size:14px;color:var(--tx2);line-height:1.6}
+  /* ─── HOME GRID ─── */
+  #homeScreen {
+    position: absolute; inset: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 32px 48px;
+    z-index: 1;
+    transition: opacity 0.4s, transform 0.4s;
+  }
 
-/* RIDDLE */
-.riddle-center{flex:1;display:flex;align-items:center;justify-content:center}
-.riddle-box{max-width:900px;text-align:center}
-.riddle-q{font-size:28px;font-weight:600;line-height:1.5;margin-bottom:30px}
-.riddle-reveal{background:var(--s1);border:1.5px solid var(--bdr);border-radius:var(--r);padding:20px 40px;font-size:22px;font-weight:700;color:var(--amb);cursor:pointer;transition:all .3s}
-.riddle-reveal:focus{outline:none;border-color:var(--amb);box-shadow:0 0 0 2px rgba(232,200,64,.2)}
-.riddle-reveal.show{background:var(--amb2);border-color:rgba(232,200,64,.3)}
-.riddle-num{font-family:'DM Mono',monospace;font-size:13px;color:var(--tx3);margin-bottom:16px}
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+    height: 56px;
+  }
+
+  .header h1 {
+    font-size: 38px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, #fff 0%, #8b8da0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .clock {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 32px;
+    font-weight: 500;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 20px;
+    flex: 1;
+  }
+
+  .tile {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .tile:hover {
+    background: var(--card-hover);
+    transform: scale(1.02);
+    border-color: transparent;
+  }
+
+  .tile::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius);
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+
+  .tile:hover::before { opacity: 1; }
+
+  .tile[data-id="racing"]::before { box-shadow: var(--glow-gold); border: 1px solid rgba(240,180,41,0.3); }
+  .tile[data-id="movies"]::before { box-shadow: var(--glow-red); border: 1px solid rgba(248,113,113,0.3); }
+  .tile[data-id="tvshows"]::before { box-shadow: var(--glow-blue); border: 1px solid rgba(96,165,250,0.3); }
+  .tile[data-id="weather"]::before { box-shadow: var(--glow-cyan); border: 1px solid rgba(34,211,238,0.3); }
+  .tile[data-id="news"]::before { box-shadow: var(--glow-purple); border: 1px solid rgba(167,139,250,0.3); }
+  .tile[data-id="crypto"]::before { box-shadow: var(--glow-green); border: 1px solid rgba(52,211,153,0.3); }
+  .tile[data-id="sports"]::before { box-shadow: var(--glow-orange); border: 1px solid rgba(251,146,60,0.3); }
+  .tile[data-id="calendar"]::before { box-shadow: var(--glow-pink); border: 1px solid rgba(244,114,182,0.3); }
+
+  .tile-icon {
+    font-size: 72px;
+    margin-bottom: 16px;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
+    transition: transform 0.3s;
+  }
+  .tile:hover .tile-icon { transform: scale(1.1); }
+
+  .tile-label {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .tile-sub {
+    font-size: 14px;
+    color: var(--text-dim);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  /* ─── SUB-SCREENS ─── */
+  .screen {
+    position: absolute;
+    inset: 0;
+    background: var(--bg);
+    z-index: 10;
+    display: none;
+    flex-direction: column;
+    padding: 32px 48px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.35s, transform 0.35s;
+  }
+
+  .screen.active {
+    display: flex;
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .screen-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 24px;
+    flex-shrink: 0;
+  }
+
+  .bk {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-size: 18px;
+    font-weight: 500;
+    padding: 10px 24px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .bk:hover { background: var(--card-hover); border-color: var(--text-dim); }
+
+  .reload-btn {
+    background: linear-gradient(135deg, #1a2a1a, #1a2520);
+    border: 1px solid rgba(52,211,153,0.3);
+    color: var(--accent-green);
+    font-family: 'Outfit', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 10px 28px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .reload-btn:hover {
+    background: linear-gradient(135deg, #1a3a1a, #1a3520);
+    border-color: var(--accent-green);
+    box-shadow: 0 0 20px rgba(52,211,153,0.15);
+  }
+
+  .reload-btn.spinning svg { animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .screen-title {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+
+  .screen-body {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .screen-body::-webkit-scrollbar { width: 6px; }
+  .screen-body::-webkit-scrollbar-track { background: transparent; }
+  .screen-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* ─── RACING ─── */
+  .race-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+
+  .race-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    transition: border-color 0.2s;
+  }
+
+  .race-card:hover { border-color: rgba(240,180,41,0.3); }
+
+  .race-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+
+  .race-time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--accent-green);
+    background: rgba(52,211,153,0.1);
+    padding: 3px 10px;
+    border-radius: 6px;
+  }
+
+  .race-course {
+    font-size: 17px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .race-meta {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+  }
+
+  .horse-row {
+    display: flex;
+    align-items: center;
+    padding: 6px 0;
+    gap: 10px;
+  }
+
+  .horse-pos {
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .horse-pos.p1 { background: rgba(240,180,41,0.15); color: var(--accent-gold); }
+  .horse-pos.p2 { background: rgba(192,192,192,0.1); color: #c0c0c0; }
+  .horse-pos.p3 { background: rgba(205,127,50,0.1); color: #cd7f32; }
+
+  .horse-cloth {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+    width: 18px;
+    text-align: center;
+  }
+
+  .horse-name {
+    flex: 1;
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  .horse-name.fav { color: var(--accent-gold); }
+
+  .horse-odds {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-dim);
+  }
+
+  .race-details {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .race-detail {
+    font-size: 12px;
+  }
+
+  .race-detail span { color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
+  .race-detail strong { color: var(--text); font-weight: 500; margin-left: 4px; }
+
+  /* ─── LOADING ─── */
+  .loader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 16px;
+  }
+
+  .loader-spinner {
+    width: 48px; height: 48px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent-gold);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  .loader-text { font-size: 18px; color: var(--text-dim); }
+
+  .error-msg {
+    text-align: center;
+    padding: 40px;
+    color: var(--accent-red);
+    font-size: 18px;
+  }
+
+  /* ─── MOVIES / TV / OTHER TILES ─── */
+  .content-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 18px;
+  }
+
+  .content-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    transition: all 0.25s;
+  }
+
+  .content-card:hover { border-color: rgba(248,113,113,0.3); transform: translateY(-4px); }
+
+  .content-poster {
+    width: 100%;
+    aspect-ratio: 2/3;
+    object-fit: cover;
+    background: var(--border);
+  }
+
+  .content-info {
+    padding: 12px 14px;
+  }
+
+  .content-title {
+    font-size: 15px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .content-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 6px;
+  }
+
+  .content-year { font-size: 13px; color: var(--text-dim); }
+
+  .content-rating {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent-gold);
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  /* ─── PLACEHOLDER SCREENS ─── */
+  .placeholder-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 16px;
+    color: var(--text-dim);
+    font-size: 22px;
+  }
+
+  .placeholder-content .big-icon { font-size: 80px; }
+
+  /* status row at race card bottom */
+  .race-status {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+
+  .race-status.weighed-in { background: rgba(52,211,153,0.15); color: var(--accent-green); }
+  .race-status.result { background: rgba(96,165,250,0.15); color: var(--accent-blue); }
+  .race-status.upcoming { background: rgba(240,180,41,0.15); color: var(--accent-gold); }
+
+  /* TMDB setup prompt */
+  .api-setup {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 32px;
+    max-width: 600px;
+    margin: 40px auto;
+    text-align: center;
+  }
+
+  .api-setup h3 { font-size: 22px; margin-bottom: 12px; }
+  .api-setup p { color: var(--text-dim); font-size: 15px; margin-bottom: 16px; line-height: 1.6; }
+
+  .api-input {
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+
+  .api-input:focus { outline: none; border-color: var(--accent-blue); }
+
+  .api-save-btn {
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+    border: none;
+    color: #fff;
+    font-family: 'Outfit', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 10px 32px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  /* Crypto / weather / other info layouts */
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+  }
+
+  .info-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    text-align: center;
+  }
+
+  .info-card .label { font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+  .info-card .value { font-size: 36px; font-weight: 700; margin: 8px 0; font-family: 'JetBrains Mono', monospace; }
+  .info-card .change { font-size: 15px; font-weight: 600; }
+  .info-card .change.up { color: var(--accent-green); }
+  .info-card .change.down { color: var(--accent-red); }
 </style>
 </head>
 <body>
 
-<!-- HOME -->
-<div class="screen home active" id="scHome">
-  <header class="hdr"><div class="logo">TV <span>Hub</span></div><div class="hdr-r"><div class="dt" id="dt"></div><div class="clock" id="c0"></div></div></header>
-  <div class="tg" id="hg">
-    <div class="tile t-grn" data-row="0" data-col="0" data-go="Racing" tabindex="0"><div class="tile-top"><div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div><span class="lb"><span class="ld"></span>Live</span></div><div class="tile-bottom"><div class="tt">Horse Racing</div><div class="td">Live results &amp; fast updates</div></div></div>
-    <div class="tile t-blu" data-row="0" data-col="1" data-go="Football" tabindex="-1"><div class="tile-top"><div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24M14.83 9.17l4.24-4.24M14.83 14.83l4.24 4.24M9.17 14.83l-4.24 4.24"/><circle cx="12" cy="12" r="4"/></svg></div></div><div class="tile-bottom"><div class="tt">Football</div><div class="td">Premier League scores</div></div></div>
-    <div class="tile t-pur" data-row="0" data-col="2" data-go="Movies" tabindex="-1"><div class="tile-top"><div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 2v20M17 2v20M2 12h20M2 7h5M2 17h5M17 7h5M17 17h5"/></svg></div></div><div class="tile-bottom"><div class="tt">Movies</div><div class="td">Trending &amp; upcoming</div></div></div>
-    <div class="tile t-pnk" data-row="0" data-col="3" data-go="TvShows" tabindex="-1"><div class="tile-top"><div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="15" rx="2"/><polyline points="17 2 12 7 7 2"/></svg></div></div><div class="tile-bottom"><div class="tt">TV Shows</div><div class="td">Trending &amp; new seasons</div></div></div>
-    <div class="tile t-org" data-row="1" data-col="0" data-go="Nasa" tabindex="-1"><div class="tile-top"><div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg></div></div><div class="tile-bottom"><div class="tt">NASA APOD</div><div class="td">Astronomy picture of the day</div></div></div>
-    <div class="tile t-amb" data-row="1" data-col="1" data-go="Riddle" tabindex="-1"><div class="tile-top"><div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div></div><div class="tile-bottom"><div class="tt">Riddle of the Day</div><div class="td">Test your brain</div></div></div>
-    <div class="tile t-slt" data-row="1" data-col="2" tabindex="-1"><div class="tile-top"><div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div></div><div class="tile-bottom"><div class="tt">World Clock</div><div class="td">Coming soon</div></div></div>
-    <div class="tile t-red" data-row="1" data-col="3" tabindex="-1"><div class="tile-top"><div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></div></div><div class="tile-bottom"><div class="tt">Settings</div><div class="td">Display &amp; preferences</div></div></div>
+<!-- ════════ HOME ════════ -->
+<div id="homeScreen">
+  <div class="header">
+    <h1>TV Hub</h1>
+    <div class="clock" id="clock"></div>
   </div>
-  <div class="hint"><kbd>&larr;</kbd><kbd>&rarr;</kbd><kbd>&uarr;</kbd><kbd>&darr;</kbd> navigate &middot; <kbd>Enter</kbd> select</div>
+  <div class="grid">
+    <div class="tile" data-id="racing" onclick="openScreen('racing')">
+      <div class="tile-icon">🏇</div>
+      <div class="tile-label">Horse Racing</div>
+      <div class="tile-sub">Live Results</div>
+    </div>
+    <div class="tile" data-id="movies" onclick="openScreen('movies')">
+      <div class="tile-icon">🎬</div>
+      <div class="tile-label">Trending Movies</div>
+      <div class="tile-sub">TMDB</div>
+    </div>
+    <div class="tile" data-id="tvshows" onclick="openScreen('tvshows')">
+      <div class="tile-icon">📺</div>
+      <div class="tile-label">TV Shows</div>
+      <div class="tile-sub">Popular Now</div>
+    </div>
+    <div class="tile" data-id="weather" onclick="openScreen('weather')">
+      <div class="tile-icon">🌤️</div>
+      <div class="tile-label">Weather</div>
+      <div class="tile-sub">Forecast</div>
+    </div>
+    <div class="tile" data-id="news" onclick="openScreen('news')">
+      <div class="tile-icon">📰</div>
+      <div class="tile-label">News</div>
+      <div class="tile-sub">Headlines</div>
+    </div>
+    <div class="tile" data-id="crypto" onclick="openScreen('crypto')">
+      <div class="tile-icon">₿</div>
+      <div class="tile-label">Crypto</div>
+      <div class="tile-sub">Live Prices</div>
+    </div>
+    <div class="tile" data-id="sports" onclick="openScreen('sports')">
+      <div class="tile-icon">⚽</div>
+      <div class="tile-label">Football</div>
+      <div class="tile-sub">Scores</div>
+    </div>
+    <div class="tile" data-id="calendar" onclick="openScreen('calendar')">
+      <div class="tile-icon">📅</div>
+      <div class="tile-label">Calendar</div>
+      <div class="tile-sub" id="dateDisplay"></div>
+    </div>
+  </div>
 </div>
 
-<!-- RACING --><div class="screen" id="scRacing"><div class="topbar"><div class="topbar-l"><button class="back-btn bk" tabindex="0">&larr; Back</button><div class="pg-title"><em>Live</em> Racing</div></div><div class="topbar-r"><button class="rld" id="rcRld" tabindex="0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Reload</button><span class="tag tag-gld" id="rcTag">CACHED</span><div class="clock" id="c1"></div></div></div><div class="tabs" id="rcTabs"></div><div class="sa" id="rcOut"></div><div class="hint"><kbd>&larr;</kbd><kbd>&rarr;</kbd><kbd>&uarr;</kbd><kbd>&darr;</kbd> navigate &middot; <kbd>Enter</kbd> expand &middot; <kbd>Backspace</kbd> home</div></div>
-<!-- FOOTBALL --><div class="screen" id="scFootball"><div class="topbar"><div class="topbar-l"><button class="back-btn bk" tabindex="0">&larr; Back</button><div class="pg-title"><em>Premier League</em> Scores</div></div><div class="topbar-r"><button class="rld" id="fbRld" tabindex="0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Reload</button><div class="clock" id="c2"></div></div></div><div class="sa" id="fbOut"></div><div class="hint"><kbd>&uarr;</kbd><kbd>&darr;</kbd> navigate &middot; <kbd>Backspace</kbd> home</div></div>
-<!-- MOVIES --><div class="screen" id="scMovies"><div class="topbar"><div class="topbar-l"><button class="back-btn bk" tabindex="0">&larr; Back</button><div class="pg-title"><em>Movies</em> &mdash; Trending &amp; Upcoming</div></div><div class="topbar-r"><button class="rld" id="mvRld" tabindex="0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Reload</button><span class="tag tag-grn" style="font-size:9px">TMDB</span><div class="clock" id="c3"></div></div></div><div class="sa" id="mvOut"></div><div class="hint"><kbd>&larr;</kbd><kbd>&rarr;</kbd><kbd>&uarr;</kbd><kbd>&darr;</kbd> navigate &middot; <kbd>Backspace</kbd> home</div></div>
-<!-- TV SHOWS --><div class="screen" id="scTvShows"><div class="topbar"><div class="topbar-l"><button class="back-btn bk" tabindex="0">&larr; Back</button><div class="pg-title"><em>TV Shows</em> &mdash; Trending &amp; New Seasons</div></div><div class="topbar-r"><button class="rld" id="tvRld" tabindex="0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Reload</button><span class="tag tag-grn" style="font-size:9px">TMDB</span><div class="clock" id="c4"></div></div></div><div class="sa" id="tvOut"></div><div class="hint"><kbd>&larr;</kbd><kbd>&rarr;</kbd><kbd>&uarr;</kbd><kbd>&darr;</kbd> navigate &middot; <kbd>Backspace</kbd> home</div></div>
-<!-- NASA --><div class="screen" id="scNasa"><div class="topbar"><div class="topbar-l"><button class="back-btn bk" tabindex="0">&larr; Back</button><div class="pg-title"><em>NASA</em> Astronomy Picture of the Day</div></div><div class="topbar-r"><button class="rld" id="naRld" tabindex="0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Reload</button><div class="clock" id="c5"></div></div></div><div class="nw" id="naOut"><div style="margin:auto;color:var(--tx3)">Loading...</div></div><div class="hint"><kbd>Backspace</kbd> home</div></div>
-<!-- RIDDLE --><div class="screen" id="scRiddle"><div class="topbar"><div class="topbar-l"><button class="back-btn bk" tabindex="0">&larr; Back</button><div class="pg-title"><em>Riddle</em> of the Day</div></div><div class="topbar-r"><div class="clock" id="c6"></div></div></div><div class="riddle-center" id="ridOut"></div><div class="hint"><kbd>Enter</kbd> reveal answer &middot; <kbd>Backspace</kbd> home</div></div>
+<!-- ════════ RACING SCREEN ════════ -->
+<div class="screen" id="screen-racing">
+  <div class="screen-header">
+    <button class="bk" id="bk-racing">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      Back
+    </button>
+    <div class="screen-title" style="color:var(--accent-gold)">🏇 Horse Racing Results</div>
+    <button class="reload-btn" id="reload-racing" onclick="loadRacing()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+      Reload
+    </button>
+  </div>
+  <div class="screen-body" id="racingBody"></div>
+</div>
+
+<!-- ════════ MOVIES SCREEN ════════ -->
+<div class="screen" id="screen-movies">
+  <div class="screen-header">
+    <button class="bk" id="bk-movies">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      Back
+    </button>
+    <div class="screen-title" style="color:var(--accent-red)">🎬 Trending Movies</div>
+    <button class="reload-btn" onclick="loadMovies()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+      Reload
+    </button>
+  </div>
+  <div class="screen-body" id="moviesBody"></div>
+</div>
+
+<!-- ════════ TV SHOWS SCREEN ════════ -->
+<div class="screen" id="screen-tvshows">
+  <div class="screen-header">
+    <button class="bk" id="bk-tvshows">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      Back
+    </button>
+    <div class="screen-title" style="color:var(--accent-blue)">📺 Popular TV Shows</div>
+    <button class="reload-btn" onclick="loadTVShows()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+      Reload
+    </button>
+  </div>
+  <div class="screen-body" id="tvshowsBody"></div>
+</div>
+
+<!-- ════════ WEATHER SCREEN ════════ -->
+<div class="screen" id="screen-weather">
+  <div class="screen-header">
+    <button class="bk" id="bk-weather">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      Back
+    </button>
+    <div class="screen-title" style="color:var(--accent-cyan)">🌤️ Weather</div>
+    <button class="reload-btn" onclick="loadWeather()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+      Reload
+    </button>
+  </div>
+  <div class="screen-body" id="weatherBody"></div>
+</div>
+
+<!-- ════════ NEWS SCREEN ════════ -->
+<div class="screen" id="screen-news">
+  <div class="screen-header">
+    <button class="bk" id="bk-news">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      Back
+    </button>
+    <div class="screen-title" style="color:var(--accent-purple)">📰 Top Headlines</div>
+    <button class="reload-btn" onclick="loadNews()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+      Reload
+    </button>
+  </div>
+  <div class="screen-body" id="newsBody"></div>
+</div>
+
+<!-- ════════ CRYPTO SCREEN ════════ -->
+<div class="screen" id="screen-crypto">
+  <div class="screen-header">
+    <button class="bk" id="bk-crypto">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      Back
+    </button>
+    <div class="screen-title" style="color:var(--accent-green)">₿ Crypto Prices</div>
+    <button class="reload-btn" onclick="loadCrypto()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+      Reload
+    </button>
+  </div>
+  <div class="screen-body" id="cryptoBody"></div>
+</div>
+
+<!-- ════════ SPORTS SCREEN ════════ -->
+<div class="screen" id="screen-sports">
+  <div class="screen-header">
+    <button class="bk" id="bk-sports">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      Back
+    </button>
+    <div class="screen-title" style="color:var(--accent-orange)">⚽ Football Scores</div>
+    <button class="reload-btn" onclick="loadSports()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+      Reload
+    </button>
+  </div>
+  <div class="screen-body" id="sportsBody"></div>
+</div>
+
+<!-- ════════ CALENDAR SCREEN ════════ -->
+<div class="screen" id="screen-calendar">
+  <div class="screen-header">
+    <button class="bk" id="bk-calendar">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      Back
+    </button>
+    <div class="screen-title" style="color:var(--accent-pink)">📅 Calendar</div>
+  </div>
+  <div class="screen-body" id="calendarBody"></div>
+</div>
 
 <script>
-(function(){
-'use strict';
-var E=document.getElementById.bind(document),Q=document.querySelector.bind(document),QA=document.querySelectorAll.bind(document);
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
-function xhrGet(url,ok,fail){var x=new XMLHttpRequest();x.timeout=12000;x.onload=function(){x.status<300?ok(x.responseText):fail&&fail()};x.onerror=function(){fail&&fail()};x.ontimeout=function(){fail&&fail()};x.open('GET',url);x.send()}
-function xhrJson(url,headers,ok,fail){var x=new XMLHttpRequest();x.timeout=12000;x.onload=function(){try{ok(JSON.parse(x.responseText))}catch(e){fail&&fail()}};x.onerror=function(){fail&&fail()};x.ontimeout=function(){fail&&fail()};x.open('GET',url);if(headers)Object.keys(headers).forEach(function(k){x.setRequestHeader(k,headers[k])});x.send()}
-function proxyUrl(u){return'https://api.allorigins.win/raw?url='+encodeURIComponent(u)}
+  // ═══════════════════════════════════════
+  // CONFIG
+  // ═══════════════════════════════════════
+  const PROXY = 'https://racing-results.kavanagh-m-rob.workers.dev';
+  const RACING_API = PROXY;
 
-/* Clock */
-function tick(){var now=new Date(),t=now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}),d=now.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});['c0','c1','c2','c3','c4','c5','c6'].forEach(function(id){var el=E(id);if(el)el.textContent=t});var dt=E('dt');if(dt)dt.textContent=d}tick();setInterval(tick,30000);
+  // TMDB - user must supply their own key
+  let TMDB_KEY = '';
+  try { TMDB_KEY = localStorage.getItem('tvhub_tmdb_key') || ''; } catch(e) {}
 
-/* Screens */
-function goHome(){show('scHome');setTimeout(function(){fh(hR,hC)},50)}
-function show(id){QA('.screen').forEach(function(s){s.classList.remove('active')});E(id).classList.add('active')}
-var inits={Racing:iRc,Football:iFb,Movies:iMv,TvShows:iTv,Nasa:iNa,Riddle:iRd};
+  // ═══════════════════════════════════════
+  // CLOCK
+  // ═══════════════════════════════════════
+  function updateClock() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2,'0');
+    const m = String(now.getMinutes()).padStart(2,'0');
+    const s = String(now.getSeconds()).padStart(2,'0');
+    document.getElementById('clock').textContent = `${h}:${m}:${s}`;
 
-/* Home nav */
-var HC=4,HR=2,hR=0,hC=0;
-function fh(r,c){hR=r;hC=c;var el=Q('.tile[data-row="'+r+'"][data-col="'+c+'"]');if(el)el.focus()}
-E('hg').addEventListener('keydown',function(e){switch(e.key){case'ArrowRight':e.preventDefault();fh(hR,(hC+1)%HC);break;case'ArrowLeft':e.preventDefault();fh(hR,(hC-1+HC)%HC);break;case'ArrowDown':e.preventDefault();fh((hR+1)%HR,hC);break;case'ArrowUp':e.preventDefault();fh((hR-1+HR)%HR,hC);break;case'Enter':var g=document.activeElement&&document.activeElement.dataset.go;if(g){show('sc'+g);if(inits[g])inits[g]()}break}});
-QA('.tile').forEach(function(t){t.addEventListener('click',function(){var g=this.dataset.go;if(g){show('sc'+g);if(inits[g])inits[g]()}})});
-setTimeout(function(){fh(0,0)},200);
+    const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    document.getElementById('dateDisplay').textContent =
+      `${days[now.getDay()]} ${now.getDate()} ${months[now.getMonth()]}`;
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
 
-/* ALL back buttons — explicit click + keyboard */
-QA('.bk').forEach(function(b){
-  b.addEventListener('click',function(e){e.preventDefault();goHome()});
-  b.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();goHome()}});
-});
-/* Global Backspace */
-document.addEventListener('keydown',function(e){
-  if(e.key==='Backspace'&&!E('scHome').classList.contains('active')){e.preventDefault();goHome()}
-});
+  // ═══════════════════════════════════════
+  // NAVIGATION
+  // ═══════════════════════════════════════
+  let currentScreen = null;
 
-function gridNav(cid,sel,cols){E(cid).addEventListener('keydown',function(e){var t=Array.prototype.slice.call(QA(sel)),i=t.indexOf(document.activeElement);if(i<0)return;var r=Math.floor(i/cols),c=i%cols,tr=Math.ceil(t.length/cols),n=-1;switch(e.key){case'ArrowDown':if(r<tr-1)n=Math.min((r+1)*cols+c,t.length-1);break;case'ArrowUp':if(r>0)n=(r-1)*cols+c;break;case'ArrowRight':if(i+1<t.length)n=i+1;break;case'ArrowLeft':if(i>0)n=i-1;break}if(n>=0){e.preventDefault();t[n].focus();t[n].scrollIntoView({behavior:'smooth',block:'nearest'})}})}
-function listNav(cid,sel){E(cid).addEventListener('keydown',function(e){var t=Array.prototype.slice.call(QA(sel)),i=t.indexOf(document.activeElement);if(i<0)return;if(e.key==='ArrowDown'&&i<t.length-1){e.preventDefault();t[i+1].focus();t[i+1].scrollIntoView({behavior:'smooth',block:'nearest'})}if(e.key==='ArrowUp'&&i>0){e.preventDefault();t[i-1].focus();t[i-1].scrollIntoView({behavior:'smooth',block:'nearest'})}})}
-function rldBtn(id,fn){var b=E(id);b.addEventListener('click',function(){b.classList.add('spin');b.disabled=true;fn(function(){b.classList.remove('spin');b.disabled=false})});b.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();b.click()}})}
+  function openScreen(id) {
+    document.getElementById('homeScreen').style.display = 'none';
+    const screen = document.getElementById('screen-' + id);
+    screen.style.display = 'flex';
+    // trigger reflow for animation
+    screen.offsetHeight;
+    screen.classList.add('active');
+    currentScreen = id;
 
-/* =========== RACING =========== */
-var RD=[{t:"16:12",v:"Chelmsford City",h:[{p:1,n:"Campani",d:"8",o:"18/1"},{p:2,n:"Secret Road (IRE)",d:"7",o:"3/1"},{p:3,n:"Up The Monk",d:"9",o:"12/1"}],x:{a:"D M Simcock",b:"Joey Haynes",c:"11 ran",d:"1\u00BC, 2\u00BE",e:"Kondratiev Wave 15/8"}},{t:"16:00",v:"Fontwell",h:[{p:1,n:"Bradman",d:"15",o:"14/1"},{p:2,n:"Lexie's Moon",d:"10",o:"16/1"},{p:3,n:"Motazzen (IRE)",d:"13",o:"14/1"}],x:{a:"K Bishop",b:"James Best",c:"14 ran",d:"2, 1",e:"Activist (FR) 4/1"}},{t:"15:42",v:"Chelmsford City",h:[{p:1,n:"North View",d:"5",o:"11/2"},{p:2,n:"Diamondonthehill",d:"1",o:"4/1 f"},{p:3,n:"Monsieur Kodi (IRE)",d:"9",o:"9/1"}],x:{a:"S C Williams",b:"Gina Mangan",c:"11 ran",d:"\u00BE, 1\u00BE"}},{t:"15:30",v:"Fontwell",h:[{p:1,n:"Alright Dai (IRE)",d:"1",o:"7/4 f"},{p:2,n:"Hatos (FR)",d:"7",o:"11/2"}],x:{a:"N P Mulholland",b:"C O'Farrell",c:"6 ran",d:"6\u00BD"}},{t:"15:12",v:"Chelmsford City",h:[{p:1,n:"Dream Composer (IRE)",d:"4",o:"5/2"},{p:2,n:"Spirit Dancer",d:"2",o:"7/2"},{p:3,n:"Harbour Front",d:"6",o:"10/1"}],x:{a:"J Tuite",b:"R Havlin",c:"9 ran",d:"2, nk"}},{t:"15:00",v:"Fontwell",h:[{p:1,n:"Sizing Cusimano (IRE)",d:"3",o:"6/4 f"},{p:2,n:"Our Doris",d:"5",o:"9/2"},{p:3,n:"Bagatelle (FR)",d:"1",o:"7/1"}],x:{a:"G L Moore",b:"J J Burke",c:"7 ran",d:"3\u00BD, 8"}},{t:"14:30",v:"Punchestown",h:[{p:1,n:"Doyen Breed (IRE)",d:"2",o:"11/4"},{p:2,n:"Firm Footings (IRE)",d:"6",o:"5/1"},{p:3,n:"Inca Prince (IRE)",d:"4",o:"8/1"}],x:{a:"W P Mullins",b:"P Townend",c:"11 ran",d:"1\u00BD, 3\u00BC"}},{t:"14:00",v:"Punchestown",h:[{p:1,n:"Harbour Lake (IRE)",d:"1",o:"4/6 f"},{p:2,n:"Ballybrown (IRE)",d:"3",o:"5/1"}],x:{a:"H De Bromhead",b:"R Blackmore",c:"5 ran",d:"12"}},{t:"13:30",v:"Punchestown",h:[{p:1,n:"Jade De Grugy (FR)",d:"3",o:"9/4"},{p:2,n:"Rebel Early (IRE)",d:"1",o:"7/2"},{p:3,n:"Cape Gentleman (IRE)",d:"5",o:"11/1"}],x:{a:"W P Mullins",b:"P Townend",c:"8 ran",d:"4, 2\u00BD"}}],rF='all';
-function iRc(){rF='all';bRcT();bRcC();tryRcL();setTimeout(function(){var f=Q('.rc');if(f)f.focus()},60)}
-function bRcT(){var vs={};RD.forEach(function(r){vs[r.v]=1});var vl=Object.keys(vs).sort(),h='<button class="tab active" data-f="all" tabindex="0">All</button>';vl.forEach(function(v){h+='<button class="tab" data-f="'+v+'" tabindex="0">'+v+'</button>'});E('rcTabs').innerHTML=h;E('rcTabs').querySelectorAll('.tab').forEach(function(t){t.addEventListener('click',function(){rF=this.dataset.f;QA('#rcTabs .tab').forEach(function(x){x.classList.remove('active')});this.classList.add('active');bRcC()})})}
-function bRcC(){var list=RD.filter(function(r){return rF==='all'||r.v===rF}),s='<div class="g3">';list.forEach(function(rc,r){var x=rc.x||{};s+='<div class="rc" tabindex="0" data-row="'+Math.floor(r/3)+'" data-col="'+(r%3)+'"><div class="rc-h"><div class="rc-hl"><span class="rc-t">'+esc(rc.t)+'</span><span class="rc-v">'+esc(rc.v)+'</span></div><div class="rc-m">';if(x.c)s+='<span>'+esc(x.c)+'</span>';if(x.d)s+='<span class="d3"></span><span>'+esc(x.d)+'</span>';s+='</div></div><div class="hra">';rc.h.forEach(function(hr){var fav=/f$/i.test(hr.o),odds=hr.o.replace(/\s*f$/i,'');s+='<div class="hr"><div class="pb'+(hr.p<=3?' pb'+hr.p:'')+'">'+hr.p+'</div><div style="display:flex;align-items:center;gap:7px;min-width:0">';if(hr.d)s+='<span class="mono" style="font-size:11px;color:var(--tx3)">'+esc(hr.d)+'</span>';s+='<span class="hn'+(hr.p===1?' w':'')+'">'+esc(hr.n)+'</span></div><div style="display:flex;align-items:center;gap:5px;justify-content:flex-end"><span class="ho">'+esc(odds)+'</span>';if(fav)s+='<span class="fv">FAV</span>';s+='</div></div>'});s+='</div>';var fl=[];if(x.a)fl.push(['Trainer',x.a]);if(x.b)fl.push(['Jockey',x.b]);if(x.c)fl.push(['Runners',x.c]);if(x.d)fl.push(['Distances',x.d]);if(x.e)fl.push(['Unpl. Fav',x.e]);if(fl.length){s+='<div class="rc-d"><div class="ddv"></div><div class="rc-di"><div class="dg">';fl.forEach(function(f){s+='<div class="di"><span class="dl">'+f[0]+'</span><span class="dv">'+esc(f[1])+'</span></div>'});s+='</div></div></div>'}s+='</div>'});s+='</div>';E('rcOut').innerHTML=s;QA('.rc').forEach(function(c){var b=false;function tog(){if(b)return;b=true;c.classList.toggle('open');setTimeout(function(){b=false},300)}c.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();e.stopPropagation();tog()}});c.addEventListener('click',function(e){if(e.detail>0)tog()})})}
-gridNav('rcOut','.rc',3);
-var JRE=/[\u00A3\u20AC\$]|tote|trifecta|tricast|swingers|placepot|watch|replay|video|Race Details/i,RMAP={'winning trainer':'a','winning jockey':'b','runners':'c','distances':'d','distance':'d','unpl.fav':'e','unpl. fav':'e','unplaced fav':'e','unpl fav':'e'};
-function tryRcL(cb){var done=cb||function(){};xhrGet(proxyUrl('https://www.sportinglife.com/racing/fast-results'),function(html){try{var doc=(new DOMParser()).parseFromString(html,'text/html'),out=[],seen={};doc.querySelectorAll('a[href*="/racing/results/"]').forEach(function(lnk){if(lnk.textContent.indexOf('Full Result')===-1)return;var slug=(lnk.getAttribute('href')||'').split('/')[4]||'';if(!slug)return;var venue=slug.replace(/-/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase()});var box=lnk.parentElement;for(var u=0;u<10;u++){if(!box||!box.parentElement)break;box=box.parentElement;var hc=box.querySelectorAll('a[href*="/racing/profiles/horse/"]').length;if(hc>=1&&hc<=5)break}if(!box)return;var tm=(box.textContent||'').match(/(\d{2}:\d{2})/);if(!tm)return;var key=tm[1]+'|'+venue;if(seen[key])return;seen[key]=true;var horses=[],hS={};box.querySelectorAll('a[href*="/racing/profiles/horse/"]').forEach(function(hl){var n=(hl.textContent||'').trim();if(!n||n.length<2||n.length>50||hS[n]||JRE.test(n))return;hS[n]=true;var pt=(hl.parentElement?hl.parentElement.textContent:'')||'',af=pt.split(n)[1]||'',bf=pt.split(n)[0]||'',om=af.match(/^[^\d]*?(\d+\/\d+)\s*([fF])?/),dm=bf.match(/(\d{1,2})\s*$/),o=om?(om[1]+(om[2]?' f':'')).trim():'',d=dm?dm[1]:'';if(o&&!/^\d+\/\d+(\s*f)?$/.test(o))o='';if(d&&!/^\d{1,2}$/.test(d))d='';horses.push({p:horses.length+1,n:n,d:d,o:o})});if(horses.length<1||horses.length>5)return;var det={};box.querySelectorAll('tr').forEach(function(tr){var tds=tr.querySelectorAll('td');if(tds.length<2)return;var lab=(tds[0].textContent||'').trim().toLowerCase().replace(/:$/,'').trim(),val=(tds[1].textContent||'').trim();if(!lab||!val||val.length>60||JRE.test(val))return;var k=RMAP[lab];if(!k)return;if(k==='e')val=val.replace(/\s*F\s*$/,'').trim();det[k]=val});out.push({t:tm[1],v:venue,h:horses,x:det})});out.sort(function(a,b){return b.t.localeCompare(a.t)});if(out.length>=3){RD=out;E('rcTag').textContent='LIVE';E('rcTag').className='tag tag-grn';rF='all';bRcT();bRcC();setTimeout(function(){var f=Q('.rc');if(f)f.focus()},60)}}catch(e){}done()},done)}
-rldBtn('rcRld',tryRcL);
+    // Load data on open
+    const loaders = {
+      racing: loadRacing,
+      movies: loadMovies,
+      tvshows: loadTVShows,
+      weather: loadWeather,
+      news: loadNews,
+      crypto: loadCrypto,
+      sports: loadSports,
+      calendar: loadCalendar
+    };
+    if (loaders[id]) loaders[id]();
+  }
 
-/* =========== FOOTBALL =========== */
-var FBD=[{h:"Arsenal",a:"Chelsea",hs:2,as:1,st:"FT"},{h:"Liverpool",a:"Man City",hs:3,as:2,st:"FT"},{h:"Man Utd",a:"Tottenham",hs:1,as:1,st:"FT"},{h:"Newcastle",a:"Aston Villa",hs:2,as:0,st:"FT"},{h:"Brighton",a:"West Ham",hs:1,as:0,st:"FT"},{h:"Everton",a:"Fulham",hs:0,as:2,st:"FT"},{h:"Wolves",a:"Crystal Palace",hs:1,as:3,st:"FT"},{h:"Bournemouth",a:"Nott'm Forest",hs:2,as:2,st:"FT"},{h:"Brentford",a:"Leicester",hs:3,as:1,st:"FT"},{h:"Ipswich",a:"Southampton",hs:1,as:0,st:"FT"}];
-function iFb(){bFb();setTimeout(function(){var f=Q('.fbc');if(f)f.focus()},60)}
-function bFb(){var s='<div style="display:flex;flex-direction:column;gap:8px;padding-bottom:8px">';FBD.forEach(function(m){var sc=m.st==='FT'?'fb-ft':m.st==='LIVE'?'fb-lv':'fb-sc';s+='<div class="fbc" tabindex="0"><div class="fb-ts"><div class="fb-r"><span class="fb-n">'+esc(m.h)+'</span><span class="fb-s">'+m.hs+'</span></div><div class="fb-r"><span class="fb-n">'+esc(m.a)+'</span><span class="fb-s">'+m.as+'</span></div></div><div class="fb-i"><div class="fb-c">Premier League</div><span class="fb-st '+sc+'">'+esc(m.st)+'</span></div></div>'});s+='</div>';E('fbOut').innerHTML=s}
-listNav('fbOut','.fbc');rldBtn('fbRld',function(d){iFb();d()});
+  function goHome() {
+    if (currentScreen) {
+      const screen = document.getElementById('screen-' + currentScreen);
+      screen.classList.remove('active');
+      screen.style.display = 'none';
+    }
+    document.getElementById('homeScreen').style.display = 'flex';
+    currentScreen = null;
+  }
 
-/* =========== TMDB =========== */
-var TMDB='eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkNmQ0NmIwOGQ1NGRlNjBlMzAzMjcxOGYzMDdhOGJiZCIsInN1YiI6IjY3NDdjMjZhYTVmNGVlNDQ1MGNkZDA2NSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.placeholder';
-var TH={'Authorization':'Bearer '+TMDB,'Accept':'application/json'};var TI='https://image.tmdb.org/t/p/w342';
-function tmdb(path,ok,fail){xhrJson('https://api.themoviedb.org/3'+path,TH,ok,fail||function(){})}
+  // Back buttons - explicit handlers
+  document.querySelectorAll('.bk').forEach(btn => {
+    function handleBack(e) {
+      e.stopPropagation();
+      e.preventDefault();
+      goHome();
+    }
+    btn.addEventListener('click', handleBack);
+    btn.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') handleBack(e);
+    });
+  });
 
-/* =========== MOVIES =========== */
-var MV_T=[{title:"Thunderbolts*",year:"2025",rating:7.2,poster:""},{title:"The Amateur",year:"2025",rating:6.8,poster:""},{title:"Sinners",year:"2025",rating:7.5,poster:""},{title:"Havoc",year:"2025",rating:6.9,poster:""},{title:"Mission Impossible 8",year:"2025",rating:8.1,poster:""}];
-var MV_U=[{title:"Jurassic World Rebirth",year:"2025",rating:0,poster:"",tag:"Coming Soon"},{title:"Superman",year:"2025",rating:0,poster:"",tag:"Coming Soon"},{title:"Fantastic Four",year:"2025",rating:0,poster:"",tag:"Coming Soon"},{title:"Blade",year:"2025",rating:0,poster:"",tag:"Coming Soon"},{title:"Wicked Part Two",year:"2025",rating:0,poster:"",tag:"Coming Soon"}];
-function iMv(){renderMv();tryMvApi();setTimeout(function(){var f=Q('#mvOut .mc');if(f)f.focus()},60)}
-function renderMv(){var s='<div class="sec-title">\u2606 Trending This Week</div><div class="mg">';MV_T.forEach(function(m){s+=mCard(m,'movie')});s+='</div><div class="sec-title">\u{1F4C5} Upcoming Releases</div><div class="mg">';MV_U.forEach(function(m){s+=mCard(m,'movie',m.tag)});s+='</div>';E('mvOut').innerHTML=s}
-function mCard(m,type,tag){var s='<div class="mc" tabindex="0">';if(m.poster)s+='<img class="mp" src="'+esc(m.poster)+'" alt="" loading="lazy">';else s+='<div class="mp-ph">\uD83C\uDFAC</div>';s+='<div class="mi"><div class="mt">'+esc(m.title)+'</div><div class="mm">';if(m.rating>0)s+='<span class="mr">\u2605 '+m.rating.toFixed(1)+'</span>';s+='<span class="my">'+esc(m.year)+'</span>';if(tag==='NEW')s+='<span class="mty mty-new">NEW</span>';else if(tag)s+='<span class="mty mty-soon">'+esc(tag)+'</span>';else s+='<span class="mty mty-m">Movie</span>';s+='</div></div></div>';return s}
-function tryMvApi(){var now=new Date();tmdb('/trending/movie/week?language=en-US',function(d){if(d.results&&d.results.length>=5)MV_T=d.results.slice(0,5).map(function(m){return{title:m.title||'',year:(m.release_date||'').slice(0,4),rating:m.vote_average||0,poster:m.poster_path?TI+m.poster_path:''}});tmdb('/movie/upcoming?language=en-US&region=GB',function(d2){if(d2.results&&d2.results.length>=3)MV_U=d2.results.slice(0,5).map(function(m){var rd=m.release_date||'';var isOut=new Date(rd)<=now;return{title:m.title||'',year:rd.slice(0,4),rating:m.vote_average||0,poster:m.poster_path?TI+m.poster_path:'',tag:isOut?'NEW':'Coming Soon'}});renderMv()},function(){renderMv()})})}
-gridNav('mvOut','.mc',5);rldBtn('mvRld',function(d){tryMvApi();d()});
+  // Global Backspace to go home
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Backspace' && currentScreen) {
+      e.preventDefault();
+      goHome();
+    }
+  });
 
-/* =========== TV SHOWS =========== */
-var TV_T=[{title:"Adolescence",year:"2025",rating:8.9,poster:""},{title:"The Last of Us",year:"2025",rating:8.6,poster:""},{title:"Daredevil: Born Again",year:"2025",rating:7.8,poster:""},{title:"White Lotus",year:"2025",rating:7.4,poster:""},{title:"Reacher",year:"2025",rating:8.1,poster:""}];
-var TV_N=[{title:"Stranger Things S5",year:"2025",rating:0,poster:"",tag:"Coming Soon"},{title:"Severance S2",year:"2025",rating:8.7,poster:"",tag:"NEW"},{title:"The Bear S4",year:"2025",rating:0,poster:"",tag:"Coming Soon"},{title:"Squid Game S3",year:"2025",rating:0,poster:"",tag:"Coming Soon"},{title:"Wednesday S2",year:"2025",rating:0,poster:"",tag:"Coming Soon"}];
-function iTv(){renderTv();tryTvApi();setTimeout(function(){var f=Q('#tvOut .mc');if(f)f.focus()},60)}
-function renderTv(){var s='<div class="sec-title">\u2606 Trending This Week</div><div class="mg">';TV_T.forEach(function(m){s+=tCard(m)});s+='</div><div class="sec-title">\u{1F4FA} New &amp; Upcoming Seasons</div><div class="mg">';TV_N.forEach(function(m){s+=tCard(m,m.tag)});s+='</div>';E('tvOut').innerHTML=s}
-function tCard(m,tag){var s='<div class="mc tv-f" tabindex="0">';if(m.poster)s+='<img class="mp" src="'+esc(m.poster)+'" alt="" loading="lazy">';else s+='<div class="mp-ph">\uD83D\uDCFA</div>';s+='<div class="mi"><div class="mt">'+esc(m.title)+'</div><div class="mm">';if(m.rating>0)s+='<span class="mr">\u2605 '+m.rating.toFixed(1)+'</span>';s+='<span class="my">'+esc(m.year)+'</span>';if(tag==='NEW')s+='<span class="mty mty-new">NEW</span>';else if(tag)s+='<span class="mty mty-soon">'+esc(tag)+'</span>';else s+='<span class="mty mty-t">TV</span>';s+='</div></div></div>';return s}
-function tryTvApi(){tmdb('/trending/tv/week?language=en-US',function(d){if(d.results&&d.results.length>=5)TV_T=d.results.slice(0,5).map(function(m){return{title:m.name||'',year:(m.first_air_date||'').slice(0,4),rating:m.vote_average||0,poster:m.poster_path?TI+m.poster_path:''}});tmdb('/tv/on_the_air?language=en-US',function(d2){if(d2.results&&d2.results.length>=3)TV_N=d2.results.slice(0,5).map(function(m){return{title:m.name||'',year:(m.first_air_date||'').slice(0,4),rating:m.vote_average||0,poster:m.poster_path?TI+m.poster_path:'',tag:'NEW'}});renderTv()},function(){renderTv()})})}
-gridNav('tvOut','.mc',5);rldBtn('tvRld',function(d){tryTvApi();d()});
+  // ═══════════════════════════════════════
+  // RACING
+  // ═══════════════════════════════════════
+  async function loadRacing() {
+    const body = document.getElementById('racingBody');
+    const btn = document.getElementById('reload-racing');
+    btn.classList.add('spinning');
+    body.innerHTML = '<div class="loader"><div class="loader-spinner"></div><div class="loader-text">Loading race results...</div></div>';
 
-/* =========== NASA =========== */
-function iNa(){loadNa()}
-function loadNa(){E('naOut').innerHTML='<div style="margin:auto;color:var(--tx3)">Loading...</div>';xhrGet('https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY',function(txt){try{var d=JSON.parse(txt);if(d.media_type==='image')E('naOut').innerHTML='<div class="ni"><img src="'+esc(d.url)+'" alt=""></div><div class="nt"><div class="n-t">'+esc(d.title)+'</div><div class="n-d">'+esc(d.date)+'</div><div class="n-e">'+esc(d.explanation)+'</div></div>';else E('naOut').innerHTML='<div class="nt" style="max-width:800px;margin:auto"><div class="n-t">'+esc(d.title)+'</div><div class="n-d">'+esc(d.date)+'</div><div class="n-e">'+esc(d.explanation)+'</div></div>'}catch(e){E('naOut').innerHTML='<div style="margin:auto;color:var(--tx3)">Failed to load</div>'}},function(){E('naOut').innerHTML='<div style="margin:auto;color:var(--tx3)">Failed to load</div>'})}
-rldBtn('naRld',function(d){loadNa();d()});
+    try {
+      const resp = await fetch(RACING_API);
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const data = await resp.json();
 
-/* =========== RIDDLE =========== */
-var RID=[{q:"I have cities, but no houses. I have mountains, but no trees. I have water, but no fish. What am I?",a:"A map"},{q:"What has hands but can\u2019t clap?",a:"A clock"},{q:"The more you take, the more you leave behind. What am I?",a:"Footsteps"},{q:"I speak without a mouth and hear without ears. I have no body, but I come alive with the wind. What am I?",a:"An echo"},{q:"What can travel around the world while staying in a corner?",a:"A stamp"},{q:"I have keys but no locks. I have space but no room. You can enter but can\u2019t go inside. What am I?",a:"A keyboard"},{q:"What gets wetter the more it dries?",a:"A towel"},{q:"I can be cracked, made, told, and played. What am I?",a:"A joke"},{q:"What has a head, a tail, is brown, and has no legs?",a:"A penny"},{q:"What disappears as soon as you say its name?",a:"Silence"},{q:"I\u2019m tall when I\u2019m young, and I\u2019m short when I\u2019m old. What am I?",a:"A candle"},{q:"What has one eye but can\u2019t see?",a:"A needle"},{q:"What begins with T, finishes with T, and has T in it?",a:"A teapot"},{q:"What building has the most stories?",a:"A library"},{q:"What goes up but never comes down?",a:"Your age"},{q:"What invention lets you look right through a wall?",a:"A window"},{q:"What has 13 hearts, but no other organs?",a:"A deck of cards"},{q:"What can fill a room but takes up no space?",a:"Light"},{q:"I shave every day, but my beard stays the same. What am I?",a:"A barber"},{q:"What has many teeth but can\u2019t bite?",a:"A comb"},{q:"What runs around the whole yard without moving?",a:"A fence"},{q:"What has four wheels and flies?",a:"A garbage truck"},{q:"What can you catch but not throw?",a:"A cold"},{q:"What has a bottom at the top?",a:"Your legs"},{q:"What tastes better than it smells?",a:"Your tongue"},{q:"Forward I am heavy, but backward I am not. What am I?",a:"The word \u2018ton\u2019"},{q:"What is seen in the middle of March and April that can\u2019t be seen at the beginning or end of either month?",a:"The letter R"},{q:"What word in the dictionary is always spelled incorrectly?",a:"Incorrectly"},{q:"A man who was outside in the rain without an umbrella or hat didn\u2019t get a single hair on his head wet. Why?",a:"He was bald"},{q:"What can you break, even if you never pick it up or touch it?",a:"A promise"},{q:"What goes through cities and fields, but never moves?",a:"A road"}];
-function iRd(){var day=Math.floor(Date.now()/86400000)%RID.length,r=RID[day];E('ridOut').innerHTML='<div class="riddle-box"><div class="riddle-num">Riddle #'+(day+1)+' of '+RID.length+'</div><div class="riddle-q">'+esc(r.q)+'</div><button class="riddle-reveal" id="ridBtn" tabindex="0">Tap to reveal answer</button></div>';var btn=E('ridBtn'),sh=false;function rev(){sh=!sh;btn.textContent=sh?r.a:'Tap to reveal answer';btn.classList.toggle('show',sh)}btn.addEventListener('click',rev);btn.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();rev()}});setTimeout(function(){btn.focus()},60)}
+      if (!Array.isArray(data) || data.length === 0) {
+        body.innerHTML = '<div class="error-msg">No race data available right now.</div>';
+        btn.classList.remove('spinning');
+        return;
+      }
 
-})();
+      let html = '<div class="race-grid">';
+      data.forEach(race => {
+        // Apply +1hr GMT adjustment
+        let displayTime = race.time || '';
+        if (displayTime && displayTime.match(/^\d{2}:\d{2}$/)) {
+          let [h, m] = displayTime.split(':').map(Number);
+          h = (h + 1) % 24;
+          displayTime = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+        }
+
+        const status = (race.status || '').toLowerCase().replace(/[\s_]/g, '-');
+        let statusClass = 'upcoming';
+        let statusText = race.status || 'Upcoming';
+        if (status.includes('weighed') || status.includes('result') || status.includes('final')) {
+          statusClass = 'weighed-in';
+        }
+
+        html += `<div class="race-card">
+          <div class="race-card-header">
+            <div>
+              <span class="race-time">${displayTime}</span>
+              <span class="race-course" style="margin-left:12px">${race.courseName || ''}</span>
+            </div>
+            <span class="race-status ${statusClass}">${statusText}</span>
+          </div>`;
+
+        if (race.name) {
+          html += `<div class="race-meta">${race.name}${race.distance ? ' · ' + race.distance : ''}${race.race_class ? ' · Class ' + race.race_class : ''}</div>`;
+        }
+
+        if (race.top_horses && race.top_horses.length > 0) {
+          race.top_horses.forEach(h => {
+            const posClass = h.position === 1 ? 'p1' : h.position === 2 ? 'p2' : 'p3';
+            const favClass = h.favourite ? ' fav' : '';
+            html += `<div class="horse-row">
+              <div class="horse-pos ${posClass}">${h.position}</div>
+              <div class="horse-cloth">${h.saddlecloth_number || ''}</div>
+              <div class="horse-name${favClass}">${h.horse_name || ''}</div>
+              <div class="horse-odds">${h.odds || ''}</div>
+            </div>`;
+          });
+        }
+
+        // Extra details
+        const details = [];
+        if (race.runners) details.push({label:'Runners', val: race.runners});
+        if (race.distances) details.push({label:'Distances', val: race.distances});
+        if (race.winning_jockeys && race.winning_jockeys.length > 0)
+          details.push({label:'Jockey', val: race.winning_jockeys[0].name});
+        if (race.winning_trainers && race.winning_trainers.length > 0)
+          details.push({label:'Trainer', val: race.winning_trainers[0].name});
+
+        if (details.length > 0) {
+          html += '<div class="race-details">';
+          details.forEach(d => {
+            html += `<div class="race-detail"><span>${d.label}</span><strong>${d.val}</strong></div>`;
+          });
+          html += '</div>';
+        }
+
+        html += '</div>';
+      });
+      html += '</div>';
+      body.innerHTML = html;
+
+    } catch (err) {
+      body.innerHTML = `<div class="error-msg">Failed to load racing data: ${err.message}<br><br>Check your Cloudflare Worker is running.</div>`;
+    }
+    btn.classList.remove('spinning');
+  }
+
+  // ═══════════════════════════════════════
+  // TMDB HELPER
+  // ═══════════════════════════════════════
+  function tmdbSetupHTML(type) {
+    return `<div class="api-setup">
+      <h3>🔑 TMDB API Key Required</h3>
+      <p>To show ${type}, you need a free API key from<br><strong>themoviedb.org</strong></p>
+      <p>Sign up → Settings → API → Copy your Bearer Token</p>
+      <input class="api-input" id="tmdbInput" type="text" placeholder="Paste your TMDB Bearer Token here...">
+      <br>
+      <button class="api-save-btn" onclick="saveTMDB()">Save & Load</button>
+    </div>`;
+  }
+
+  function saveTMDB() {
+    const val = document.getElementById('tmdbInput').value.trim();
+    if (val) {
+      TMDB_KEY = val;
+      try { localStorage.setItem('tvhub_tmdb_key', val); } catch(e) {}
+      if (currentScreen === 'movies') loadMovies();
+      else if (currentScreen === 'tvshows') loadTVShows();
+    }
+  }
+
+  async function tmdbFetch(endpoint) {
+    const url = `https://api.themoviedb.org/3${endpoint}`;
+    const proxied = PROXY + '?url=' + encodeURIComponent(url);
+    const resp = await fetch(proxied, {
+      headers: { 'Authorization': 'Bearer ' + TMDB_KEY }
+    });
+    if (!resp.ok) throw new Error('TMDB HTTP ' + resp.status);
+    return resp.json();
+  }
+
+  function renderContentGrid(items, type) {
+    let html = '<div class="content-grid">';
+    items.forEach(item => {
+      const title = type === 'movie' ? item.title : item.name;
+      const date = type === 'movie' ? item.release_date : item.first_air_date;
+      const year = date ? date.substring(0, 4) : '';
+      const poster = item.poster_path
+        ? `https://image.tmdb.org/t/p/w342${item.poster_path}`
+        : '';
+      const rating = item.vote_average ? item.vote_average.toFixed(1) : '—';
+
+      html += `<div class="content-card">
+        ${poster ? `<img class="content-poster" src="${poster}" alt="${title}" loading="lazy">` : '<div class="content-poster" style="display:flex;align-items:center;justify-content:center;font-size:40px">🎬</div>'}
+        <div class="content-info">
+          <div class="content-title">${title || ''}</div>
+          <div class="content-meta">
+            <span class="content-year">${year}</span>
+            <span class="content-rating">★ ${rating}</span>
+          </div>
+        </div>
+      </div>`;
+    });
+    html += '</div>';
+    return html;
+  }
+
+  // ═══════════════════════════════════════
+  // MOVIES
+  // ═══════════════════════════════════════
+  async function loadMovies() {
+    const body = document.getElementById('moviesBody');
+    if (!TMDB_KEY) { body.innerHTML = tmdbSetupHTML('trending movies'); return; }
+    body.innerHTML = '<div class="loader"><div class="loader-spinner"></div><div class="loader-text">Loading trending movies...</div></div>';
+    try {
+      const data = await tmdbFetch('/trending/movie/week?language=en-US');
+      body.innerHTML = renderContentGrid(data.results || [], 'movie');
+    } catch(err) {
+      body.innerHTML = `<div class="error-msg">Failed to load movies: ${err.message}</div>`;
+    }
+  }
+
+  // ═══════════════════════════════════════
+  // TV SHOWS
+  // ═══════════════════════════════════════
+  async function loadTVShows() {
+    const body = document.getElementById('tvshowsBody');
+    if (!TMDB_KEY) { body.innerHTML = tmdbSetupHTML('TV shows'); return; }
+    body.innerHTML = '<div class="loader"><div class="loader-spinner"></div><div class="loader-text">Loading popular TV shows...</div></div>';
+    try {
+      const data = await tmdbFetch('/trending/tv/week?language=en-US');
+      body.innerHTML = renderContentGrid(data.results || [], 'tv');
+    } catch(err) {
+      body.innerHTML = `<div class="error-msg">Failed to load TV shows: ${err.message}</div>`;
+    }
+  }
+
+  // ═══════════════════════════════════════
+  // WEATHER (free wttr.in API - no key needed)
+  // ═══════════════════════════════════════
+  async function loadWeather() {
+    const body = document.getElementById('weatherBody');
+    body.innerHTML = '<div class="loader"><div class="loader-spinner"></div><div class="loader-text">Loading weather...</div></div>';
+    try {
+      const url = 'https://wttr.in/?format=j1';
+      const proxied = PROXY + '?url=' + encodeURIComponent(url);
+      const resp = await fetch(proxied);
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const data = await resp.json();
+
+      const cur = data.current_condition[0];
+      const area = data.nearest_area[0];
+      const location = area.areaName[0].value + ', ' + area.country[0].value;
+
+      const weatherEmoji = {
+        'Sunny': '☀️', 'Clear': '🌙', 'Partly cloudy': '⛅', 'Cloudy': '☁️',
+        'Overcast': '🌥️', 'Mist': '🌫️', 'Fog': '🌫️', 'Light rain': '🌦️',
+        'Rain': '🌧️', 'Heavy rain': '⛈️', 'Snow': '❄️', 'Thunderstorm': '⛈️'
+      };
+
+      const desc = cur.weatherDesc[0].value;
+      const emoji = weatherEmoji[desc] || '🌤️';
+
+      let html = `<div style="text-align:center;padding:20px">
+        <div style="font-size:100px;margin-bottom:16px">${emoji}</div>
+        <div style="font-size:64px;font-weight:800;font-family:'JetBrains Mono',monospace">${cur.temp_C}°C</div>
+        <div style="font-size:24px;color:var(--text-dim);margin:8px 0">${desc}</div>
+        <div style="font-size:20px;color:var(--accent-cyan);margin-bottom:32px">${location}</div>
+      </div>
+      <div class="info-grid">
+        <div class="info-card"><div class="label">Feels Like</div><div class="value">${cur.FeelsLikeC}°</div></div>
+        <div class="info-card"><div class="label">Humidity</div><div class="value">${cur.humidity}%</div></div>
+        <div class="info-card"><div class="label">Wind</div><div class="value">${cur.windspeedKmph}<span style="font-size:18px">km/h</span></div></div>
+        <div class="info-card"><div class="label">Visibility</div><div class="value">${cur.visibility}<span style="font-size:18px">km</span></div></div>
+      </div>`;
+
+      // 3-day forecast
+      if (data.weather && data.weather.length > 0) {
+        html += '<div style="margin-top:28px"><h3 style="font-size:22px;margin-bottom:16px;color:var(--text-dim)">3-Day Forecast</h3><div class="info-grid">';
+        data.weather.slice(0, 3).forEach(day => {
+          const d = new Date(day.date);
+          const dayName = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()];
+          html += `<div class="info-card">
+            <div class="label">${dayName} ${d.getDate()}</div>
+            <div class="value" style="font-size:28px">${day.avgtempC}°</div>
+            <div style="font-size:13px;color:var(--text-dim)">${day.maxtempC}° / ${day.mintempC}°</div>
+          </div>`;
+        });
+        html += '</div></div>';
+      }
+
+      body.innerHTML = html;
+    } catch(err) {
+      body.innerHTML = `<div class="error-msg">Failed to load weather: ${err.message}</div>`;
+    }
+  }
+
+  // ═══════════════════════════════════════
+  // NEWS (free RSS via rss2json)
+  // ═══════════════════════════════════════
+  async function loadNews() {
+    const body = document.getElementById('newsBody');
+    body.innerHTML = '<div class="loader"><div class="loader-spinner"></div><div class="loader-text">Loading headlines...</div></div>';
+    try {
+      const rssUrl = 'https://feeds.bbci.co.uk/news/rss.xml';
+      const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
+      const proxied = PROXY + '?url=' + encodeURIComponent(apiUrl);
+      const resp = await fetch(proxied);
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const data = await resp.json();
+
+      if (!data.items || data.items.length === 0) {
+        body.innerHTML = '<div class="error-msg">No news items available.</div>';
+        return;
+      }
+
+      let html = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px">';
+      data.items.slice(0, 12).forEach((item, i) => {
+        const thumb = item.thumbnail || item.enclosure?.link || '';
+        html += `<div class="content-card" style="cursor:default">
+          ${thumb ? `<img class="content-poster" style="aspect-ratio:16/9" src="${thumb}" loading="lazy">` : ''}
+          <div class="content-info">
+            <div class="content-title" style="white-space:normal;font-size:16px;line-height:1.4">${item.title || ''}</div>
+            <div class="content-meta" style="margin-top:8px">
+              <span class="content-year">${item.pubDate ? new Date(item.pubDate).toLocaleDateString() : ''}</span>
+            </div>
+          </div>
+        </div>`;
+      });
+      html += '</div>';
+      body.innerHTML = html;
+    } catch(err) {
+      body.innerHTML = `<div class="error-msg">Failed to load news: ${err.message}</div>`;
+    }
+  }
+
+  // ═══════════════════════════════════════
+  // CRYPTO (CoinGecko free API)
+  // ═══════════════════════════════════════
+  async function loadCrypto() {
+    const body = document.getElementById('cryptoBody');
+    body.innerHTML = '<div class="loader"><div class="loader-spinner"></div><div class="loader-text">Loading crypto prices...</div></div>';
+    try {
+      const url = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=8&page=1&sparkline=false&price_change_percentage=24h';
+      const proxied = PROXY + '?url=' + encodeURIComponent(url);
+      const resp = await fetch(proxied);
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const coins = await resp.json();
+
+      const icons = { bitcoin:'₿', ethereum:'Ξ', tether:'₮', binancecoin:'🔶', ripple:'✕',
+        solana:'◎', cardano:'₳', dogecoin:'🐕' };
+
+      let html = '<div class="info-grid">';
+      coins.forEach(coin => {
+        const change = coin.price_change_percentage_24h || 0;
+        const changeClass = change >= 0 ? 'up' : 'down';
+        const changeStr = (change >= 0 ? '+' : '') + change.toFixed(2) + '%';
+        const price = coin.current_price >= 1
+          ? '$' + coin.current_price.toLocaleString('en-US', {maximumFractionDigits: 2})
+          : '$' + coin.current_price.toFixed(4);
+        const icon = icons[coin.id] || '🪙';
+
+        html += `<div class="info-card">
+          <div style="font-size:36px;margin-bottom:8px">${icon}</div>
+          <div class="label">${coin.symbol.toUpperCase()}</div>
+          <div class="value" style="font-size:28px">${price}</div>
+          <div class="change ${changeClass}">${changeStr}</div>
+        </div>`;
+      });
+      html += '</div>';
+      body.innerHTML = html;
+    } catch(err) {
+      body.innerHTML = `<div class="error-msg">Failed to load crypto: ${err.message}</div>`;
+    }
+  }
+
+  // ═══════════════════════════════════════
+  // SPORTS (free football-data or placeholder)
+  // ═══════════════════════════════════════
+  async function loadSports() {
+    const body = document.getElementById('sportsBody');
+    body.innerHTML = `<div class="placeholder-content">
+      <div class="big-icon">⚽</div>
+      <div>Football scores load via WebView</div>
+      <div style="font-size:16px;margin-top:8px;color:var(--text-dim)">Use livescore.football365.com for live scores<br>or add a football API key for JSON data</div>
+    </div>`;
+  }
+
+  // ═══════════════════════════════════════
+  // CALENDAR
+  // ═══════════════════════════════════════
+  function loadCalendar() {
+    const body = document.getElementById('calendarBody');
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+    const today = now.getDate();
+
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const firstDay = new Date(year, month, 1).getDay();
+    // Adjust so Monday is first
+    const startDay = (firstDay + 6) % 7;
+
+    let html = `<div style="max-width:800px;margin:0 auto">
+      <h2 style="text-align:center;font-size:32px;margin-bottom:24px;color:var(--accent-pink)">${months[month]} ${year}</h2>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center">`;
+
+    ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].forEach(d => {
+      html += `<div style="padding:12px;font-weight:700;color:var(--text-dim);font-size:16px">${d}</div>`;
+    });
+
+    for (let i = 0; i < startDay; i++) {
+      html += '<div></div>';
+    }
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const isToday = d === today;
+      const bg = isToday ? 'background:var(--accent-pink);color:#000;font-weight:700;border-radius:12px' : '';
+      html += `<div style="padding:14px;font-size:20px;${bg}">${d}</div>`;
+    }
+
+    html += '</div></div>';
+    body.innerHTML = html;
+  }
 </script>
 </body>
 </html>
