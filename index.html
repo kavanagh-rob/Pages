@@ -217,55 +217,56 @@ function goHome(){
   document.getElementById('home').style.display='flex';curScr=null;
   setTimeout(()=>{const t=document.querySelector('.tile');if(t)t.focus()},80);
 }
-function isModalOpen(){return document.getElementById('mOverlay').classList.contains('show')}
-function closeModal(){
-  document.getElementById('mOverlay').classList.remove('show');
-  if(lastFocus){lastFocus.focus();lastFocus=null}
-}
 
 // Home tile clicks
 document.querySelectorAll('.tile').forEach(t=>{
   t.addEventListener('click',()=>openScr(t.dataset.id));
-  t.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();openScr(t.dataset.id)}});
 });
 
 // Back buttons
 document.querySelectorAll('.bk').forEach(b=>{
-  const h=e=>{e.stopPropagation();e.preventDefault();goHome()};
-  b.addEventListener('click',h);
-  b.addEventListener('keydown',e=>{if(e.key==='Enter')h(e)});
+  b.addEventListener('click',e=>{e.stopPropagation();e.preventDefault();goHome()});
 });
 
 // Reload buttons
 document.querySelectorAll('.rl').forEach(b=>{
   b.addEventListener('click',()=>{if(curScr&&loaders[curScr])loaders[curScr]()});
-  b.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();if(curScr&&loaders[curScr])loaders[curScr]()}});
 });
 
-// ═══════ D-PAD NAVIGATION ═══════
+// ═══════ D-PAD / TV REMOTE NAVIGATION ═══════
 document.addEventListener('keydown',e=>{
-  // BACK / ESCAPE
-  if(e.key==='Backspace'||e.key==='Escape'){
-    e.preventDefault();
-    if(isModalOpen()){closeModal();return}
+  const modal=isModalOpen();
+
+  // BACK / ESCAPE / TV Back button — close modal first, then screen, never exit from home
+  if(e.key==='Backspace'||e.key==='Escape'||e.key==='XF86Back'||e.key==='GoBack'){
+    e.preventDefault();e.stopPropagation();
+    if(modal){closeModal();return}
     if(curScr){goHome();return}
-    // On home: do nothing (don't exit)
     return;
   }
+
+  // ENTER — if modal is open (and not just opened), close it. Otherwise activate focused element.
   if(e.key==='Enter'){
-    const el=document.activeElement;
-    if(el&&el!==document.body){el.click();return}
+    e.preventDefault();
+    if(isModalOpen()&&Date.now()-modalOpenTime>400){closeModal();return}
+    if(!isModalOpen()){
+      const el=document.activeElement;
+      if(el&&el!==document.body){el.click();return}
+    }
+    return;
   }
+
   if(!['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key))return;
   e.preventDefault();
 
-  if(isModalOpen()){
-    const cb=document.querySelector('.md-x');
+  // In modal: any arrow keeps focus on close button (or close with any key)
+  if(modal){
+    const cb=document.querySelector('#mContent .md-x');
     if(cb)cb.focus();
     return;
   }
 
-  // Gather focusable items
+  // Gather focusable items for grid navigation
   let items=[],cols=1;
   if(!curScr){
     items=[...document.querySelectorAll('#homeGrid .tile')];cols=4;
@@ -274,7 +275,6 @@ document.addEventListener('keydown',e=>{
     const hdr=[...scr.querySelectorAll('.sh .bk,.sh .rl')];
     const body=[...scr.querySelectorAll('.sb .cc,.sb .nasa-card,.sb .rv')];
     if(!body.length){
-      // Simple screen: just nav header buttons
       items=hdr;cols=items.length;
     }else{
       const f=body[0];
@@ -290,7 +290,7 @@ document.addEventListener('keydown',e=>{
         else if(e.key==='ArrowLeft'&&ci>0)items[ci-1].focus();
         else if(e.key==='ArrowDown'&&body.length){body[0].focus();body[0].scrollIntoView({block:'nearest',behavior:'smooth'})}
       }else{
-        const bi=ci-hdr.length,row=Math.floor(bi/cols),col=bi%cols;
+        const bi=ci-hdr.length;
         let ti=-1;
         if(e.key==='ArrowRight')ti=bi+1;
         else if(e.key==='ArrowLeft')ti=bi-1;
@@ -315,32 +315,53 @@ document.addEventListener('keydown',e=>{
 window.addEventListener('load',()=>setTimeout(()=>{document.querySelector('.tile')?.focus()},300));
 
 // ═══════ MODAL ═══════
+let modalState='closed'; // 'closed' | 'loading' | 'open'
+let modalOpenTime=0;
+
+function isModalOpen(){return modalState!=='closed'}
+function closeModal(){
+  if(modalState==='closed')return;
+  modalState='closed';
+  document.getElementById('mOverlay').classList.remove('show');
+  if(lastFocus){lastFocus.focus();lastFocus=null}
+}
+
 async function showDetail(id,type){
   lastFocus=document.activeElement;
+  modalState='loading';
+  modalOpenTime=Date.now();
   const o=document.getElementById('mOverlay'),mc=document.getElementById('mContent');
   mc.innerHTML='<div class="ld"><div class="ld-s"></div></div>';
   o.classList.add('show');
   try{
     const d=await tmdbFetch(`/${type}/${id}?language=en-US`);
+    if(modalState==='closed')return; // was closed while loading
     const poster=d.poster_path?'https://image.tmdb.org/t/p/w500'+d.poster_path:'';
     const title=d.title||d.name||'',year=(d.release_date||d.first_air_date||'').substring(0,4);
     const rating=d.vote_average?d.vote_average.toFixed(1):'—',votes=d.vote_count||0;
     const runtime=d.runtime?d.runtime+'min':d.number_of_seasons?d.number_of_seasons+' seasons':'';
     const genres=(d.genres||[]).map(g=>`<span class="md-genre">${g.name}</span>`).join('');
-    mc.innerHTML=`<button class="md-x" tabindex="0" onclick="closeModal()">✕</button>
+    mc.innerHTML=`<button class="md-x" tabindex="0">✕</button>
       ${poster?`<img class="md-poster" src="${poster}">`:''}
       <div class="md-body"><div class="md-title">${title}</div>
       ${d.tagline?`<div class="md-tag">"${d.tagline}"</div>`:''}
       <div class="md-stats"><div class="md-stat">★ <strong>${rating}</strong>/10</div><div class="md-stat"><strong>${votes.toLocaleString()}</strong> votes</div>${year?`<div class="md-stat">${year}</div>`:''}${runtime?`<div class="md-stat">${runtime}</div>`:''}${d.original_language?`<div class="md-stat">${d.original_language.toUpperCase()}</div>`:''}${d.status?`<div class="md-stat">${d.status}</div>`:''}</div>
       ${genres?`<div class="md-genres">${genres}</div>`:''}
       <div class="md-ov">${d.overview||''}</div></div>`;
-    setTimeout(()=>{mc.querySelector('.md-x')?.focus()},100);
-  }catch(e){mc.innerHTML=`<div class="err">${e.message}</div><button class="md-x" tabindex="0" onclick="closeModal()">✕</button>`}
+    modalState='open';
+    setTimeout(()=>{mc.querySelector('.md-x')?.focus()},50);
+  }catch(e){
+    if(modalState==='closed')return;
+    mc.innerHTML=`<div class="err">${e.message}</div><button class="md-x" tabindex="0">✕</button>`;
+    modalState='open';
+  }
 }
 function showNasaDetail(url,title,explanation,date){
   lastFocus=document.activeElement;
+  modalState='open';
+  modalOpenTime=Date.now();
   const o=document.getElementById('mOverlay'),mc=document.getElementById('mContent');
-  mc.innerHTML=`<button class="md-x" tabindex="0" onclick="closeModal()">✕</button>
+  mc.innerHTML=`<button class="md-x" tabindex="0">✕</button>
     <div style="display:flex;flex-direction:column;gap:16px;width:100%">
       <img class="md-nasa-img" src="${url}" alt="${title}">
       <div class="md-title" style="text-align:center">${title}</div>
@@ -348,9 +369,11 @@ function showNasaDetail(url,title,explanation,date){
       <div class="md-ov">${explanation?explanation.substring(0,600)+(explanation.length>600?'...':''):''}</div>
     </div>`;
   o.classList.add('show');
-  setTimeout(()=>{mc.querySelector('.md-x')?.focus()},100);
+  setTimeout(()=>{mc.querySelector('.md-x')?.focus()},50);
 }
-document.getElementById('mOverlay').addEventListener('click',e=>{if(e.target.id==='mOverlay')closeModal()});
+document.getElementById('mOverlay').addEventListener('click',e=>{
+  if(e.target.id==='mOverlay'||e.target.closest('.md-x'))closeModal();
+});
 
 // ═══════ RACING ═══════
 async function loadRacing(){
