@@ -131,7 +131,7 @@ body::before{content:'';position:fixed;inset:-50%;width:200%;height:200%;backgro
 .up-card:focus{outline:none;border-color:var(--pink);box-shadow:0 0 24px rgba(244,114,182,.25);transform:translateY(-4px)}
 .up-card:hover{border-color:rgba(244,114,182,.3);transform:translateY(-3px)}
 .up-thumb{width:100%;aspect-ratio:16/12;object-fit:cover;background:var(--border);display:block}
-.up-thumb-placeholder{width:100%;aspect-ratio:16/9;background:linear-gradient(135deg,#1a1b25,#12131a);display:flex;align-items:center;justify-content:center;font-size:40px}
+.up-thumb-placeholder{width:100%;aspect-ratio:16/12;background:linear-gradient(135deg,#1a1b25,#12131a);display:flex;align-items:center;justify-content:center;font-size:40px}
 .up-rank{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.75);color:var(--dim);font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
 .up-body{padding:12px 14px;flex:1;display:flex;flex-direction:column;gap:6px}
 .up-title{font-size:22px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)}
@@ -655,7 +655,6 @@ async function loadUpcoming(){
   if(upcomingCache&&Date.now()-upcomingCacheTime<1800000){renderUpcoming(b,upcomingCache);btn?.classList.remove('spin');return}
   b.innerHTML='<div class="ld"><div class="ld-s"></div><div class="ld-t">Loading upcoming shows...</div></div>';
   try{
-    // Pass key as query param to avoid CORS preflight on custom headers
     const r=await fetch(UPCOMING_API);
     if(!r.ok)throw new Error('HTTP '+r.status);
     const text=await r.text();
@@ -670,13 +669,15 @@ async function loadUpcoming(){
       const metaEl=el.querySelector('.meta');
       const premiereEl=el.querySelector('.premiere');
       const ratingEl=el.querySelector('.rating');
+      const summaryEl=el.querySelector('.summary');
       return{
         rank:rankEl?.textContent.trim()||String(i+1),
         title:titleEl?.textContent.trim()||'Unknown',
         img:imgEl?.src||'',
         meta:metaEl?.textContent.trim()||'',
         premiere:premiereEl?.textContent.replace(/⏱\s*/,'').trim()||'',
-        rating:ratingEl?.textContent.replace(/⭐\s*/,'').trim()||''
+        rating:ratingEl?.textContent.replace(/⭐\s*/,'').trim()||'',
+        summary:summaryEl?.textContent.trim()||''
       };
     });
     upcomingCache=shows;upcomingCacheTime=Date.now();
@@ -685,12 +686,14 @@ async function loadUpcoming(){
   btn?.classList.remove('spin');
 }
 
+let upcomingShows=[];
 function renderUpcoming(b,shows){
+  upcomingShows=shows;
   let h='<div class="up-grid">';
-  shows.forEach(s=>{
+  shows.forEach((s,i)=>{
     const imgHtml=s.img?`<img class="up-thumb" src="${s.img}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`:'' ;
     const phStyle=s.img?'display:none':'';
-    h+=`<div class="up-card" tabindex="0">
+    h+=`<div class="up-card" tabindex="0" data-show="${i}">
       <div style="position:relative">
         ${imgHtml}
         <div class="up-thumb-placeholder" style="${phStyle}">📺</div>
@@ -707,6 +710,37 @@ function renderUpcoming(b,shows){
     </div>`;
   });
   b.innerHTML=h+'</div>';
+}
+
+document.addEventListener('click',e=>{
+  const uc=e.target.closest('.up-card[data-show]');
+  if(uc)showUpcomingDetail(Number(uc.dataset.show));
+});
+
+function showUpcomingDetail(idx){
+  const s=upcomingShows[idx];if(!s)return;
+  lastFocus=document.activeElement;
+  modalState='open';
+  modalOpenTime=Date.now();
+  const o=document.getElementById('mOverlay'),mc=document.getElementById('mContent');
+  mc.className='md';
+  mc.innerHTML=`
+    <button class="md-x" tabindex="0">✕</button>
+    ${s.img?`<img class="md-poster" src="${s.img}" style="width:320px;border-radius:14px;object-fit:cover;aspect-ratio:16/12;flex-shrink:0">`:''}
+    <div class="md-body">
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:4px">
+        <div style="background:rgba(0,0,0,.5);color:var(--dim);font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;padding:4px 12px;border-radius:8px">#${s.rank}</div>
+        ${s.rating?`<div style="font-size:26px;font-weight:700;color:var(--gold)">★ ${s.rating}</div>`:''}
+      </div>
+      <div class="md-title" style="font-size:40px">${s.title}</div>
+      ${s.meta?`<div class="md-tag" style="font-size:24px">${s.meta}</div>`:''}
+      <div class="md-stats">
+        ${s.premiere?`<div class="md-stat" style="font-size:24px;color:var(--orange)">⏱ <strong>${s.premiere}</strong></div>`:''}
+      </div>
+      ${s.summary?`<div class="md-ov" style="font-size:26px;line-height:1.7">${s.summary}</div>`:'<div class="md-ov" style="font-size:26px;color:var(--dim);font-style:italic">No summary available.</div>'}
+    </div>`;
+  o.classList.add('show');
+  setTimeout(()=>{mc.querySelector('.md-x')?.focus()},50);
 }
 
 // ═══════ NASA GALLERY (last 15 days) ═══════
