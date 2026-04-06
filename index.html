@@ -445,11 +445,21 @@ document.querySelectorAll('.sb').forEach(sb=>{
   },true);
 });
 
-// Some remotes only fire keyup for back — cover both
-document.addEventListener('keyup', e=>handleBackKey(e), true);
+
+// ── ANDROID WEBVIEW BACK BRIDGE ──────────────────────────────────
+// Called directly by MainActivity.kt via evaluateJavascript.
+// Returns true if we handled it (so Kotlin doesn't exit the app).
+window.androidBack = function(){
+  const modal=isModalOpen();
+  if(modal){closeModal();return true;}
+  if(curScr){goHome();return true;}
+  return false; // at home screen — let app handle (exit)
+};
 
 // Auto-focus
-window.addEventListener('load',()=>setTimeout(()=>{document.querySelector('.tile')?.focus()},300));
+window.addEventListener('load',()=>{
+  setTimeout(()=>{document.querySelector('.tile')?.focus()},300);
+});
 
 // ═══════ MODAL ═══════
 let modalState='closed'; // 'closed' | 'loading' | 'open'
