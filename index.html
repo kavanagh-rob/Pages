@@ -148,11 +148,21 @@ body::before{content:'';position:fixed;inset:-50%;width:200%;height:200%;backgro
 .rtab:hover{border-color:rgba(240,180,41,.4);color:var(--text)}
 
 /* HISTORY */
-.hl{max-width:1100px;margin:0 auto}
-.hi{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 28px;margin-bottom:12px;transition:border-color .2s}
-.hi:hover{border-color:rgba(167,139,250,.3)}
-.hy{font-family:'JetBrains Mono',monospace;font-size:25px;font-weight:700;color:var(--purple);margin-bottom:4px}
-.ht{font-size:25px;line-height:1.5}
+.hl{max-width:1400px;margin:0 auto;padding:0 8px}
+.h-date-banner{text-align:center;margin-bottom:28px;display:flex;align-items:center;justify-content:center;gap:16px}
+.h-date-banner .h-date-txt{font-size:32px;font-weight:800;color:var(--purple);letter-spacing:1px}
+.h-date-banner .h-date-line{flex:1;height:2px;background:linear-gradient(to right,transparent,rgba(167,139,250,.3),transparent)}
+.hi{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px 28px;margin-bottom:14px;transition:all .2s;display:flex;align-items:flex-start;gap:24px;cursor:default;outline:none;position:relative;overflow:hidden}
+.hi::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--purple);opacity:.4;border-radius:4px 0 0 4px;transition:opacity .2s}
+.hi:hover::before,.hi:focus::before{opacity:1}
+.hi:hover{border-color:rgba(167,139,250,.4);background:var(--card-hover)}
+.hi:focus{outline:none;border-color:var(--purple);box-shadow:0 0 20px rgba(167,139,250,.2);background:var(--card-hover)}
+.hi:focus::before{background:var(--purple);opacity:1}
+.hy-wrap{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:4px;width:100px}
+.hy{font-family:'JetBrains Mono',monospace;font-size:30px;font-weight:800;color:var(--purple);line-height:1}
+.hy-ago{font-size:17px;color:var(--dim);font-family:'JetBrains Mono',monospace;white-space:nowrap}
+.h-divider{width:1px;background:var(--border);align-self:stretch;flex-shrink:0}
+.ht{font-size:24px;line-height:1.6;color:var(--text);flex:1;padding-top:2px}
 </style>
 </head>
 <body>
@@ -280,7 +290,7 @@ document.addEventListener('keydown',e=>{
   const modal=isModalOpen();
 
   // BACK / ESCAPE / TV Back button — close modal first, then screen, never exit from home
-  if(e.key==='Backspace'||e.key==='Escape'||e.key==='XF86Back'||e.key==='GoBack'){
+  if(e.key==='Backspace'||e.key==='Escape'||e.key==='XF86Back'||e.key==='GoBack'||e.key==='BrowserBack'||e.key==='AndroidBack'||e.keyCode===8||e.keyCode===27||e.keyCode===461||e.keyCode===10009){
     e.preventDefault();e.stopPropagation();
     if(modal){closeModal();return}
     if(curScr){goHome();return}
@@ -373,12 +383,14 @@ document.addEventListener('keydown',e=>{
     const ccItems=[...sb.querySelectorAll('.cc')];
     const nasaItems=[...sb.querySelectorAll('.nasa-card')];
     const upItems=[...sb.querySelectorAll('.up-card')];
+    const hiItems=[...sb.querySelectorAll('.hi')];
     const otherItems=[...sb.querySelectorAll('.rv')];
 
     if(rcItems.length){bodyItems=rcItems;cols=3;}
     else if(ccItems.length){bodyItems=ccItems;cols=5;}
     else if(nasaItems.length){bodyItems=nasaItems;cols=3;}
     else if(upItems.length){bodyItems=upItems;cols=5;}
+    else if(hiItems.length){bodyItems=hiItems;cols=1;}
     else if(otherItems.length){bodyItems=otherItems;cols=1;}
   }
 
@@ -787,11 +799,28 @@ async function loadHistory(){
     const n=new Date(),mo=String(n.getMonth()+1).padStart(2,'0'),da=String(n.getDate()).padStart(2,'0');
     const r=await fetch(`https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/${mo}/${da}`);
     if(!r.ok)throw new Error('HTTP '+r.status);
-    const d=await r.json(),ev=(d.events||[]).slice(0,15);
+    const d=await r.json(),ev=(d.events||[]).slice(0,20);
     if(!ev.length){b.innerHTML='<div class="err">No events found.</div>';return}
     const ms=['January','February','March','April','May','June','July','August','September','October','November','December'];
-    let h=`<div style="text-align:center;margin-bottom:24px;font-size:26px;color:var(--purple)">${ms[n.getMonth()]} ${n.getDate()}</div><div class="hl">`;
-    ev.forEach(e=>h+=`<div class="hi"><div class="hy">${e.year||'?'}</div><div class="ht">${e.text||''}</div></div>`);
+    const curYear=n.getFullYear();
+    let h=`<div class="hl">
+      <div class="h-date-banner">
+        <div class="h-date-line"></div>
+        <div class="h-date-txt">📜 ${ms[n.getMonth()]} ${n.getDate()}</div>
+        <div class="h-date-line"></div>
+      </div>`;
+    ev.forEach(e=>{
+      const yr=parseInt(e.year)||0;
+      const ago=yr>0?`${curYear-yr} yrs ago`:'';
+      h+=`<div class="hi" tabindex="0">
+        <div class="hy-wrap">
+          <div class="hy">${e.year||'?'}</div>
+          ${ago?`<div class="hy-ago">${ago}</div>`:''}
+        </div>
+        <div class="h-divider"></div>
+        <div class="ht">${e.text||''}</div>
+      </div>`;
+    });
     b.innerHTML=h+'</div>';
   }catch(e){b.innerHTML=`<div class="err">${e.message}</div>`}
 }
