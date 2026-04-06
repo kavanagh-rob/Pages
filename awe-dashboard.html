@@ -287,22 +287,30 @@ document.querySelectorAll('.rl').forEach(b=>{
 
 // ═══════ D-PAD / TV REMOTE NAVIGATION ═══════
 // Use capture:true so this fires BEFORE any element's own handlers (including scroll containers)
-document.addEventListener('keydown', e=>{
-  const modal=isModalOpen();
-
-  // ── BACK keys — every known remote/platform variant ──────────────
+function handleBackKey(e){
   const isBack=e.key==='Escape'||e.key==='Backspace'||
     e.key==='XF86Back'||e.key==='GoBack'||e.key==='BrowserBack'||
     e.key==='Back'||e.key==='AndroidBack'||
     e.keyCode===27||e.keyCode===8||
     e.keyCode===461||  // LG webOS
     e.keyCode===10009; // Samsung Tizen
-  if(isBack){
-    e.preventDefault();e.stopImmediatePropagation();
-    if(modal){closeModal();return}
-    if(curScr){goHome();return}
-    return;
-  }
+  if(!isBack)return;
+  e.preventDefault();
+  // Only act on keydown (or keyup for remotes that only fire keyup)
+  // deduplicate: if keydown already handled, skip keyup
+  if(e.type==='keyup'&&e._backHandled)return;
+  if(e.type==='keydown')e._backHandled=true;
+  const modal=isModalOpen();
+  if(modal){closeModal();return}
+  if(curScr){goHome();return}
+}
+
+document.addEventListener('keydown', e=>{
+  handleBackKey(e);
+  if(e.defaultPrevented&&['Escape','Backspace','XF86Back','GoBack','BrowserBack','Back','AndroidBack'].includes(e.key))return;
+  if(e.defaultPrevented&&[8,27,461,10009].includes(e.keyCode))return;
+
+  const modal=isModalOpen();
 
   // ── ENTER / OK ────────────────────────────────────────────────────
   if(e.key==='Enter'||e.keyCode===13){
@@ -436,6 +444,9 @@ document.querySelectorAll('.sb').forEach(sb=>{
     }
   },true);
 });
+
+// Some remotes only fire keyup for back — cover both
+document.addEventListener('keyup', e=>handleBackKey(e), true);
 
 // Auto-focus
 window.addEventListener('load',()=>setTimeout(()=>{document.querySelector('.tile')?.focus()},300));
