@@ -76,7 +76,7 @@ body::before{content:'';position:fixed;inset:-50%;width:200%;height:200%;backgro
 .cy{font-size:25px;color:var(--dim)}.cr{font-size:25px;font-weight:600;color:var(--gold)}
 
 /* NASA CARDS */
-.nasa-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.nasa-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:18px}
 .nasa-card{background:var(--card);border:2px solid var(--border);border-radius:14px;overflow:hidden;transition:all .2s;cursor:pointer}
 .nasa-card:hover,.nasa-card:focus{outline:none;border-color:var(--cyan);transform:translateY(-4px);box-shadow:0 0 24px rgba(34,211,238,.2)}
 .nasa-img-thumb{width:100%;aspect-ratio:16/10;object-fit:cover;background:var(--border)}
@@ -214,6 +214,7 @@ body::before{content:'';position:fixed;inset:-50%;width:200%;height:200%;backgro
   <div class="sh">
     <button class="bk" tabindex="0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>Back</button>
     <div class="st" style="color:var(--pink)">📅 Upcoming TV Shows</div>
+    <div id="upcomingCacheLabel" style="font-size:18px;color:var(--dim);font-family:'JetBrains Mono',monospace;margin-right:8px"></div>
     <button class="rl" tabindex="0" id="rl-upcoming"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>Reload</button>
   </div>
   <div class="sb" id="upcomingBody"></div>
@@ -287,6 +288,9 @@ document.querySelectorAll('.rl').forEach(b=>{
 
 // ═══════ D-PAD / TV REMOTE NAVIGATION ═══════
 // Use capture:true so this fires BEFORE any element's own handlers (including scroll containers)
+let keyBackPressedOnce=false;
+let keyBackResetTimer=null;
+
 function handleBackKey(e){
   const isBack=e.key==='Escape'||e.key==='Backspace'||
     e.key==='XF86Back'||e.key==='GoBack'||e.key==='BrowserBack'||
@@ -296,13 +300,32 @@ function handleBackKey(e){
     e.keyCode===10009; // Samsung Tizen
   if(!isBack)return;
   e.preventDefault();
-  // Only act on keydown (or keyup for remotes that only fire keyup)
-  // deduplicate: if keydown already handled, skip keyup
+  // Deduplicate keydown+keyup pairs
   if(e.type==='keyup'&&e._backHandled)return;
   if(e.type==='keydown')e._backHandled=true;
   const modal=isModalOpen();
   if(modal){closeModal();return}
   if(curScr){goHome();return}
+  // At home screen — double-press to exit (mirrors Kotlin logic for key-based remotes)
+  if(keyBackPressedOnce){
+    clearTimeout(keyBackResetTimer);
+    // Signal the Android app to exit by calling androidBack which returns false,
+    // but we need to actually close — use window.close() or Android JS bridge if available
+    try{window.AndroidBridge?.exitApp();}catch(_){}
+    // Fallback: trigger the Kotlin back handler via a synthetic approach
+    // The app's double-press detection in Kotlin handles first remote;
+    // for key-based remotes we can't call finishAndRemoveTask directly,
+    // so just show a toast-style overlay and let the OS handle it
+    const t=document.createElement('div');
+    t.style.cssText='position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.85);color:#e8e8ed;font-family:Outfit,sans-serif;font-size:26px;padding:16px 40px;border-radius:14px;z-index:9999;border:1px solid #2a2a3a';
+    t.textContent='Already at home';document.body.appendChild(t);
+    setTimeout(()=>t.remove(),2000);
+    keyBackPressedOnce=false;
+    return;
+  }
+  keyBackPressedOnce=true;
+  clearTimeout(keyBackResetTimer);
+  keyBackResetTimer=setTimeout(()=>{keyBackPressedOnce=false;},2500);
 }
 
 document.addEventListener('keydown', e=>{
@@ -390,7 +413,7 @@ document.addEventListener('keydown', e=>{
     const rv=[...sb.querySelectorAll('.rv')];
     if(rc.length){bodyItems=rc;cols=3;}
     else if(cc.length){bodyItems=cc;cols=5;}
-    else if(nc.length){bodyItems=nc;cols=3;}
+    else if(nc.length){bodyItems=nc;cols=5;}
     else if(uc.length){bodyItems=uc;cols=5;}
     else if(hi.length){bodyItems=hi;cols=3;}
     else if(rv.length){bodyItems=rv;cols=1;}
@@ -696,7 +719,10 @@ let upcomingCache=null,upcomingCacheTime=0;
 async function loadUpcoming(){
   const b=document.getElementById('upcomingBody'),btn=document.getElementById('rl-upcoming');
   btn?.classList.add('spin');
-  if(upcomingCache&&Date.now()-upcomingCacheTime<1800000){renderUpcoming(b,upcomingCache);btn?.classList.remove('spin');return}
+  if(upcomingCache&&Date.now()-upcomingCacheTime<1800000){
+    updateUpcomingCacheLabel(upcomingCacheTime);
+    renderUpcoming(b,upcomingCache);btn?.classList.remove('spin');return;
+  }
   b.innerHTML='<div class="ld"><div class="ld-s"></div><div class="ld-t">Loading upcoming shows...</div></div>';
   try{
     const r=await fetch(UPCOMING_API);
@@ -704,6 +730,11 @@ async function loadUpcoming(){
     const text=await r.text();
     const parser=new DOMParser();
     const doc=parser.parseFromString(text,'text/html');
+    // Check if API response includes its own cache age in the meta-bar
+    const metaBar=doc.querySelector('.meta-bar');
+    const metaText=metaBar?.textContent||'';
+    const cacheMatch=metaText.match(/Cached\s+([\d]+h?\s*[\d]*m?\s*ago|just now|[\d]+\s*\w+\s*ago)/i);
+    const apiCacheAge=cacheMatch?cacheMatch[1]:null;
     const items=[...doc.querySelectorAll('.show-item')];
     if(!items.length)throw new Error('No shows found in response');
     const shows=items.map((el,i)=>{
@@ -725,9 +756,18 @@ async function loadUpcoming(){
       };
     });
     upcomingCache=shows;upcomingCacheTime=Date.now();
+    updateUpcomingCacheLabel(upcomingCacheTime, apiCacheAge);
     renderUpcoming(b,shows);
   }catch(e){b.innerHTML=`<div class="err">${e.message}</div>`}
   btn?.classList.remove('spin');
+}
+
+function updateUpcomingCacheLabel(fetchTime, apiAge){
+  const el=document.getElementById('upcomingCacheLabel');
+  if(!el)return;
+  const mins=Math.floor((Date.now()-fetchTime)/60000);
+  const localAge=mins<1?'just now':mins===1?'1 min ago':`${mins} mins ago`;
+  el.textContent=apiAge?`API cached ${apiAge} · fetched ${localAge}`:`Fetched ${localAge}`;
 }
 
 let upcomingShows=[];
@@ -787,26 +827,30 @@ function showUpcomingDetail(idx){
   setTimeout(()=>{mc.querySelector('.md-x')?.focus()},50);
 }
 
-// ═══════ NASA GALLERY (last 15 days) ═══════
+// ═══════ NASA GALLERY (30 images, always fresh) ═══════
 let nasaData=[];
-let nasaCache=null,nasaCacheTime=0;
 async function loadNasa(){
   const b=document.getElementById('nasaBody');
-  // Use cache if less than 30 min old to avoid 429
-  if(nasaCache&&Date.now()-nasaCacheTime<1800000){
-    renderNasaGrid(b);return;
-  }
   b.innerHTML='<div class="ld"><div class="ld-s"></div><div class="ld-t">Loading NASA gallery...</div></div>';
   try{
-    const start=new Date();start.setDate(start.getDate()-15);
-    const sd=`${start.getFullYear()}-${String(start.getMonth()+1).padStart(2,'0')}-${String(start.getDate()).padStart(2,'0')}`;
-    // Call NASA directly — it supports CORS. Only use start_date (returns up to today).
-    const r=await fetch(`https://api.nasa.gov/planetary/apod?api_key=${NASA_KEY}&start_date=${sd}`);
+    // Fetch 40 days to ensure we get 30 images after filtering out videos
+    const today=new Date();
+    const start=new Date();start.setDate(today.getDate()-39);
+    const fmt=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const sd=fmt(start),ed=fmt(today);
+    // Force no-cache headers so Android WebView always fetches fresh
+    const r=await fetch(`https://api.nasa.gov/planetary/apod?api_key=${NASA_KEY}&start_date=${sd}&end_date=${ed}`,{
+      cache:'no-store',
+      headers:{'Cache-Control':'no-cache','Pragma':'no-cache'}
+    });
     if(!r.ok)throw new Error('NASA API returned '+r.status+(r.status===429?' — rate limited, try again in a minute':''));
     let raw=await r.json();
     if(!Array.isArray(raw))raw=[raw];
-    nasaData=raw.filter(d=>d.media_type==='image').reverse();
-    nasaCache=nasaData;nasaCacheTime=Date.now();
+    // Images only, newest first, cap at 30
+    nasaData=raw
+      .filter(d=>d.media_type==='image')
+      .sort((a,b)=>b.date.localeCompare(a.date))
+      .slice(0,30);
     renderNasaGrid(b);
   }catch(e){b.innerHTML=`<div class="err">${e.message}</div>`}
 }
@@ -903,6 +947,7 @@ async function loadRiddle(){
     const a=d.answer||'';
     if(!q)throw new Error('No riddle data');
     b.innerHTML=`<div class="fc"><div class="be">🧩</div><div class="ft" style="color:var(--orange)">${q}</div><div id="ra" style="display:none"><div class="fb" style="color:var(--green);font-size:36px;font-weight:700;margin-top:20px">${a}</div></div><button class="rv" tabindex="0" onclick="document.getElementById('ra').style.display='block';this.style.display='none'">Reveal Answer</button></div>`;
+    setTimeout(()=>b.querySelector('.rv')?.focus(),100);
   }catch(ex){
     // Fallback to a local riddle if API fails
     const fallbacks=[
@@ -914,6 +959,7 @@ async function loadRiddle(){
     ];
     const f=fallbacks[Math.floor(Math.random()*fallbacks.length)];
     b.innerHTML=`<div class="fc"><div class="be">🧩</div><div class="ft" style="color:var(--orange)">${f.q}</div><div id="ra" style="display:none"><div class="fb" style="color:var(--green);font-size:36px;font-weight:700;margin-top:20px">${f.a}</div></div><button class="rv" tabindex="0" onclick="document.getElementById('ra').style.display='block';this.style.display='none'">Reveal Answer</button></div>`;
+    setTimeout(()=>b.querySelector('.rv')?.focus(),100);
   }
 }
 
@@ -931,6 +977,7 @@ async function loadJoke(){
     if(!setup)throw new Error('No joke data');
     const pid='pl_'+Date.now();
     b.innerHTML=`<div class="fc"><div class="be">😂</div><div class="ft" style="color:var(--green)">${setup}</div><div id="${pid}" style="display:none"><div class="fb" style="color:var(--gold);font-size:34px;font-weight:700;margin-top:20px">${punchline}</div></div><button class="rv" tabindex="0" style="background:linear-gradient(135deg,#0a2a1a,#102520);border-color:rgba(52,211,153,.3);color:var(--green)" onclick="document.getElementById('${pid}').style.display='block';this.style.display='none'">Show Punchline</button></div>`;
+    setTimeout(()=>b.querySelector('.rv')?.focus(),100);
   }catch(ex){
     const fallbacks=[
       {s:"Why don't scientists trust atoms?",p:"Because they make up everything!"},
@@ -942,6 +989,7 @@ async function loadJoke(){
     const f=fallbacks[Math.floor(Math.random()*fallbacks.length)];
     const pid='pl_'+Date.now();
     b.innerHTML=`<div class="fc"><div class="be">😂</div><div class="ft" style="color:var(--green)">${f.s}</div><div id="${pid}" style="display:none"><div class="fb" style="color:var(--gold);font-size:34px;font-weight:700;margin-top:20px">${f.p}</div></div><button class="rv" tabindex="0" style="background:linear-gradient(135deg,#0a2a1a,#102520);border-color:rgba(52,211,153,.3);color:var(--green)" onclick="document.getElementById('${pid}').style.display='block';this.style.display='none'">Show Punchline</button></div>`;
+    setTimeout(()=>b.querySelector('.rv')?.focus(),100);
   }
 }
 </script>
