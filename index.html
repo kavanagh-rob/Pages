@@ -133,6 +133,10 @@ body::before{content:'';position:fixed;inset:-50%;width:200%;height:200%;backgro
 .up-thumb{width:100%;aspect-ratio:16/12;object-fit:cover;background:var(--border);display:block}
 .up-thumb-placeholder{width:100%;aspect-ratio:16/12;background:linear-gradient(135deg,#1a1b25,#12131a);display:flex;align-items:center;justify-content:center;font-size:40px}
 .up-rank{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.75);color:var(--dim);font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.up-aired-badge{position:absolute;top:8px;right:8px;background:rgba(52,211,153,.2);color:var(--green);font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;padding:3px 8px;border-radius:6px;backdrop-filter:blur(4px)}
+.up-section-hdr{grid-column:1/-1;display:flex;align-items:center;gap:16px;padding:8px 0 4px}
+.up-section-hdr .up-section-txt{font-size:24px;font-weight:700;color:var(--dim);white-space:nowrap}
+.up-section-hdr .up-section-line{flex:1;height:1px;background:var(--border)}
 .up-body{padding:12px 14px;flex:1;display:flex;flex-direction:column;gap:6px}
 .up-title{font-size:22px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)}
 .up-meta{font-size:18px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -712,7 +716,7 @@ document.addEventListener('click',e=>{
 async function loadMovies(){const b=document.getElementById('moviesBody');b.innerHTML='<div class="ld"><div class="ld-s"></div><div class="ld-t">Loading movies...</div></div>';try{const d=await tmdbFetch('/trending/movie/week?language=en-US');b.innerHTML=renderCards(d.results||[],'movie')}catch(e){b.innerHTML=`<div class="err">${e.message}</div>`}}
 async function loadTVShows(){const b=document.getElementById('tvshowsBody');b.innerHTML='<div class="ld"><div class="ld-s"></div><div class="ld-t">Loading TV shows...</div></div>';try{const d=await tmdbFetch('/trending/tv/week?language=en-US');b.innerHTML=renderCards(d.results||[],'tv')}catch(e){b.innerHTML=`<div class="err">${e.message}</div>`}}
 
-// ═══════ UPCOMING TV (API) ═══════
+// ═══════ UPCOMING TV (API — JSON) ═══════
 const UPCOMING_API='https://rx4up4hm0e.execute-api.eu-west-1.amazonaws.com';
 let upcomingCache=null,upcomingCacheTime=0;
 
@@ -720,79 +724,79 @@ async function loadUpcoming(){
   const b=document.getElementById('upcomingBody'),btn=document.getElementById('rl-upcoming');
   btn?.classList.add('spin');
   if(upcomingCache&&Date.now()-upcomingCacheTime<1800000){
-    updateUpcomingCacheLabel(upcomingCacheTime);
-    renderUpcoming(b,upcomingCache);btn?.classList.remove('spin');return;
+    updateUpcomingCacheLabel(upcomingCache);
+    renderUpcoming(b,upcomingCache);
+    btn?.classList.remove('spin');return;
   }
   b.innerHTML='<div class="ld"><div class="ld-s"></div><div class="ld-t">Loading upcoming shows...</div></div>';
   try{
-    const r=await fetch(UPCOMING_API);
+    const r=await fetch(UPCOMING_API+'/?format=json');
     if(!r.ok)throw new Error('HTTP '+r.status);
-    const text=await r.text();
-    const parser=new DOMParser();
-    const doc=parser.parseFromString(text,'text/html');
-    // Check if API response includes its own cache age in the meta-bar
-    const metaBar=doc.querySelector('.meta-bar');
-    const metaText=metaBar?.textContent||'';
-    const cacheMatch=metaText.match(/Cached\s+([\d]+h?\s*[\d]*m?\s*ago|just now|[\d]+\s*\w+\s*ago)/i);
-    const apiCacheAge=cacheMatch?cacheMatch[1]:null;
-    const items=[...doc.querySelectorAll('.show-item')];
-    if(!items.length)throw new Error('No shows found in response');
-    const shows=items.map((el,i)=>{
-      const rankEl=el.querySelector('.rank');
-      const titleEl=el.querySelector('.show-info a strong');
-      const imgEl=el.querySelector('img');
-      const metaEl=el.querySelector('.meta');
-      const premiereEl=el.querySelector('.premiere');
-      const ratingEl=el.querySelector('.rating');
-      const summaryEl=el.querySelector('.summary');
-      return{
-        rank:rankEl?.textContent.trim()||String(i+1),
-        title:titleEl?.textContent.trim()||'Unknown',
-        img:imgEl?.src||'',
-        meta:metaEl?.textContent.trim()||'',
-        premiere:premiereEl?.textContent.replace(/⏱\s*/,'').trim()||'',
-        rating:ratingEl?.textContent.replace(/⭐\s*/,'').trim()||'',
-        summary:summaryEl?.textContent.trim()||''
-      };
-    });
-    upcomingCache=shows;upcomingCacheTime=Date.now();
-    updateUpcomingCacheLabel(upcomingCacheTime, apiCacheAge);
-    renderUpcoming(b,shows);
+    const json=await r.json();
+    if(!json.shows?.length)throw new Error('No shows in response');
+    upcomingCache=json;upcomingCacheTime=Date.now();
+    updateUpcomingCacheLabel(json);
+    renderUpcoming(b,json);
   }catch(e){b.innerHTML=`<div class="err">${e.message}</div>`}
   btn?.classList.remove('spin');
 }
 
-function updateUpcomingCacheLabel(fetchTime, apiAge){
+function updateUpcomingCacheLabel(json){
   const el=document.getElementById('upcomingCacheLabel');
   if(!el)return;
-  const mins=Math.floor((Date.now()-fetchTime)/60000);
-  const localAge=mins<1?'just now':mins===1?'1 min ago':`${mins} mins ago`;
-  el.textContent=apiAge?`API cached ${apiAge} · fetched ${localAge}`:`Fetched ${localAge}`;
+  if(json?.cachedAtFormatted){
+    const hrs=json.cacheAgeHours||0;
+    const age=hrs<1?'just now':`${hrs}h ago`;
+    el.textContent=`API cached ${age} · ${json.cachedAtFormatted}`;
+  } else {
+    const mins=Math.floor((Date.now()-upcomingCacheTime)/60000);
+    el.textContent=`Fetched ${mins<1?'just now':mins+'m ago'}`;
+  }
 }
 
+// Flat list of all show objects for modal lookup — upcoming first, then recently aired
 let upcomingShows=[];
-function renderUpcoming(b,shows){
-  upcomingShows=shows;
-  let h='<div class="up-grid">';
-  shows.forEach((s,i)=>{
+
+function renderUpcoming(b,json){
+  const upcoming=json.shows||[];
+  const aired=json.recentlyAired||[];
+  upcomingShows=[...upcoming,...aired];
+
+  const cardHtml=(s,i,isAired)=>{
     const imgHtml=s.img?`<img class="up-thumb" src="${s.img}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`:'' ;
     const phStyle=s.img?'display:none':'';
-    h+=`<div class="up-card" tabindex="0" data-show="${i}">
+    const genres=(s.genres||[]).join(', ');
+    const premiere=s.premiereIn||'';
+    const rating=s.rating?`★ ${s.rating}`:'';
+    const rankBadge=isAired
+      ?`<div class="up-aired-badge">✓ Aired</div>`
+      :`<div class="up-rank">${i+1}</div>`;
+    return `<div class="up-card" tabindex="0" data-show="${upcomingShows.indexOf(s)}">
       <div style="position:relative">
         ${imgHtml}
         <div class="up-thumb-placeholder" style="${phStyle}">📺</div>
-        <div class="up-rank">${s.rank}</div>
+        ${rankBadge}
       </div>
       <div class="up-body">
-        <div class="up-title">${s.title}</div>
-        ${s.meta?`<div class="up-meta">${s.meta}</div>`:''}
+        <div class="up-title">${s.name||''}</div>
+        ${genres?`<div class="up-meta">${genres}</div>`:''}
         <div class="up-row">
-          ${s.premiere?`<div class="up-premiere">⏱ ${s.premiere}</div>`:'<div></div>'}
-          ${s.rating?`<div class="up-rating">★ ${s.rating}</div>`:''}
+          ${premiere?`<div class="up-premiere" style="${isAired?'color:var(--green)':''}">⏱ ${premiere}</div>`:'<div></div>'}
+          ${rating?`<div class="up-rating">${rating}</div>`:''}
         </div>
       </div>
     </div>`;
-  });
+  };
+
+  let h='<div class="up-grid">';
+  if(upcoming.length){
+    h+=`<div class="up-section-hdr"><div class="up-section-txt">📅 Coming Up</div><div class="up-section-line"></div></div>`;
+    upcoming.forEach((s,i)=>h+=cardHtml(s,i,false));
+  }
+  if(aired.length){
+    h+=`<div class="up-section-hdr"><div class="up-section-txt">✅ Recently Aired</div><div class="up-section-line"></div></div>`;
+    aired.forEach((s,i)=>h+=cardHtml(s,i,true));
+  }
   b.innerHTML=h+'</div>';
 }
 
@@ -806,20 +810,23 @@ function showUpcomingDetail(idx){
   lastFocus=document.activeElement;
   modalState='open';
   modalOpenTime=Date.now();
+  const genres=(s.genres||[]).map(g=>`<span style="background:rgba(244,114,182,.1);color:var(--pink);padding:4px 12px;border-radius:8px;font-size:20px">${g}</span>`).join('');
+  const isAired=s.status==='aired';
   const o=document.getElementById('mOverlay'),mc=document.getElementById('mContent');
   mc.className='md';
   mc.innerHTML=`
     <button class="md-x" tabindex="0">✕</button>
     ${s.img?`<img class="md-poster" src="${s.img}" style="width:320px;border-radius:14px;object-fit:cover;aspect-ratio:16/12;flex-shrink:0">`:''}
     <div class="md-body">
-      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:4px">
-        <div style="background:rgba(0,0,0,.5);color:var(--dim);font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;padding:4px 12px;border-radius:8px">#${s.rank}</div>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px">
+        ${isAired?`<div style="background:rgba(52,211,153,.15);color:var(--green);font-size:20px;font-weight:700;padding:4px 14px;border-radius:8px">✓ Aired</div>`:''}
         ${s.rating?`<div style="font-size:26px;font-weight:700;color:var(--gold)">★ ${s.rating}</div>`:''}
       </div>
-      <div class="md-title" style="font-size:40px">${s.title}</div>
-      ${s.meta?`<div class="md-tag" style="font-size:24px">${s.meta}</div>`:''}
-      <div class="md-stats">
-        ${s.premiere?`<div class="md-stat" style="font-size:24px;color:var(--orange)">⏱ <strong>${s.premiere}</strong></div>`:''}
+      <div class="md-title" style="font-size:40px">${s.name||''}</div>
+      ${genres?`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">${genres}</div>`:''}
+      <div class="md-stats" style="margin-top:8px">
+        ${s.premiereIn?`<div class="md-stat" style="font-size:22px;color:${isAired?'var(--green)':'var(--orange)'}">⏱ <strong>${s.premiereIn}</strong></div>`:''}
+        ${s.channel?`<div class="md-stat" style="font-size:22px">${s.channel}</div>`:''}
       </div>
       ${s.summary?`<div class="md-ov" style="font-size:26px;line-height:1.7">${s.summary}</div>`:'<div class="md-ov" style="font-size:26px;color:var(--dim);font-style:italic">No summary available.</div>'}
     </div>`;
@@ -833,20 +840,19 @@ async function loadNasa(){
   const b=document.getElementById('nasaBody');
   b.innerHTML='<div class="ld"><div class="ld-s"></div><div class="ld-t">Loading NASA gallery...</div></div>';
   try{
-    // Fetch 40 days to ensure we get 30 images after filtering out videos
-    const today=new Date();
-    const start=new Date();start.setDate(today.getDate()-39);
-    const fmt=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    const sd=fmt(start),ed=fmt(today);
-    // Force no-cache headers so Android WebView always fetches fresh
-    const r=await fetch(`https://api.nasa.gov/planetary/apod?api_key=${NASA_KEY}&start_date=${sd}&end_date=${ed}`,{
+    // Dynamically compute start_date as 40 days before today
+    // No end_date needed — NASA API defaults to today
+    const start=new Date();
+    start.setDate(start.getDate()-40);
+    const sd=`${start.getFullYear()}-${String(start.getMonth()+1).padStart(2,'0')}-${String(start.getDate()).padStart(2,'0')}`;
+    const r=await fetch(`https://api.nasa.gov/planetary/apod?api_key=${NASA_KEY}&start_date=${sd}`,{
       cache:'no-store',
       headers:{'Cache-Control':'no-cache','Pragma':'no-cache'}
     });
     if(!r.ok)throw new Error('NASA API returned '+r.status+(r.status===429?' — rate limited, try again in a minute':''));
     let raw=await r.json();
     if(!Array.isArray(raw))raw=[raw];
-    // Images only, newest first, cap at 30
+    // Filter images only, sort newest first, take top 30
     nasaData=raw
       .filter(d=>d.media_type==='image')
       .sort((a,b)=>b.date.localeCompare(a.date))
