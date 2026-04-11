@@ -181,21 +181,20 @@ body::before{content:'';position:fixed;inset:-50%;width:200%;height:200%;backgro
 /* Prevent first row hiding behind sticky header at scrollTop=0 */
 .golf-tbl tbody tr:first-child td{padding-top:14px}
 .golf-tbl th.left{text-align:left}
-.golf-tbl th:nth-child(1){width:54px} /* Fav */
+.golf-tbl th:nth-child(1){width:50px}   /* Star */
 .golf-tbl th:nth-child(2){width:70px}   /* Pos */
-.golf-tbl th:nth-child(3){width:310px;text-align:left}  /* Player */
+.golf-tbl th:nth-child(3){width:330px;text-align:left}  /* Player */
 .golf-tbl th:nth-child(4){width:90px}   /* Total */
 .golf-tbl th:nth-child(5){width:90px}   /* Today */
 .golf-tbl th:nth-child(6){width:80px;color:var(--text)}   /* Thru — bold white */
 .golf-tbl th:nth-child(7),.golf-tbl th:nth-child(8),.golf-tbl th:nth-child(9),.golf-tbl th:nth-child(10){width:70px}
-/* Star / fav */
-.g-star{background:none;border:none;cursor:pointer;font-size:26px;line-height:1;padding:4px 6px;border-radius:8px;transition:transform .15s,opacity .15s;opacity:.35;color:var(--gold)}
-.g-star:hover,.g-star:focus{opacity:1;transform:scale(1.2);outline:2px solid var(--gold);outline-offset:2px}
-.g-star.on{opacity:1}
+/* Row star — display only, not interactive */
+.g-row-star{font-size:22px;display:block;text-align:center;line-height:1;color:var(--dim);opacity:.35}
+.g-row-star.on{color:var(--gold);opacity:1}
 /* Modal fav button */
-.g-modal-star{background:rgba(240,180,41,.1);border:2px solid rgba(240,180,41,.3);color:var(--gold);font-size:20px;font-weight:700;padding:10px 22px;border-radius:12px;cursor:pointer;transition:all .2s;white-space:nowrap}
-.g-modal-star:hover,.g-modal-star:focus{background:rgba(240,180,41,.2);border-color:var(--gold);outline:none;transform:scale(1.04)}
-.g-modal-star.on{background:rgba(240,180,41,.25);border-color:var(--gold)}
+.g-modal-star{background:rgba(107,109,128,.1);border:2px solid rgba(107,109,128,.3);color:var(--dim);font-size:20px;font-weight:700;padding:10px 22px;border-radius:12px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.g-modal-star:hover,.g-modal-star:focus{background:rgba(240,180,41,.15);border-color:rgba(240,180,41,.5);color:var(--gold);outline:none;transform:scale(1.04)}
+.g-modal-star.on{background:rgba(240,180,41,.2);border-color:var(--gold);color:var(--gold)}
 .golf-row.is-fav{background:rgba(240,180,41,.05);border-left:3px solid var(--gold)}
 .golf-row.is-fav:focus{background:rgba(240,180,41,.1)}
 /* Fav section divider */
@@ -694,10 +693,16 @@ document.addEventListener('keydown', e=>{
       return;
     }
     if(bi!==-1){
-      // ArrowLeft on a row → focus its star button
+      // ArrowLeft on a row → toggle favourite instantly
       if(e.key==='ArrowLeft'){
-        const star=body[bi].querySelector('.g-star');
-        if(star){star.focus();return}
+        const c=body[bi];
+        toggleFav(c.dataset.golfid);
+        // Restore focus to same row after re-render
+        requestAnimationFrame(()=>{
+          const rows=[...document.querySelectorAll('#golfBody .golf-row')];
+          const target=rows.find(r=>r.dataset.golfid===c.dataset.golfid)||rows[Math.min(bi,rows.length-1)];
+          if(target)scrollFocus(target,sb);
+        });
         return;
       }
       let ni=-1;
@@ -705,21 +710,6 @@ document.addEventListener('keydown', e=>{
       else if(e.key==='ArrowUp'){ni=bi-1;if(ni<0){(tabs.length?tabs[0]:hdr[0])?.focus();return}}
       if(ni>=0&&ni<body.length)scrollFocus(body[ni],sb);
       return;
-    }
-    // Star button focused — ArrowRight returns to parent row
-    const focusedStar=scr.querySelector('.g-star:focus');
-    if(focusedStar){
-      const parentRow=focusedStar.closest('.golf-row');
-      if(e.key==='ArrowRight'){parentRow?.focus();return}
-      if(e.key==='ArrowUp'||e.key==='ArrowDown'){
-        const idx=body.indexOf(parentRow);
-        const ni=e.key==='ArrowDown'?idx+1:idx-1;
-        if(ni>=0&&ni<body.length){
-          const nextStar=body[ni].querySelector('.g-star');
-          nextStar?nextStar.focus():scrollFocus(body[ni],sb);
-        } else if(ni<0)(tabs.length?tabs[0]:hdr[0])?.focus();
-        return;
-      }
     }
     hdr[0]?.focus();return;
   }
@@ -1391,26 +1381,23 @@ function toggleFav(playerId){
   if(golfFavs.has(playerId))golfFavs.delete(playerId);
   else golfFavs.add(playerId);
   saveFavs();
-  renderGolfLeaderboard(); // re-render to reorder rows
+  // Re-render preserving scroll so modal stays usable
+  const sb=document.getElementById('golfBody');
+  const scrollPos=sb?.scrollTop||0;
+  renderGolfLeaderboard();
+  if(sb)sb.scrollTop=scrollPos;
 }
 
-// Star click — stop propagation so it doesn't open the modal
+// Star click — table star removed, fav only from modal
 document.addEventListener('click',e=>{
-  const star=e.target.closest('.g-star[data-starid]');
-  if(star){e.stopPropagation();toggleFav(star.dataset.starid);return;}
-
   // Modal star button — toggle in-place without closing modal
   const modalStar=e.target.closest('.g-modal-star[data-starid]');
   if(modalStar){
     const pid=modalStar.dataset.starid;
     toggleFav(pid);
-    // Update button text and state in-place
     const isFavNow=golfFavs.has(pid);
     modalStar.textContent=isFavNow?'★ Favourited':'☆ Add to Favourites';
     modalStar.classList.toggle('on',isFavNow);
-    // Also update the row star in the leaderboard behind the modal
-    const rowStar=document.querySelector(`.g-star[data-starid="${pid}"]`);
-    if(rowStar){rowStar.classList.toggle('on',isFavNow);}
   }
 });
 let golfData=null;
@@ -1498,7 +1485,7 @@ function renderGolfLeaderboard(){
   // Table only — goes into scrollable golfBody so sticky th works correctly
   let h=`<div class="golf-wrap"><table class="golf-tbl">
     <thead><tr>
-      <th>FAV</th>
+      <th>★</th>
       <th>POS</th>
       <th class="left">PLAYER</th>
       <th>TOTAL</th>
@@ -1539,7 +1526,7 @@ function renderGolfLeaderboard(){
     const thruDisp=c.status?.displayThru||c.status?.detail||'—';
     const thruClean=thruDisp==='F'||thruDisp==='18'?'F':thruDisp;
     return `<tr class="golf-row${isCut||isWD?' is-cut':''}${isFav?' is-fav':''}" tabindex="0" data-golfid="${c.id}" data-evid="${activeGolfEvent}">
-      <td><button class="g-star${isFav?' on':''}" data-starid="${c.id}" tabindex="0" title="${isFav?'Remove favourite':'Add to favourites'}">★</button></td>
+      <td><span class="g-row-star${isFav?' on':''}">★</span></td>
       <td><span class="g-pos${isTop3?' top3':''}">${isCut?'CUT':isWD?'WD':pos}</span></td>
       <td class="left">
         <div class="g-player">
@@ -1588,31 +1575,8 @@ function renderGolfLeaderboard(){
 // Augusta National par values per hole
 const MASTERS_PARS=[4,5,4,3,4,3,4,5,4,4,4,3,5,4,5,3,4,4]; // holes 1-18
 
-// Golf row: click → modal, long press (600ms) → toggle fav
-let _lpTimer=null,_lpRow=null,_lpMoved=false;
-
-document.addEventListener('pointerdown',e=>{
-  const row=e.target.closest('.golf-row[data-golfid]');
-  if(!row||e.target.closest('.g-star'))return;
-  _lpMoved=false;
-  _lpRow=row;
-  _lpTimer=setTimeout(()=>{
-    if(!_lpMoved){
-      toggleFav(row.dataset.golfid);
-      // Pulse the star to give feedback
-      const star=row.querySelector('.g-star');
-      if(star){star.style.transform='scale(1.6)';setTimeout(()=>star.style.transform='',300);}
-      _lpRow=null; // prevent click from firing
-    }
-  },600);
-});
-document.addEventListener('pointermove',()=>{_lpMoved=true;clearTimeout(_lpTimer);});
-document.addEventListener('pointerup',()=>clearTimeout(_lpTimer));
-document.addEventListener('pointercancel',()=>clearTimeout(_lpTimer));
-
+// Golf row: click → modal (simple and clean)
 document.addEventListener('click',e=>{
-  // Don't open modal if long press just fired
-  if(!_lpRow)return;
   const row=e.target.closest('.golf-row[data-golfid]');
   if(row)showGolfModal(row.dataset.golfid,row.dataset.evid);
 });
