@@ -144,12 +144,49 @@ body::before{content:'';position:fixed;inset:-50%;width:200%;height:200%;backgro
 .up-premiere{font-size:18px;color:var(--orange);font-weight:600}
 .up-rating{font-size:18px;color:var(--gold);font-weight:600}
 
-/* RACING SUBTABS */
-.rtabs{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;flex-shrink:0}
+/* UPCOMING TABS */
+.uptabs{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;flex-shrink:0}
+.uptab{background:var(--card);border:2px solid var(--border);color:var(--dim);font:600 22px 'Outfit',sans-serif;padding:10px 28px;border-radius:12px;cursor:pointer;transition:all .2s;white-space:nowrap;display:flex;align-items:center;gap:10px}
+.uptab:focus{outline:none;border-color:var(--pink);color:var(--text);box-shadow:0 0 16px rgba(244,114,182,.2)}
+.uptab.active{border-color:var(--pink);color:var(--pink);background:rgba(244,114,182,.08)}
+.uptab:hover{border-color:rgba(244,114,182,.4);color:var(--text)}
+.uptab .uptab-count{background:var(--border);color:var(--dim);font-size:17px;font-weight:700;padding:2px 8px;border-radius:6px;font-family:'JetBrains Mono',monospace}
+.uptab.active .uptab-count{background:rgba(244,114,182,.15);color:var(--pink)}
 .rtab{background:var(--card);border:2px solid var(--border);color:var(--dim);font:600 20px 'Outfit',sans-serif;padding:8px 22px;border-radius:10px;cursor:pointer;transition:all .2s;white-space:nowrap}
 .rtab:focus{outline:none;border-color:var(--gold);color:var(--text);box-shadow:0 0 16px rgba(240,180,41,.2)}
 .rtab.active{border-color:var(--gold);color:var(--gold);background:rgba(240,180,41,.08)}
 .rtab:hover{border-color:rgba(240,180,41,.4);color:var(--text)}
+
+/* FUN TABS (joke/riddle) */
+.funtab{background:var(--card);border:2px solid var(--border);color:var(--dim);font:600 22px 'Outfit',sans-serif;padding:10px 36px;border-radius:12px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.funtab:focus{outline:none;border-color:var(--orange);color:var(--text);box-shadow:0 0 16px rgba(251,146,60,.2)}
+.funtab.active{border-color:var(--orange);color:var(--orange);background:rgba(251,146,60,.08)}
+.funtab:hover{border-color:rgba(251,146,60,.4);color:var(--text)}
+
+/* GOLF LEADERBOARD */
+.golf-event{font-size:26px;font-weight:700;color:var(--green);margin-bottom:6px;flex-shrink:0}
+.golf-meta{font-size:20px;color:var(--dim);margin-bottom:16px;font-family:'JetBrains Mono',monospace;display:flex;gap:24px;flex-wrap:wrap;flex-shrink:0}
+.golf-meta span{color:var(--text);font-weight:600}
+.golf-table{width:100%;border-collapse:collapse}
+.golf-table th{font-size:18px;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:.8px;padding:8px 12px;border-bottom:2px solid var(--border);text-align:left;position:sticky;top:0;background:var(--bg);z-index:1}
+.golf-table th.num{text-align:center}
+.golf-row{border-bottom:1px solid var(--border);transition:background .15s;cursor:default;outline:none}
+.golf-row:focus{background:rgba(52,211,153,.06);outline:2px solid var(--green);outline-offset:-2px}
+.golf-row:hover{background:var(--card)}
+.golf-row td{padding:11px 12px;font-size:22px;vertical-align:middle}
+.golf-pos{font-family:'JetBrains Mono',monospace;font-size:20px;color:var(--dim);text-align:center}
+.golf-name{font-weight:600;color:var(--text)}
+.golf-ctry{font-size:18px;color:var(--dim);margin-left:8px;font-weight:400}
+.golf-score{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:800;text-align:center}
+.golf-score.under{color:#f87171}
+.golf-score.over{color:var(--text)}
+.golf-score.even{color:var(--dim)}
+.golf-rd{font-family:'JetBrains Mono',monospace;font-size:20px;text-align:center;color:var(--dim)}
+.golf-thru{font-family:'JetBrains Mono',monospace;font-size:18px;color:var(--dim);text-align:center}
+.golf-status-live{color:var(--green);font-size:16px;font-weight:700;animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.golf-cut-row td{background:rgba(248,113,113,.07);color:var(--red);font-size:17px;font-style:italic;padding:5px 12px;border-top:1px solid rgba(248,113,113,.25);border-bottom:1px solid rgba(248,113,113,.25)}
+.golf-tabs{display:flex;gap:10px;margin-bottom:16px;flex-wrap:nowrap;flex-shrink:0;overflow-x:auto}
 
 /* HISTORY TILES */
 .hl{padding:0 4px}
@@ -180,8 +217,8 @@ body::before{content:'';position:fixed;inset:-50%;width:200%;height:200%;backgro
     <div class="tile" tabindex="0" data-id="nasa"><div class="t-icon">🚀</div><div class="t-lbl">NASA</div><div class="t-sub">Gallery</div></div>
     <div class="tile" tabindex="0" data-id="upcoming"><div class="t-icon">📅</div><div class="t-lbl">Upcoming TV</div><div class="t-sub">Next Episode</div></div>
     <div class="tile" tabindex="0" data-id="history"><div class="t-icon">📜</div><div class="t-lbl">This Day</div><div class="t-sub">In History</div></div>
-    <div class="tile" tabindex="0" data-id="riddle"><div class="t-icon">🧩</div><div class="t-lbl">Riddle</div><div class="t-sub">Of the Day</div></div>
-    <div class="tile" tabindex="0" data-id="joke"><div class="t-icon">😂</div><div class="t-lbl">Joke</div><div class="t-sub">Of the Day</div></div>
+    <div class="tile" tabindex="0" data-id="fun"><div class="t-icon">🎭</div><div class="t-lbl">Joke & Riddle</div><div class="t-sub">Daily Fun</div></div>
+    <div class="tile" tabindex="0" data-id="golf"><div class="t-icon">⛳</div><div class="t-lbl">Golf</div><div class="t-sub">Live Scores</div></div>
   </div>
 </div>
 
@@ -217,9 +254,13 @@ body::before{content:'';position:fixed;inset:-50%;width:200%;height:200%;backgro
 <div class="scr" id="scr-upcoming">
   <div class="sh">
     <button class="bk" tabindex="0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>Back</button>
-    <div class="st" style="color:var(--pink)">📅 Upcoming TV Shows</div>
+    <div class="st" style="color:var(--pink)">📅 TV Shows</div>
     <div id="upcomingCacheLabel" style="font-size:18px;color:var(--dim);font-family:'JetBrains Mono',monospace;margin-right:8px"></div>
     <button class="rl" tabindex="0" id="rl-upcoming"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>Reload</button>
+  </div>
+  <div class="uptabs" id="upcomingTabs">
+    <button class="uptab active" tabindex="0" data-uptab="upcoming">📅 Coming Up <span class="uptab-count" id="uptab-count-upcoming">—</span></button>
+    <button class="uptab" tabindex="0" data-uptab="aired">✅ Recently Aired <span class="uptab-count" id="uptab-count-aired">—</span></button>
   </div>
   <div class="sb" id="upcomingBody"></div>
 </div>
@@ -230,17 +271,28 @@ body::before{content:'';position:fixed;inset:-50%;width:200%;height:200%;backgro
   <button class="rl" tabindex="0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>Reload</button>
 </div><div class="sb" id="historyBody"></div></div>
 
-<div class="scr" id="scr-riddle"><div class="sh">
-  <button class="bk" tabindex="0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>Back</button>
-  <div class="st" style="color:var(--orange)">🧩 Riddle of the Day</div>
-  <button class="rl" tabindex="0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>New Riddle</button>
-</div><div class="sb" id="riddleBody"></div></div>
+<div class="scr" id="scr-fun">
+  <div class="sh">
+    <button class="bk" tabindex="0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>Back</button>
+    <div class="st" style="color:var(--orange)">🎭 Daily Fun</div>
+    <button class="rl" tabindex="0" id="rl-fun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>New</button>
+  </div>
+  <div class="uptabs" id="funTabs" style="--tab-color:var(--orange)">
+    <button class="funtab active" tabindex="0" data-funtab="joke">😂 Joke</button>
+    <button class="funtab" tabindex="0" data-funtab="riddle">🧩 Riddle</button>
+  </div>
+  <div class="sb" id="funBody"></div>
+</div>
 
-<div class="scr" id="scr-joke"><div class="sh">
-  <button class="bk" tabindex="0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>Back</button>
-  <div class="st" style="color:var(--green)">😂 Joke of the Day</div>
-  <button class="rl" tabindex="0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>New Joke</button>
-</div><div class="sb" id="jokeBody"></div></div>
+<div class="scr" id="scr-golf" style="overflow:hidden">
+  <div class="sh">
+    <button class="bk" tabindex="0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>Back</button>
+    <div class="st" style="color:var(--green)">⛳ Golf Leaderboard</div>
+    <button class="rl" tabindex="0" id="rl-golf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>Reload</button>
+  </div>
+  <div class="rtabs" id="golfTabs"></div>
+  <div class="sb" id="golfBody"></div>
+</div>
 
 <!-- MODAL -->
 <div class="mo" id="mOverlay"><div class="md" id="mContent"></div></div>
@@ -255,7 +307,7 @@ const NASA_KEY='cQVDvwpdFz0u34enmqgkBxLMEwTq6Kdkg6hWluJG';
 
 // ═══════ NAVIGATION ═══════
 let curScr=null,lastFocus=null;
-const loaders={racing:loadRacing,movies:loadMovies,tvshows:loadTVShows,nasa:loadNasa,upcoming:loadUpcoming,history:loadHistory,riddle:loadRiddle,joke:loadJoke};
+const loaders={racing:loadRacing,movies:loadMovies,tvshows:loadTVShows,nasa:loadNasa,upcoming:loadUpcoming,history:loadHistory,fun:loadFun,golf:loadGolf};
 
 function openScr(id){
   document.getElementById('home').style.display='none';
@@ -405,8 +457,101 @@ document.addEventListener('keydown', e=>{
     hdr[0]?.focus();return;
   }
 
-  // General screens — detect grid type and column count
-  const sb=scr.querySelector('.sb');
+  // Upcoming: header → tabs → grid (5 cols)
+  if(curScr==='upcoming'){
+    const tabs=[...scr.querySelectorAll('.uptab')];
+    const body=[...scr.querySelectorAll('.sb .up-card')];
+    const cur=document.activeElement;
+    const inHdr=hdr.includes(cur),inTabs=tabs.includes(cur);
+    const bi=body.indexOf(cur);
+    const sb=scr.querySelector('.sb');
+    if(inHdr){
+      const hi=hdr.indexOf(cur);
+      if(e.key==='ArrowRight'&&hi+1<hdr.length){hdr[hi+1].focus();return}
+      if(e.key==='ArrowLeft'&&hi>0){hdr[hi-1].focus();return}
+      if(e.key==='ArrowDown'){(tabs.length?tabs[0]:body[0])?.focus();return}
+      return;
+    }
+    if(inTabs){
+      const ti=tabs.indexOf(cur);
+      if(e.key==='ArrowRight'&&ti+1<tabs.length){tabs[ti+1].focus();return}
+      if(e.key==='ArrowLeft'&&ti>0){tabs[ti-1].focus();return}
+      if(e.key==='ArrowUp'){hdr[0]?.focus();return}
+      if(e.key==='ArrowDown'&&body.length){scrollFocus(body[0],sb);return}
+      return;
+    }
+    if(bi!==-1){
+      const cols=5;let ni=-1;
+      if(e.key==='ArrowRight'){ni=bi+1;if(ni>=body.length||Math.floor(ni/cols)!==Math.floor(bi/cols))return}
+      else if(e.key==='ArrowLeft'){ni=bi-1;if(ni<0||Math.floor(ni/cols)!==Math.floor(bi/cols))return}
+      else if(e.key==='ArrowDown'){ni=bi+cols;}
+      else if(e.key==='ArrowUp'){ni=bi-cols;if(ni<0){(tabs.length?tabs[0]:hdr[0])?.focus();return}}
+      if(ni>=0&&ni<body.length)scrollFocus(body[ni],sb);
+      return;
+    }
+    hdr[0]?.focus();return;
+  }
+
+  // Fun: header → tabs → .rv button (single col)
+  if(curScr==='fun'){
+    const tabs=[...scr.querySelectorAll('.funtab')];
+    const body=[...scr.querySelectorAll('.sb .rv')];
+    const cur=document.activeElement;
+    const inHdr=hdr.includes(cur),inTabs=tabs.includes(cur),inBody=body.includes(cur);
+    if(inHdr){
+      const hi=hdr.indexOf(cur);
+      if(e.key==='ArrowRight'&&hi+1<hdr.length){hdr[hi+1].focus();return}
+      if(e.key==='ArrowLeft'&&hi>0){hdr[hi-1].focus();return}
+      if(e.key==='ArrowDown'){tabs[0]?.focus();return}
+      return;
+    }
+    if(inTabs){
+      const ti=tabs.indexOf(cur);
+      if(e.key==='ArrowRight'&&ti+1<tabs.length){tabs[ti+1].focus();return}
+      if(e.key==='ArrowLeft'&&ti>0){tabs[ti-1].focus();return}
+      if(e.key==='ArrowUp'){hdr[0]?.focus();return}
+      if(e.key==='ArrowDown'&&body.length){body[0].focus();return}
+      return;
+    }
+    if(inBody){
+      if(e.key==='ArrowUp'){tabs[0]?.focus();return}
+      return;
+    }
+    hdr[0]?.focus();return;
+  }
+
+  // Golf: header → tour tabs → leaderboard rows (single col)
+  if(curScr==='golf'){
+    const tabs=[...scr.querySelectorAll('.rtab')];
+    const body=[...scr.querySelectorAll('.sb .golf-row')];
+    const sb=scr.querySelector('.sb');
+    const cur=document.activeElement;
+    const inHdr=hdr.includes(cur),inTabs=tabs.includes(cur);
+    const bi=body.indexOf(cur);
+    if(inHdr){
+      const hi=hdr.indexOf(cur);
+      if(e.key==='ArrowRight'&&hi+1<hdr.length){hdr[hi+1].focus();return}
+      if(e.key==='ArrowLeft'&&hi>0){hdr[hi-1].focus();return}
+      if(e.key==='ArrowDown'){(tabs.length?tabs[0]:body[0])?.focus();return}
+      return;
+    }
+    if(inTabs){
+      const ti=tabs.indexOf(cur);
+      if(e.key==='ArrowRight'&&ti+1<tabs.length){tabs[ti+1].focus();return}
+      if(e.key==='ArrowLeft'&&ti>0){tabs[ti-1].focus();return}
+      if(e.key==='ArrowUp'){hdr[0]?.focus();return}
+      if(e.key==='ArrowDown'&&body.length){scrollFocus(body[0],sb);return}
+      return;
+    }
+    if(bi!==-1){
+      let ni=-1;
+      if(e.key==='ArrowDown'){ni=bi+1;}
+      else if(e.key==='ArrowUp'){ni=bi-1;if(ni<0){(tabs.length?tabs[0]:hdr[0])?.focus();return}}
+      if(ni>=0&&ni<body.length)scrollFocus(body[ni],sb);
+      return;
+    }
+    hdr[0]?.focus();return;
+  }
   let bodyItems=[],cols=1;
   if(sb){
     const rc=[...sb.querySelectorAll('.rc')];
@@ -725,9 +870,13 @@ async function loadUpcoming(){
   btn?.classList.add('spin');
   if(upcomingCache&&Date.now()-upcomingCacheTime<1800000){
     updateUpcomingCacheLabel(upcomingCache);
-    renderUpcoming(b,upcomingCache);
+    // Re-render with current tab state
+    renderUpcoming(document.getElementById('upcomingBody'),upcomingCache);
     btn?.classList.remove('spin');return;
   }
+  activeUpTab='upcoming';
+  // Reset tab UI
+  document.querySelectorAll('.uptab').forEach((b2,i)=>b2.classList.toggle('active',i===0));
   b.innerHTML='<div class="ld"><div class="ld-s"></div><div class="ld-t">Loading upcoming shows...</div></div>';
   try{
     const r=await fetch(UPCOMING_API+'/?format=json');
@@ -756,11 +905,42 @@ function updateUpcomingCacheLabel(json){
 
 // Flat list of all show objects for modal lookup — upcoming first, then recently aired
 let upcomingShows=[];
+let upcomingJson=null;
+let activeUpTab='upcoming';
 
 function renderUpcoming(b,json){
+  upcomingJson=json;
   const upcoming=json.shows||[];
   const aired=json.recentlyAired||[];
   upcomingShows=[...upcoming,...aired];
+
+  // Update tab counts
+  const cu=document.getElementById('uptab-count-upcoming');
+  const ca=document.getElementById('uptab-count-aired');
+  if(cu)cu.textContent=upcoming.length;
+  if(ca)ca.textContent=aired.length;
+
+  // Wire tab buttons
+  document.querySelectorAll('.uptab').forEach(btn=>{
+    btn.onclick=()=>{
+      activeUpTab=btn.dataset.uptab;
+      document.querySelectorAll('.uptab').forEach(b2=>b2.classList.remove('active'));
+      btn.classList.add('active');
+      renderUpcomingGrid(b,json);
+      btn.focus();
+    };
+  });
+
+  renderUpcomingGrid(b,json);
+}
+
+function renderUpcomingGrid(b,json){
+  const upcoming=json.shows||[];
+  const aired=json.recentlyAired||[];
+  const isAiredTab=activeUpTab==='aired';
+  const items=isAiredTab?aired:upcoming;
+
+  if(!items.length){b.innerHTML='<div class="err">No shows found.</div>';return}
 
   const cardHtml=(s,i,isAired)=>{
     const imgHtml=s.img?`<img class="up-thumb" src="${s.img}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`:'' ;
@@ -771,7 +951,8 @@ function renderUpcoming(b,json){
     const rankBadge=isAired
       ?`<div class="up-aired-badge">✓ Aired</div>`
       :`<div class="up-rank">${i+1}</div>`;
-    return `<div class="up-card" tabindex="0" data-show="${upcomingShows.indexOf(s)}">
+    const globalIdx=upcomingShows.indexOf(s);
+    return `<div class="up-card" tabindex="0" data-show="${globalIdx}">
       <div style="position:relative">
         ${imgHtml}
         <div class="up-thumb-placeholder" style="${phStyle}">📺</div>
@@ -789,15 +970,9 @@ function renderUpcoming(b,json){
   };
 
   let h='<div class="up-grid">';
-  if(upcoming.length){
-    h+=`<div class="up-section-hdr"><div class="up-section-txt">📅 Coming Up</div><div class="up-section-line"></div></div>`;
-    upcoming.forEach((s,i)=>h+=cardHtml(s,i,false));
-  }
-  if(aired.length){
-    h+=`<div class="up-section-hdr"><div class="up-section-txt">✅ Recently Aired</div><div class="up-section-line"></div></div>`;
-    aired.forEach((s,i)=>h+=cardHtml(s,i,true));
-  }
+  items.forEach((s,i)=>h+=cardHtml(s,i,isAiredTab));
   b.innerHTML=h+'</div>';
+  b.scrollTop=0;
 }
 
 document.addEventListener('click',e=>{
@@ -940,63 +1115,197 @@ function showHistoryDetail(idx){
   setTimeout(()=>{mc.querySelector('.md-x')?.focus()},50);
 }
 
-// ═══════ RIDDLE ═══════
-async function loadRiddle(){
-  const b=document.getElementById('riddleBody');
-  b.innerHTML='<div class="ld"><div class="ld-s"></div><div class="ld-t">Loading riddle...</div></div>';
+// ═══════ FUN (Joke + Riddle combined) ═══════
+let activeFunTab='joke';
+
+async function loadFun(){
+  // Wire tab buttons on first open
+  document.querySelectorAll('.funtab').forEach(btn=>{
+    btn.onclick=()=>{
+      activeFunTab=btn.dataset.funtab;
+      document.querySelectorAll('.funtab').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      renderFun();
+      btn.focus();
+    };
+  });
+  renderFun();
+}
+
+async function renderFun(){
+  const b=document.getElementById('funBody');
+  b.innerHTML='<div class="ld"><div class="ld-s"></div><div class="ld-t">Loading...</div></div>';
+  if(activeFunTab==='joke') await doJoke(b);
+  else await doRiddle(b);
+}
+
+document.getElementById('rl-fun')?.addEventListener('click',()=>renderFun());
+
+async function doJoke(b){
   try{
-    // riddles.one API — returns {riddle, answer}
+    const r=await fetch('https://official-joke-api.appspot.com/random_joke');
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    const d=await r.json();
+    if(!d.setup)throw new Error('No joke');
+    const pid='pl_'+Date.now();
+    b.innerHTML=`<div class="fc"><div class="be">😂</div><div class="ft" style="color:var(--green)">${d.setup}</div><div id="${pid}" style="display:none"><div class="fb" style="color:var(--gold);font-size:34px;font-weight:700;margin-top:20px">${d.punchline}</div></div><button class="rv" tabindex="0" style="background:linear-gradient(135deg,#0a2a1a,#102520);border-color:rgba(52,211,153,.3);color:var(--green)" onclick="document.getElementById('${pid}').style.display='block';this.style.display='none'">Show Punchline</button></div>`;
+    setTimeout(()=>b.querySelector('.rv')?.focus(),100);
+  }catch(_){
+    const f=[{s:"Why don't scientists trust atoms?",p:"Because they make up everything!"},{s:"How do you organise a space party?",p:"You planet!"}][Math.floor(Math.random()*2)];
+    const pid='pl_'+Date.now();
+    b.innerHTML=`<div class="fc"><div class="be">😂</div><div class="ft" style="color:var(--green)">${f.s}</div><div id="${pid}" style="display:none"><div class="fb" style="color:var(--gold);font-size:34px;font-weight:700;margin-top:20px">${f.p}</div></div><button class="rv" tabindex="0" style="background:linear-gradient(135deg,#0a2a1a,#102520);border-color:rgba(52,211,153,.3);color:var(--green)" onclick="document.getElementById('${pid}').style.display='block';this.style.display='none'">Show Punchline</button></div>`;
+    setTimeout(()=>b.querySelector('.rv')?.focus(),100);
+  }
+}
+
+async function doRiddle(b){
+  try{
     const r=await fetch('https://riddles-api.vercel.app/random');
     if(!r.ok)throw new Error('HTTP '+r.status);
     const d=await r.json();
-    const q=d.riddle||d.question||'';
-    const a=d.answer||'';
-    if(!q)throw new Error('No riddle data');
+    const q=d.riddle||d.question||'';const a=d.answer||'';
+    if(!q)throw new Error('No riddle');
     b.innerHTML=`<div class="fc"><div class="be">🧩</div><div class="ft" style="color:var(--orange)">${q}</div><div id="ra" style="display:none"><div class="fb" style="color:var(--green);font-size:36px;font-weight:700;margin-top:20px">${a}</div></div><button class="rv" tabindex="0" onclick="document.getElementById('ra').style.display='block';this.style.display='none'">Reveal Answer</button></div>`;
     setTimeout(()=>b.querySelector('.rv')?.focus(),100);
-  }catch(ex){
-    // Fallback to a local riddle if API fails
-    const fallbacks=[
-      {q:"I have cities, but no houses. Mountains, but no trees. Water, but no fish.",a:"A map"},
-      {q:"The more you take, the more you leave behind.",a:"Footsteps"},
-      {q:"What is so fragile that saying its name breaks it?",a:"Silence"},
-      {q:"I speak without a mouth and hear without ears.",a:"An echo"},
-      {q:"What can run but never walks, has a mouth but never talks?",a:"A river"}
-    ];
-    const f=fallbacks[Math.floor(Math.random()*fallbacks.length)];
+  }catch(_){
+    const f=[{q:"I have cities, but no houses. Mountains, but no trees. Water, but no fish.",a:"A map"},{q:"What is so fragile that saying its name breaks it?",a:"Silence"}][Math.floor(Math.random()*2)];
     b.innerHTML=`<div class="fc"><div class="be">🧩</div><div class="ft" style="color:var(--orange)">${f.q}</div><div id="ra" style="display:none"><div class="fb" style="color:var(--green);font-size:36px;font-weight:700;margin-top:20px">${f.a}</div></div><button class="rv" tabindex="0" onclick="document.getElementById('ra').style.display='block';this.style.display='none'">Reveal Answer</button></div>`;
     setTimeout(()=>b.querySelector('.rv')?.focus(),100);
   }
 }
 
-// ═══════ JOKE ═══════
-async function loadJoke(){
-  const b=document.getElementById('jokeBody');
-  b.innerHTML='<div class="ld"><div class="ld-s"></div><div class="ld-t">Loading joke...</div></div>';
+// ═══════ GOLF LEADERBOARD ═══════
+let golfData=null;
+let activeGolfEvent=null;
+
+// ESPN golf API — returns active/recent tournament leaderboards
+const ESPN_GOLF='https://site.api.espn.com/apis/site/v2/sports/golf/leaderboard';
+
+async function loadGolf(){
+  const b=document.getElementById('golfBody'),btn=document.getElementById('rl-golf');
+  btn?.classList.add('spin');
+  b.innerHTML='<div class="ld"><div class="ld-s"></div><div class="ld-t">Loading leaderboard...</div></div>';
   try{
-    // Official Joke API — returns {setup, punchline}
-    const r=await fetch('https://official-joke-api.appspot.com/random_joke');
-    if(!r.ok)throw new Error('HTTP '+r.status);
-    const d=await r.json();
-    const setup=d.setup||'';
-    const punchline=d.punchline||'';
-    if(!setup)throw new Error('No joke data');
-    const pid='pl_'+Date.now();
-    b.innerHTML=`<div class="fc"><div class="be">😂</div><div class="ft" style="color:var(--green)">${setup}</div><div id="${pid}" style="display:none"><div class="fb" style="color:var(--gold);font-size:34px;font-weight:700;margin-top:20px">${punchline}</div></div><button class="rv" tabindex="0" style="background:linear-gradient(135deg,#0a2a1a,#102520);border-color:rgba(52,211,153,.3);color:var(--green)" onclick="document.getElementById('${pid}').style.display='block';this.style.display='none'">Show Punchline</button></div>`;
-    setTimeout(()=>b.querySelector('.rv')?.focus(),100);
-  }catch(ex){
-    const fallbacks=[
-      {s:"Why don't scientists trust atoms?",p:"Because they make up everything!"},
-      {s:"I'm reading a book about anti-gravity.",p:"It's impossible to put down!"},
-      {s:"Why did the scarecrow win an award?",p:"Because he was outstanding in his field!"},
-      {s:"What do you call a fake noodle?",p:"An impasta!"},
-      {s:"How do you organise a space party?",p:"You planet!"}
-    ];
-    const f=fallbacks[Math.floor(Math.random()*fallbacks.length)];
-    const pid='pl_'+Date.now();
-    b.innerHTML=`<div class="fc"><div class="be">😂</div><div class="ft" style="color:var(--green)">${f.s}</div><div id="${pid}" style="display:none"><div class="fb" style="color:var(--gold);font-size:34px;font-weight:700;margin-top:20px">${f.p}</div></div><button class="rv" tabindex="0" style="background:linear-gradient(135deg,#0a2a1a,#102520);border-color:rgba(52,211,153,.3);color:var(--green)" onclick="document.getElementById('${pid}').style.display='block';this.style.display='none'">Show Punchline</button></div>`;
-    setTimeout(()=>b.querySelector('.rv')?.focus(),100);
-  }
+    // Fetch all active/recent golf events from ESPN
+    const r=await fetch(ESPN_GOLF,{cache:'no-store',headers:{'Cache-Control':'no-cache'}});
+    if(!r.ok)throw new Error('ESPN API '+r.status);
+    const json=await r.json();
+    const events=(json.events||[]).filter(ev=>ev.status?.type?.state!=='pre'||ev.competitions?.length);
+    if(!events.length)throw new Error('No active golf events found');
+    golfData=events;
+    // Default to first event (most likely Masters/current major)
+    if(!activeGolfEvent||!events.find(ev=>ev.id===activeGolfEvent))activeGolfEvent=events[0].id;
+    buildGolfTabs(events);
+    renderGolfLeaderboard();
+  }catch(e){b.innerHTML=`<div class="err">${e.message}</div>`}
+  btn?.classList.remove('spin');
+}
+
+function buildGolfTabs(events){
+  const tabs=document.getElementById('golfTabs');
+  tabs.innerHTML=events.map(ev=>`<button class="rtab${ev.id===activeGolfEvent?' active':''}" tabindex="0" data-evid="${ev.id}">${ev.shortName||ev.name||'Event'}</button>`).join('');
+  tabs.querySelectorAll('.rtab').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      activeGolfEvent=btn.dataset.evid;
+      tabs.querySelectorAll('.rtab').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      renderGolfLeaderboard();
+      btn.focus();
+    });
+  });
+}
+
+function scoreClass(score){
+  if(score===null||score===undefined||score==='')return 'even';
+  const n=typeof score==='string'?parseInt(score):score;
+  if(isNaN(n))return 'even';
+  if(n<0)return 'under';
+  if(n>0)return 'over';
+  return 'even';
+}
+
+function fmtScore(score){
+  if(score===null||score===undefined||score==='E'||score==='')return 'E';
+  const n=typeof score==='string'?parseInt(score):score;
+  if(isNaN(n))return score;
+  if(n===0)return 'E';
+  return n>0?`+${n}`:String(n);
+}
+
+function renderGolfLeaderboard(){
+  const b=document.getElementById('golfBody');
+  const ev=golfData?.find(ev=>ev.id===activeGolfEvent);
+  if(!ev){b.innerHTML='<div class="err">Event not found.</div>';return}
+
+  const comp=ev.competitions?.[0];
+  const competitors=comp?.competitors||[];
+  if(!competitors.length){b.innerHTML='<div class="err">No leaderboard data yet.</div>';return}
+
+  // Sort by position
+  const sorted=[...competitors].sort((a,b)=>{
+    const pa=parseInt(a.status?.position?.id||a.position||999);
+    const pb=parseInt(b.status?.position?.id||b.position||999);
+    return pa-pb;
+  });
+
+  const round=comp?.status?.period||ev.status?.period||'';
+  const statusTxt=comp?.status?.type?.shortDetail||comp?.status?.type?.description||'';
+  const isLive=comp?.status?.type?.state==='in';
+
+  let h=`<div class="golf-event">${ev.name||ev.shortName||'Golf'}</div>`;
+  h+=`<div class="golf-meta">`;
+  if(round)h+=`Round <span>${round}</span>`;
+  if(statusTxt)h+=`&nbsp;·&nbsp;<span>${statusTxt}</span>`;
+  if(isLive)h+=`&nbsp;<span class="golf-status-live">● LIVE</span>`;
+  h+=`</div>`;
+
+  h+=`<table class="golf-table">
+    <thead><tr>
+      <th class="num">Pos</th>
+      <th>Player</th>
+      <th class="num">Total</th>
+      <th class="num">Today</th>
+      <th class="num">Thru</th>
+      <th class="num">R1</th><th class="num">R2</th><th class="num">R3</th><th class="num">R4</th>
+    </tr></thead><tbody>`;
+
+  let cutInserted=false;
+  sorted.forEach((c,idx)=>{
+    const pos=c.status?.position?.displayName||c.status?.position?.id||c.position||'—';
+    const athlete=c.athlete||{};
+    const name=athlete.displayName||athlete.shortName||'Unknown';
+    const ctry=athlete.flag?.alternateText||athlete.country||'';
+    const total=c.score||c.linescores?.find(l=>l.type==='total')?.value;
+    const today=c.linescores?.find(l=>l.type==='round')?.value??c.todayScore;
+    const thru=c.status?.thru||c.thru||'F';
+    const rounds=c.linescores?.filter(l=>l.type==='round')||[];
+    const r1=rounds[0]?.value,r2=rounds[1]?.value,r3=rounds[2]?.value,r4=rounds[3]?.value;
+    const isCut=c.status?.type?.id==='cut'||pos==='CUT';
+
+    // Insert cut line divider
+    if(!cutInserted&&isCut){
+      h+=`<tr class="golf-cut-row"><td colspan="9">✂ Cut Line</td></tr>`;
+      cutInserted=true;
+    }
+
+    const totalFmt=fmtScore(total);
+    const todayFmt=today!==undefined&&today!==null?fmtScore(today):'—';
+    h+=`<tr class="golf-row" tabindex="0">
+      <td class="golf-pos">${pos}</td>
+      <td class="golf-name">${name}${ctry?`<span class="golf-ctry">${ctry}</span>`:''}</td>
+      <td class="golf-score ${scoreClass(total)}">${totalFmt}</td>
+      <td class="golf-score ${scoreClass(today)}">${todayFmt}</td>
+      <td class="golf-thru">${thru}</td>
+      <td class="golf-rd">${r1??'—'}</td>
+      <td class="golf-rd">${r2??'—'}</td>
+      <td class="golf-rd">${r3??'—'}</td>
+      <td class="golf-rd">${r4??'—'}</td>
+    </tr>`;
+  });
+
+  h+=`</tbody></table>`;
+  b.innerHTML=h;
+  b.scrollTop=0;
 }
 </script>
 </body>
