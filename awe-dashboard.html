@@ -180,12 +180,25 @@ body::before{content:'';position:fixed;inset:-50%;width:200%;height:200%;backgro
 /* Prevent first row hiding behind sticky header at scrollTop=0 */
 .golf-tbl tbody tr:first-child td{padding-top:14px}
 .golf-tbl th.left{text-align:left}
-.golf-tbl th:nth-child(1){width:70px}   /* Pos */
-.golf-tbl th:nth-child(2){width:340px;text-align:left}  /* Player */
-.golf-tbl th:nth-child(3){width:90px}   /* Total */
-.golf-tbl th:nth-child(4){width:90px}   /* Today */
-.golf-tbl th:nth-child(5){width:80px;color:var(--text)}   /* Thru — bold white */
-.golf-tbl th:nth-child(6),.golf-tbl th:nth-child(7),.golf-tbl th:nth-child(8),.golf-tbl th:nth-child(9){width:70px}
+.golf-tbl th:nth-child(1){width:54px} /* Fav */
+.golf-tbl th:nth-child(2){width:70px}   /* Pos */
+.golf-tbl th:nth-child(3){width:310px;text-align:left}  /* Player */
+.golf-tbl th:nth-child(4){width:90px}   /* Total */
+.golf-tbl th:nth-child(5){width:90px}   /* Today */
+.golf-tbl th:nth-child(6){width:80px;color:var(--text)}   /* Thru — bold white */
+.golf-tbl th:nth-child(7),.golf-tbl th:nth-child(8),.golf-tbl th:nth-child(9),.golf-tbl th:nth-child(10){width:70px}
+/* Star / fav */
+.g-star{background:none;border:none;cursor:pointer;font-size:26px;line-height:1;padding:4px 6px;border-radius:8px;transition:transform .15s,opacity .15s;opacity:.35;color:var(--gold)}
+.g-star:hover,.g-star:focus{opacity:1;transform:scale(1.2);outline:none}
+.g-star.on{opacity:1}
+/* Modal fav button */
+.g-modal-star{background:rgba(240,180,41,.1);border:2px solid rgba(240,180,41,.3);color:var(--gold);font-size:20px;font-weight:700;padding:10px 22px;border-radius:12px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.g-modal-star:hover,.g-modal-star:focus{background:rgba(240,180,41,.2);border-color:var(--gold);outline:none;transform:scale(1.04)}
+.g-modal-star.on{background:rgba(240,180,41,.25);border-color:var(--gold)}
+.golf-row.is-fav{background:rgba(240,180,41,.05);border-left:3px solid var(--gold)}
+.golf-row.is-fav:focus{background:rgba(240,180,41,.1)}
+/* Fav section divider */
+.golf-fav-divider td{background:rgba(240,180,41,.06);color:var(--gold);font-size:16px;padding:5px 14px;border-top:1px solid rgba(240,180,41,.2);border-bottom:1px solid rgba(240,180,41,.2);text-align:left;font-family:'JetBrains Mono',monospace;letter-spacing:.5px;font-weight:700}
 .golf-row{border-bottom:1px solid rgba(30,32,48,.8);outline:none;transition:background .12s}
 .golf-row:focus{background:rgba(52,211,153,.07);outline:2px solid var(--green);outline-offset:-2px}
 .golf-row:hover{background:var(--card)}
@@ -1295,7 +1308,40 @@ async function doRiddle(b){
   }
 }
 
-// ═══════ GOLF LEADERBOARD ═══════
+// ═══════ GOLF FAVOURITES ═══════
+const GOLF_FAV_KEY='golf_favs';
+let golfFavs=new Set(JSON.parse(localStorage.getItem(GOLF_FAV_KEY)||'[]'));
+
+function saveFavs(){
+  try{localStorage.setItem(GOLF_FAV_KEY,JSON.stringify([...golfFavs]));}catch(_){}
+}
+
+function toggleFav(playerId){
+  if(golfFavs.has(playerId))golfFavs.delete(playerId);
+  else golfFavs.add(playerId);
+  saveFavs();
+  renderGolfLeaderboard(); // re-render to reorder rows
+}
+
+// Star click — stop propagation so it doesn't open the modal
+document.addEventListener('click',e=>{
+  const star=e.target.closest('.g-star[data-starid]');
+  if(star){e.stopPropagation();toggleFav(star.dataset.starid);return;}
+
+  // Modal star button — toggle in-place without closing modal
+  const modalStar=e.target.closest('.g-modal-star[data-starid]');
+  if(modalStar){
+    const pid=modalStar.dataset.starid;
+    toggleFav(pid);
+    // Update button text and state in-place
+    const isFavNow=golfFavs.has(pid);
+    modalStar.textContent=isFavNow?'★ Favourited':'☆ Add to Favourites';
+    modalStar.classList.toggle('on',isFavNow);
+    // Also update the row star in the leaderboard behind the modal
+    const rowStar=document.querySelector(`.g-star[data-starid="${pid}"]`);
+    if(rowStar){rowStar.classList.toggle('on',isFavNow);}
+  }
+});
 let golfData=null;
 let activeGolfEvent=null;
 const GOLF_PROXY='https://golf-scores.kavanagh-m-rob.workers.dev/golf/all';
@@ -1378,6 +1424,7 @@ function renderGolfLeaderboard(){
   // Table only — goes into scrollable golfBody so sticky th works correctly
   let h=`<div class="golf-wrap"><table class="golf-tbl">
     <thead><tr>
+      <th>FAV</th>
       <th>POS</th>
       <th class="left">PLAYER</th>
       <th>TOTAL</th>
@@ -1387,47 +1434,38 @@ function renderGolfLeaderboard(){
     </tr></thead><tbody>`;
 
   let cutInserted=false;
-  competitors.forEach(c=>{
+
+  // Split into favs (pinned top) and rest
+  const favs=competitors.filter(c=>golfFavs.has(c.id));
+  const rest=competitors.filter(c=>!golfFavs.has(c.id));
+
+  // Render a single competitor row
+  function renderRow(c, pinned){
     const isCut=c.status?.type?.name==='STATUS_CUT';
     const isWD=c.status?.type?.name==='STATUS_WITHDRAWN';
-
-    // Insert cut divider before first CUT player
-    if(!cutInserted&&(isCut||isWD)){
-      h+=`<tr class="golf-cut-row"><td colspan="9">✂ &nbsp; CUT LINE</td></tr>`;
-      cutInserted=true;
-    }
-
     const pos=c.status?.position?.displayName||'—';
     const posNum=parseInt(c.status?.position?.id)||999;
     const isTop3=posNum<=3&&!isCut&&!isWD;
-
+    const isFav=golfFavs.has(c.id);
     const athlete=c.athlete||{};
     const name=athlete.displayName||athlete.shortName||'Unknown';
     const ctry=athlete.flag?.alt||'';
     const headshot=athlete.headshot?.href||'';
     const isAmateur=c.amateur;
-
-    // Total score from score.displayValue (e.g. "-12", "+6", "E")
     const totalDisp=c.score?.displayValue||'—';
     const totalClass=gScoreClass(totalDisp);
-
-    // Round scores — linescores sorted by period
     const ls=(c.linescores||[]).filter(l=>l.period&&l.period<=4).sort((a,b)=>a.period-b.period);
     const r1=ls.find(l=>l.period===1);
     const r2=ls.find(l=>l.period===2);
     const r3=ls.find(l=>l.period===3);
     const r4=ls.find(l=>l.period===4);
-
-    // Today = current active round score
     const activeRound=ls.filter(l=>l.value!==undefined).at(-1);
     const todayDisp=activeRound?.displayValue||'—';
     const todayClass=gScoreClass(todayDisp);
-
-    // Thru
     const thruDisp=c.status?.displayThru||c.status?.detail||'—';
     const thruClean=thruDisp==='F'||thruDisp==='18'?'F':thruDisp;
-
-    h+=`<tr class="golf-row${isCut||isWD?' is-cut':''}" tabindex="0" data-golfid="${c.id}" data-evid="${activeGolfEvent}">
+    return `<tr class="golf-row${isCut||isWD?' is-cut':''}${isFav?' is-fav':''}" tabindex="0" data-golfid="${c.id}" data-evid="${activeGolfEvent}">
+      <td><button class="g-star${isFav?' on':''}" data-starid="${c.id}" tabindex="-1" title="${isFav?'Remove favourite':'Add to favourites'}">★</button></td>
       <td><span class="g-pos${isTop3?' top3':''}">${isCut?'CUT':isWD?'WD':pos}</span></td>
       <td class="left">
         <div class="g-player">
@@ -1446,6 +1484,24 @@ function renderGolfLeaderboard(){
       <td class="g-rd">${r3?.value??'—'}</td>
       <td class="g-rd">${r4?.value??'—'}</td>
     </tr>`;
+  }
+
+  // Favourites pinned at top
+  if(favs.length){
+    h+=`<tr class="golf-fav-divider"><td colspan="10">⭐ Favourites</td></tr>`;
+    favs.forEach(c=>h+=renderRow(c,true));
+    h+=`<tr class="golf-fav-divider"><td colspan="10">— All Players —</td></tr>`;
+  }
+
+  // Rest of field
+  rest.forEach(c=>{
+    const isCut=c.status?.type?.name==='STATUS_CUT';
+    const isWD=c.status?.type?.name==='STATUS_WITHDRAWN';
+    if(!cutInserted&&(isCut||isWD)){
+      h+=`<tr class="golf-cut-row"><td colspan="10">✂ &nbsp; CUT LINE</td></tr>`;
+      cutInserted=true;
+    }
+    h+=renderRow(c,false);
   });
 
   h+=`</tbody></table></div>`;
@@ -1507,6 +1563,7 @@ async function showGolfModal(competitorId,eventId){
       ${r.has&&r.out!==undefined?`<div style="font-size:14px;color:var(--dim);margin-top:4px">Out:${r.out} · In:${r.in}</div>`:''}
     </div>`).join('');
 
+  const isFavNow=golfFavs.has(c.id);
   const o=document.getElementById('mOverlay'),mc=document.getElementById('mContent');
   mc.className='md';
   mc.innerHTML=`
@@ -1523,9 +1580,12 @@ async function showGolfModal(competitorId,eventId){
             ${isLive?`<span style="color:var(--green);font-size:18px;font-weight:700;animation:pulse 1.5s ease-in-out infinite">● Playing</span>`:''}
           </div>
         </div>
-        <div style="text-align:right">
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:12px">
           <div class="golf-modal-score ${totalClass}">${totalDisp}</div>
-          <div style="font-size:16px;color:var(--dim);margin-top:4px;font-family:'JetBrains Mono',monospace">${ev.name||'Golf'}</div>
+          <div style="font-size:16px;color:var(--dim);font-family:'JetBrains Mono',monospace">${ev.name||'Golf'}</div>
+          <button class="g-modal-star${isFavNow?' on':''}" id="modalStarBtn" data-starid="${c.id}" tabindex="0">
+            ${isFavNow?'★ Favourited':'☆ Add to Favourites'}
+          </button>
         </div>
       </div>
       <div class="golf-modal-rounds">${roundsHtml}</div>
