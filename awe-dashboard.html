@@ -89,7 +89,10 @@ body::before{content:'';position:fixed;inset:-50%;width:200%;height:200%;backgro
 /* MODAL */
 .mo{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:100;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
 .mo.show{opacity:1;pointer-events:all}
-.md{background:var(--card);border:1px solid var(--border);border-radius:20px;max-width:100%;width:96%;max-height:92vh;overflow-y:auto;display:flex;gap:28px;padding:36px;position:relative}
+.md{background:var(--card);border:1px solid var(--border);border-radius:20px;max-width:100%;width:96%;height:88vh;overflow:hidden;display:flex;gap:28px;padding:36px;position:relative}
+.md.md-golf{align-items:flex-start}
+.md-body{flex:1;display:flex;flex-direction:column;gap:10px;overflow-y:auto;height:100%;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.md-body::-webkit-scrollbar{width:6px}.md-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 .md-poster{width:280px;flex-shrink:0;border-radius:14px;object-fit:cover}
 .md-body{flex:1;display:flex;flex-direction:column;gap:10px}
 .md-title{font-size:30px;font-weight:800;line-height:1.2}
@@ -532,24 +535,25 @@ document.addEventListener('keydown', e=>{
   // ── ENTER / OK ────────────────────────────────────────────────────
   if(e.key==='Enter'||e.keyCode===13){
     e.preventDefault();
+
+    // Inside modal: if a non-close button is focused, activate it; else close
     if(modal){
       const focused=document.activeElement;
-      // If a button inside the modal is focused, activate it (fav toggle, etc.)
-      if(focused&&focused!==document.body&&document.getElementById('mContent')?.contains(focused)){
+      const mc=document.getElementById('mContent');
+      if(focused&&mc?.contains(focused)&&!focused.classList.contains('md-x')){
         focused.click();
       } else if(Date.now()-modalOpenTime>400){
         closeModal();
       }
       return;
     }
-    if(!modal){const el=document.activeElement;if(el&&el!==document.body)el.click();}
-    return;
-  }
 
-  // ── LONG-PRESS OK (hold >600ms on a golf row) → toggle fav ────────
-  // Android TV remote fires repeated keydown while held
-  if((e.key==='Enter'||e.keyCode===13)&&!modal&&curScr==='golf'){
-    // Handled above — long press handled via keydown hold timer below
+    // Outside modal: only fire on keydown (not repeat) — long press handled by keyup timer
+    if(!e.repeat){
+      const el=document.activeElement;
+      if(el&&el!==document.body)el.click();
+    }
+    return;
   }
 
   if(!['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key))return;
@@ -773,44 +777,46 @@ document.addEventListener('keydown', e=>{
 }, true); // ← capture phase: fires before scroll containers can intercept
 
 // ── LONG-PRESS OK on golf rows → toggle fav ──────────────────────────
-// Android TV remotes fire repeated keydown while held. Track hold start
-// time; if released quickly → normal click (modal), if held >600ms → fav.
-let _okHoldTimer=null;
-let _okHoldFired=false;
+// Uses a keydown hold timer. On keydown: start 600ms timer.
+// If keyup fires before 600ms → short press → normal click (modal opens).
+// If 600ms elapses before keyup → long press → toggle fav, suppress click.
+{
+  let _holdTimer=null;
+  let _holdFired=false;
+  let _holdRow=null;
 
-document.addEventListener('keydown',e=>{
-  if(e.key!=='Enter'&&e.keyCode!==13)return;
-  if(isModalOpen()||curScr!=='golf')return;
-  const row=document.activeElement?.closest?.('.golf-row[data-golfid]')
-            ||document.activeElement?.classList?.contains('golf-row')&&document.activeElement;
-  if(!row||!row.dataset?.golfid)return;
-  // e.repeat = true means key is being held (repeated keydown)
-  if(e.repeat&&!_okHoldFired){
-    // Key has been held long enough (repeat fires after ~500ms)
-    _okHoldFired=true;
-    const gid=row.dataset.golfid;
-    toggleFav(gid);
-    // Flash the star cell as feedback
-    const starCell=row.querySelector('.g-row-star');
-    if(starCell){
-      starCell.style.transition='transform .15s';
-      starCell.style.transform='scale(1.8)';
-      setTimeout(()=>starCell.style.transform='',250);
+  document.addEventListener('keydown',e=>{
+    if(e.key!=='Enter'&&e.keyCode!==13)return;
+    if(isModalOpen()||curScr!=='golf')return;
+    const el=document.activeElement;
+    const row=el?.closest?.('.golf-row[data-golfid]')||(el?.classList?.contains('golf-row')?el:null);
+    if(!row?.dataset?.golfid)return;
+    if(e.repeat)return; // ignore key-repeat, we use the timer
+    _holdFired=false;
+    _holdRow=row;
+    _holdTimer=setTimeout(()=>{
+      _holdFired=true;
+      const gid=_holdRow.dataset.golfid;
+      toggleFav(gid);
+      // Pulse star for feedback
+      const star=document.querySelector(`.golf-row[data-golfid="${gid}"] .g-row-star`);
+      if(star){star.style.transition='transform .2s';star.style.transform='scale(2)';setTimeout(()=>star.style.transform='',300);}
+    },600);
+  },true);
+
+  document.addEventListener('keyup',e=>{
+    if(e.key!=='Enter'&&e.keyCode!==13)return;
+    clearTimeout(_holdTimer);
+    if(_holdFired){
+      // Long press fired — swallow this event so click/modal doesn't trigger
+      _holdFired=false;
+      _holdRow=null;
+      e.stopImmediatePropagation();
+      e.preventDefault();
     }
-    e.stopImmediatePropagation();
-    e.preventDefault();
-  }
-},true);
-
-document.addEventListener('keyup',e=>{
-  if(e.key!=='Enter'&&e.keyCode!==13)return;
-  // If long press fired, swallow this keyup so modal doesn't open
-  if(_okHoldFired){
-    _okHoldFired=false;
-    e.stopImmediatePropagation();
-    e.preventDefault();
-  }
-},true);
+    _holdRow=null;
+  },true);
+}
 
 // Smooth scroll helper — focuses element and adjusts scroll container
 function scrollFocus(el,sb){
@@ -1704,10 +1710,10 @@ async function showGolfModal(competitorId,eventId){
 
   const isFavNow=golfFavs.has(c.id);
   const o=document.getElementById('mOverlay'),mc=document.getElementById('mContent');
-  mc.className='md';
+  mc.className='md md-golf';
   mc.innerHTML=`
     <button class="md-x" tabindex="0">✕</button>
-    <div class="md-body" style="gap:0;width:100%">
+    <div class="md-body" style="gap:0">
       <div class="golf-modal-head">
         ${headshot?`<img class="golf-modal-hs" src="${headshot}" onerror="this.style.display='none'">`:''}
         <div class="golf-modal-title">
