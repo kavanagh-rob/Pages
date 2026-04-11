@@ -87,7 +87,7 @@ body::before{content:'';position:fixed;inset:-50%;width:200%;height:200%;backgro
 /* MODAL */
 .mo{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:100;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
 .mo.show{opacity:1;pointer-events:all}
-.md{background:var(--card);border:1px solid var(--border);border-radius:20px;max-width:100%;width:92%;max-height:95vh;overflow-y:auto;display:flex;gap:28px;padding:32px;position:relative}
+.md{background:var(--card);border:1px solid var(--border);border-radius:20px;max-width:100%;width:96%;max-height:92vh;overflow-y:auto;display:flex;gap:28px;padding:36px;position:relative}
 .md-poster{width:280px;flex-shrink:0;border-radius:14px;object-fit:cover}
 .md-body{flex:1;display:flex;flex-direction:column;gap:10px}
 .md-title{font-size:30px;font-weight:800;line-height:1.2}
@@ -214,60 +214,61 @@ body::before{content:'';position:fixed;inset:-50%;width:200%;height:200%;backgro
 /* Tournament tabs */
 .golf-tabs{display:flex;gap:10px;margin-bottom:14px;flex-wrap:nowrap;flex-shrink:0;overflow-x:auto;scrollbar-width:none}
 .golf-tabs::-webkit-scrollbar{display:none}
-/* Golf player modal */
-.golf-modal-head{display:flex;align-items:center;gap:24px;margin-bottom:20px}
-.golf-modal-hs{width:96px;height:96px;border-radius:50%;object-fit:cover;border:3px solid var(--border);background:var(--border);flex-shrink:0}
+/* Golf player modal — TV optimised */
+.golf-modal-head{display:flex;align-items:center;gap:28px;margin-bottom:18px}
+.golf-modal-hs{width:110px;height:110px;border-radius:50%;object-fit:cover;border:3px solid var(--border);background:var(--border);flex-shrink:0}
 .golf-modal-title{flex:1}
-.golf-modal-name{font-size:38px;font-weight:800;color:var(--text);line-height:1.1}
-.golf-modal-ctry{font-size:22px;color:var(--dim);margin-top:4px}
-.golf-modal-pos{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:800;color:var(--gold)}
-.golf-modal-score{font-family:'JetBrains Mono',monospace;font-size:52px;font-weight:900;line-height:1}
+.golf-modal-name{font-size:40px;font-weight:800;color:var(--text);line-height:1.1}
+.golf-modal-ctry{font-size:24px;color:var(--dim);margin-top:4px}
+.golf-modal-pos{font-family:'JetBrains Mono',monospace;font-size:30px;font-weight:800;color:var(--gold)}
+.golf-modal-score{font-family:'JetBrains Mono',monospace;font-size:58px;font-weight:900;line-height:1}
 .golf-modal-score.under{color:#f87171}
 .golf-modal-score.over{color:var(--text)}
 .golf-modal-score.even{color:var(--dim)}
-.golf-modal-rounds{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0}
-.golf-modal-rd{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center}
-.golf-modal-rd-lbl{font-size:17px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
-.golf-modal-rd-score{font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:800;color:var(--text)}
-.golf-modal-rd-rel{font-family:'JetBrains Mono',monospace;font-size:20px;margin-top:2px}
+.golf-modal-rounds{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:16px 0}
+.golf-modal-rd{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center}
+.golf-modal-rd-lbl{font-size:18px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;font-weight:600}
+.golf-modal-rd-score{font-family:'JetBrains Mono',monospace;font-size:36px;font-weight:800;color:var(--text)}
+.golf-modal-rd-rel{font-family:'JetBrains Mono',monospace;font-size:22px;margin-top:4px;font-weight:700}
 .golf-modal-rd-rel.under{color:#f87171}
 .golf-modal-rd-rel.over{color:var(--text)}
 .golf-modal-rd-rel.even{color:var(--dim)}
-.golf-modal-stats{display:flex;gap:16px;flex-wrap:wrap}
-.golf-modal-stat{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 20px;font-size:22px}
+.golf-modal-stats{display:flex;gap:14px;flex-wrap:wrap;margin-top:4px}
+.golf-modal-stat{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 22px;font-size:22px}
 .golf-modal-stat strong{color:var(--gold)}
-/* Golf hole scorecard */
-.golf-sc-section{margin-top:20px}
-.golf-sc-round-hdr{font-size:20px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.7px;margin:16px 0 8px;display:flex;align-items:center;gap:12px}
-.golf-sc-round-hdr .sc-rd-pill{font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:700;padding:3px 12px;border-radius:6px;background:var(--bg);border:1px solid var(--border)}
+/* Golf hole scorecard — TV optimised */
+.golf-sc-section{margin-top:18px}
+.golf-sc-round-hdr{font-size:22px;font-weight:800;color:var(--text);text-transform:uppercase;letter-spacing:.6px;margin:18px 0 10px;display:flex;align-items:center;gap:14px}
+.golf-sc-round-hdr .sc-rd-pill{font-family:'JetBrains Mono',monospace;font-size:19px;font-weight:800;padding:4px 14px;border-radius:6px;background:var(--bg);border:1px solid var(--border)}
 .golf-sc-round-hdr .sc-rd-pill.under{color:#f87171}
 .golf-sc-round-hdr .sc-rd-pill.over{color:var(--text)}
 .golf-sc-round-hdr .sc-rd-pill.even{color:var(--dim)}
-.golf-holes{display:grid;grid-template-columns:repeat(9,1fr);gap:5px;margin-bottom:8px}
-.golf-hole{border-radius:8px;overflow:hidden;text-align:center;min-width:0}
-.golf-hole-num{font-size:13px;color:var(--dim);padding:2px 0;background:rgba(0,0,0,.25);font-family:'JetBrains Mono',monospace}
-.golf-hole-par{font-size:12px;color:var(--dim);padding:1px 0;background:rgba(0,0,0,.15)}
-.golf-hole-score{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:800;padding:7px 0}
+/* 9 holes per row, narrow cells filling full width */
+.golf-holes{display:grid;grid-template-columns:repeat(9,1fr);gap:6px;margin-bottom:6px}
+.golf-hole{border-radius:6px;overflow:hidden;text-align:center;min-width:0}
+.golf-hole-num{font-size:16px;color:var(--dim);padding:4px 0;background:rgba(0,0,0,.3);font-family:'JetBrains Mono',monospace;font-weight:600}
+.golf-hole-par{font-size:16px;color:var(--dim);padding:3px 0;background:rgba(0,0,0,.15);font-weight:500}
+.golf-hole-score{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:900;padding:10px 0}
 .golf-hole.eagle .golf-hole-score{background:rgba(240,180,41,.3);color:var(--gold)}
-.golf-hole.birdie .golf-hole-score{background:rgba(248,113,113,.22);color:#f87171}
+.golf-hole.birdie .golf-hole-score{background:rgba(52,211,153,.22);color:var(--green)}
 .golf-hole.par .golf-hole-score{background:rgba(30,32,48,.9);color:var(--dim)}
-.golf-hole.bogey .golf-hole-score{background:rgba(96,165,250,.18);color:var(--blue)}
-.golf-hole.double .golf-hole-score{background:rgba(96,165,250,.32);color:#93c5fd}
-.golf-hole.worse .golf-hole-score{background:rgba(167,139,250,.28);color:var(--purple)}
+.golf-hole.bogey .golf-hole-score{background:rgba(248,113,113,.3);color:#f87171}
+.golf-hole.double .golf-hole-score{background:rgba(200,40,40,.5);color:#fca5a5}
+.golf-hole.worse .golf-hole-score{background:rgba(160,20,20,.65);color:#fecaca}
 .golf-hole.empty .golf-hole-score{background:rgba(30,32,48,.4);color:rgba(107,109,128,.3)}
-.golf-hole-rel{font-family:'JetBrains Mono',monospace;font-size:12px;padding:2px 0;text-align:center;opacity:.8}
+.golf-hole-rel{font-family:'JetBrains Mono',monospace;font-size:16px;padding:3px 0;text-align:center;font-weight:700}
 .golf-hole.eagle .golf-hole-rel{color:var(--gold)}
-.golf-hole.birdie .golf-hole-rel{color:#f87171}
+.golf-hole.birdie .golf-hole-rel{color:var(--green)}
 .golf-hole.par .golf-hole-rel{color:var(--dim)}
-.golf-hole.bogey .golf-hole-rel{color:var(--blue)}
-.golf-hole.double .golf-hole-rel,.golf-hole.worse .golf-hole-rel{color:#93c5fd}
-.golf-inout{display:flex;gap:10px;margin-bottom:6px;flex-wrap:wrap}
-.golf-inout-chip{font-family:'JetBrains Mono',monospace;font-size:17px;padding:4px 14px;border-radius:7px;background:var(--bg);border:1px solid var(--border);color:var(--dim)}
+.golf-hole.bogey .golf-hole-rel{color:#f87171}
+.golf-hole.double .golf-hole-rel,.golf-hole.worse .golf-hole-rel{color:#fca5a5}
+.golf-inout{display:flex;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+.golf-inout-chip{font-family:'JetBrains Mono',monospace;font-size:19px;padding:6px 16px;border-radius:7px;background:var(--bg);border:1px solid var(--border);color:var(--dim)}
 .golf-inout-chip strong{color:var(--text)}
-.golf-sc-loading{color:var(--dim);font-size:20px;font-style:italic;padding:16px 0}
-.golf-sc-legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
-.golf-sc-legend-item{display:flex;align-items:center;gap:6px;font-size:16px;color:var(--dim)}
-.golf-sc-legend-dot{width:14px;height:14px;border-radius:3px}
+.golf-sc-loading{color:var(--dim);font-size:22px;font-style:italic;padding:16px 0}
+.golf-sc-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)}
+.golf-sc-legend-item{display:flex;align-items:center;gap:8px;font-size:18px;color:var(--dim)}
+.golf-sc-legend-dot{width:18px;height:18px;border-radius:4px}
 
 /* HISTORY TILES */
 .hl{padding:0 4px}
@@ -1447,10 +1448,12 @@ async function showGolfModal(competitorId,eventId){
   const earningsStat=c.statistics?.find(s=>s.name==='officialAmount');
   const earnings=earningsStat?.displayValue&&earningsStat.displayValue!=='--'?earningsStat.displayValue:null;
   const rounds=[1,2,3,4].map(p=>{const l=ls.find(l=>l.period===p);return{period:p,score:l?.value,disp:l?.displayValue,out:l?.outScore,in:l?.inScore,has:l?.value!==undefined};});
-  // Most recent round first
+  // Summary cards: R1 → R4 left to right (chronological)
+  const roundsChron=[...rounds];
+  // Detail sections: most recent first
   const roundsSorted=[...rounds].reverse();
 
-  const roundsHtml=roundsSorted.map(r=>`
+  const roundsHtml=roundsChron.map(r=>`
     <div class="golf-modal-rd"${!r.has?' style="opacity:.35"':''}>
       <div class="golf-modal-rd-lbl">Round ${r.period}</div>
       <div class="golf-modal-rd-score">${r.score??'—'}</div>
@@ -1462,7 +1465,7 @@ async function showGolfModal(competitorId,eventId){
   mc.className='md';
   mc.innerHTML=`
     <button class="md-x" tabindex="0">✕</button>
-    <div class="md-body" style="gap:0;width:100%;overflow-y:auto;max-height:80vh">
+    <div class="md-body" style="gap:0;width:100%">
       <div class="golf-modal-head">
         ${headshot?`<img class="golf-modal-hs" src="${headshot}" onerror="this.style.display='none'">`:''}
         <div class="golf-modal-title">
@@ -1512,8 +1515,17 @@ async function fetchGolfScorecard(eventId, competitorId, rounds, roundsSorted, e
   }
 }
 
-function holeClass(playerScore, par){
-  if(playerScore===null||playerScore===undefined)return 'empty';
+function holeClass(playerScore, par, scoreTypeName){
+  if(scoreTypeName){
+    const n=scoreTypeName.toUpperCase();
+    if(n==='HOLE_IN_ONE'||n==='DOUBLE_EAGLE'||n==='EAGLE')return 'eagle';
+    if(n==='BIRDIE')return 'birdie';
+    if(n==='PAR')return 'par';
+    if(n==='BOGEY')return 'bogey';
+    if(n==='DOUBLE_BOGEY')return 'double';
+    if(n.includes('BOGEY'))return 'worse';
+  }
+  if(playerScore===null||playerScore===undefined||isNaN(playerScore))return 'empty';
   const diff=playerScore-par;
   if(diff<=-2)return 'eagle';
   if(diff===-1)return 'birdie';
@@ -1523,55 +1535,78 @@ function holeClass(playerScore, par){
   return 'worse';
 }
 
-function holeCell(holeNum, par, playerScore){
-  const cls=playerScore!==undefined&&playerScore!==null?holeClass(playerScore,par):'empty';
-  const relScore=playerScore!==undefined&&playerScore!==null
+function holeCell(holeNum, par, playerScore, scoreTypeName){
+  const hasScore=playerScore!==undefined&&playerScore!==null&&!isNaN(playerScore);
+  const cls=hasScore?holeClass(playerScore,par,scoreTypeName):'empty';
+  const relScore=hasScore
     ?(playerScore-par===0?'E':playerScore-par>0?`+${playerScore-par}`:String(playerScore-par))
     :'';
   return `<div class="golf-hole ${cls}">
     <div class="golf-hole-num">${holeNum}</div>
     <div class="golf-hole-par">Par ${par}</div>
-    <div class="golf-hole-score">${playerScore??'·'}</div>
+    <div class="golf-hole-score">${hasScore?playerScore:'·'}</div>
     ${relScore?`<div class="golf-hole-rel">${relScore}</div>`:''}
   </div>`;
 }
 
 function renderHoleScores(area, json, rounds, roundsSorted){
-  const scRounds=json.rounds||json.scorecard?.rounds||[];
-  if(!scRounds.length){renderInOutFallback(area,roundsSorted);return}
+  // API structure from screenshot:
+  // items[] = rounds (each item has period=round number, linescores[]=hole scores)
+  // items[0].period = 1 (Round 1), items[1].period = 2 (Round 2) etc
+  // items[n].linescores[h] = { value: strokes, par: holePar, period: holeNumber, scoreType:{name} }
+  const items=json.items||[];
+  if(!items.length){renderInOutFallback(area,roundsSorted);return}
 
-  // Sort scorecard rounds most recent first
-  const sorted=[...scRounds].sort((a,b)=>(b.period||b.round||0)-(a.period||a.round||0));
+  // Build a map: roundPeriod → holes[]
+  const roundMap={};
+  items.forEach(item=>{
+    const rdPeriod=item.period;
+    if(!rdPeriod)return;
+    const holes=(item.linescores||[]).map(ls=>({
+      hole: ls.period,           // hole number
+      par:  ls.par??4,
+      score:ls.value,
+      scoreTypeName:ls.scoreType?.name||''
+    })).filter(h=>h.hole&&h.hole>=1&&h.hole<=18);
+    roundMap[rdPeriod]=holes;
+  });
+
+  // Show rounds most recent first
+  const roundsWithData=roundsSorted.filter(r=>r.has&&roundMap[r.period]?.length);
+  // fallback if no round map entries
+  if(!roundsWithData.length){
+    // try all items we got
+    const allPeriods=Object.keys(roundMap).map(Number).sort((a,b)=>b-a);
+    if(!allPeriods.length){renderInOutFallback(area,roundsSorted);return}
+    allPeriods.forEach(period=>{
+      const rdMeta=rounds.find(r=>r.period===period)||{period,disp:'',out:undefined,in:undefined,score:undefined};
+      renderRoundHoles(h=>'', rdMeta, roundMap[period]);
+    });
+    return;
+  }
 
   let h='';
-  sorted.forEach(rd=>{
-    const holes=rd.holes||rd.linescores||[];
-    if(!holes.length)return;
-    const rdPeriod=rd.period||rd.round;
-    const rdMeta=rounds.find(r=>r.period===rdPeriod);
-    const pill=rdMeta?.disp?`<span class="sc-rd-pill ${gScoreClass(rdMeta.disp)}">${rdMeta.disp}</span>`:'';
-    const outIn=rdMeta?.out!==undefined?`<span style="font-size:16px;color:var(--dim);font-weight:400">Out: ${rdMeta.out} · In: ${rdMeta.in}</span>`:'';
-    h+=`<div class="golf-sc-round-hdr">Round ${rdPeriod} ${pill} ${outIn}</div>`;
+  roundsWithData.forEach(rdMeta=>{
+    const holes=roundMap[rdMeta.period]||[];
+    const pill=`<span class="sc-rd-pill ${gScoreClass(rdMeta.disp)}">${rdMeta.disp}</span>`;
+    const outIn=rdMeta.out!==undefined
+      ?`<span style="font-size:18px;color:var(--dim);font-weight:400;margin-left:8px">OUT: ${rdMeta.out} · IN: ${rdMeta.in} · TOTAL: ${rdMeta.score}</span>`:'';
+    h+=`<div class="golf-sc-round-hdr">ROUND ${rdMeta.period} ${pill}${outIn}</div>`;
 
-    // Front 9
+    // Sort holes 1-18 by hole number
+    const sorted=[...holes].sort((a,b)=>a.hole-b.hole);
+
     h+=`<div class="golf-holes">`;
-    holes.slice(0,9).forEach(hole=>{
-      const sc=hole.score??hole.value;
-      const par=hole.par??hole.parValue??MASTERS_PARS[(hole.number||hole.hole||1)-1]??4;
-      h+=holeCell(hole.number||hole.hole||'',par,sc);
-    });
+    sorted.slice(0,9).forEach(hd=>h+=holeCell(hd.hole,hd.par,hd.score,hd.scoreTypeName));
+    // pad to 9 if fewer played
+    for(let i=sorted.slice(0,9).length;i<9;i++)h+=holeCell(i+1,MASTERS_PARS[i],undefined,'');
     h+=`</div>`;
 
-    // Back 9
-    if(holes.length>9){
-      h+=`<div class="golf-holes" style="margin-top:5px">`;
-      holes.slice(9,18).forEach(hole=>{
-        const sc=hole.score??hole.value;
-        const par=hole.par??hole.parValue??MASTERS_PARS[(hole.number||hole.hole||1)-1]??4;
-        h+=holeCell(hole.number||hole.hole||'',par,sc);
-      });
-      h+=`</div>`;
-    }
+    h+=`<div class="golf-holes" style="margin-top:5px">`;
+    sorted.slice(9,18).forEach(hd=>h+=holeCell(hd.hole,hd.par,hd.score,hd.scoreTypeName));
+    const back9played=sorted.slice(9,18).length;
+    for(let i=back9played;i<9;i++)h+=holeCell(i+10,MASTERS_PARS[i+9],undefined,'');
+    h+=`</div>`;
   });
 
   h+=legend();
@@ -1585,7 +1620,7 @@ function renderInOutFallback(area, roundsSorted){
   let h='';
   played.forEach(r=>{
     const pill=`<span class="sc-rd-pill ${gScoreClass(r.disp)}">${r.disp}</span>`;
-    const outIn=r.out!==undefined?`<span style="font-size:16px;color:var(--dim);font-weight:400">Out: ${r.out} · In: ${r.in} · Total: ${r.score}</span>`:'';
+    const outIn=r.out!==undefined?`<span style="font-size:18px;color:var(--dim);font-weight:400">Out: ${r.out} · In: ${r.in} · Total: ${r.score}</span>`:'';
     h+=`<div class="golf-sc-round-hdr">Round ${r.period} ${pill} ${outIn}</div>`;
 
     // Front 9 — colour-code using Masters pars, player score estimated from out total
@@ -1608,18 +1643,18 @@ function renderInOutFallback(area, roundsSorted){
   });
 
   h+=legend();
-  h+=`<div style="font-size:15px;color:var(--dim);margin-top:10px;font-style:italic">Individual hole scores available once /scorecard worker route is added</div>`;
+  h+=`<div style="font-size:16px;color:var(--dim);margin-top:10px;font-style:italic">Individual hole scores available once /scorecard worker route is added</div>`;
   area.innerHTML=h;
 }
 
 function legend(){
   return `<div class="golf-sc-legend">
     <div class="golf-sc-legend-item"><div class="golf-sc-legend-dot" style="background:rgba(240,180,41,.35)"></div>Eagle−</div>
-    <div class="golf-sc-legend-item"><div class="golf-sc-legend-dot" style="background:rgba(248,113,113,.25)"></div>Birdie</div>
-    <div class="golf-sc-legend-item"><div class="golf-sc-legend-dot" style="background:rgba(30,32,48,.9)"></div>Par</div>
-    <div class="golf-sc-legend-item"><div class="golf-sc-legend-dot" style="background:rgba(96,165,250,.2)"></div>Bogey</div>
-    <div class="golf-sc-legend-item"><div class="golf-sc-legend-dot" style="background:rgba(96,165,250,.35)"></div>Double+</div>
-    <div class="golf-sc-legend-item"><div class="golf-sc-legend-dot" style="background:rgba(167,139,250,.3)"></div>Triple+</div>
+    <div class="golf-sc-legend-item"><div class="golf-sc-legend-dot" style="background:rgba(52,211,153,.25)"></div>Birdie</div>
+    <div class="golf-sc-legend-item"><div class="golf-sc-legend-dot" style="background:rgba(30,32,48,.9);border:1px solid #2a2a3a"></div>Par</div>
+    <div class="golf-sc-legend-item"><div class="golf-sc-legend-dot" style="background:rgba(248,113,113,.3)"></div>Bogey</div>
+    <div class="golf-sc-legend-item"><div class="golf-sc-legend-dot" style="background:rgba(200,40,40,.5)"></div>Double+</div>
+    <div class="golf-sc-legend-item"><div class="golf-sc-legend-dot" style="background:rgba(160,20,20,.65)"></div>Triple+</div>
   </div>`;
 }
 </script>
