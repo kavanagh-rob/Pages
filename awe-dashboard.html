@@ -144,12 +144,130 @@ body::before{content:'';position:fixed;inset:-50%;width:200%;height:200%;backgro
 .up-premiere{font-size:18px;color:var(--orange);font-weight:600}
 .up-rating{font-size:18px;color:var(--gold);font-weight:600}
 
-/* RACING SUBTABS */
-.rtabs{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;flex-shrink:0}
+/* UPCOMING TABS */
+.uptabs{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;flex-shrink:0}
+.uptab{background:var(--card);border:2px solid var(--border);color:var(--dim);font:600 22px 'Outfit',sans-serif;padding:10px 28px;border-radius:12px;cursor:pointer;transition:all .2s;white-space:nowrap;display:flex;align-items:center;gap:10px}
+.uptab:focus{outline:none;border-color:var(--pink);color:var(--text);box-shadow:0 0 16px rgba(244,114,182,.2)}
+.uptab.active{border-color:var(--pink);color:var(--pink);background:rgba(244,114,182,.08)}
+.uptab:hover{border-color:rgba(244,114,182,.4);color:var(--text)}
+.uptab .uptab-count{background:var(--border);color:var(--dim);font-size:17px;font-weight:700;padding:2px 8px;border-radius:6px;font-family:'JetBrains Mono',monospace}
+.uptab.active .uptab-count{background:rgba(244,114,182,.15);color:var(--pink)}
 .rtab{background:var(--card);border:2px solid var(--border);color:var(--dim);font:600 20px 'Outfit',sans-serif;padding:8px 22px;border-radius:10px;cursor:pointer;transition:all .2s;white-space:nowrap}
 .rtab:focus{outline:none;border-color:var(--gold);color:var(--text);box-shadow:0 0 16px rgba(240,180,41,.2)}
 .rtab.active{border-color:var(--gold);color:var(--gold);background:rgba(240,180,41,.08)}
 .rtab:hover{border-color:rgba(240,180,41,.4);color:var(--text)}
+
+/* FUN TABS (joke/riddle) */
+.funtab{background:var(--card);border:2px solid var(--border);color:var(--dim);font:600 22px 'Outfit',sans-serif;padding:10px 36px;border-radius:12px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.funtab:focus{outline:none;border-color:var(--orange);color:var(--text);box-shadow:0 0 16px rgba(251,146,60,.2)}
+.funtab.active{border-color:var(--orange);color:var(--orange);background:rgba(251,146,60,.08)}
+.funtab:hover{border-color:rgba(251,146,60,.4);color:var(--text)}
+
+/* GOLF LEADERBOARD */
+.golf-header{flex-shrink:0;margin-bottom:12px}
+.golf-event-name{font-size:30px;font-weight:800;color:var(--green);letter-spacing:-.5px;display:flex;align-items:center;gap:16px}
+.golf-status-badge{font-size:18px;font-weight:700;padding:4px 14px;border-radius:8px;font-family:'JetBrains Mono',monospace}
+.golf-status-badge.live{background:rgba(52,211,153,.15);color:var(--green);animation:pulse 1.5s ease-in-out infinite}
+.golf-status-badge.post{background:rgba(107,109,128,.15);color:var(--dim)}
+.golf-meta-row{display:flex;gap:20px;margin-top:6px;font-size:20px;color:var(--dim);font-family:'JetBrains Mono',monospace;flex-wrap:wrap}
+.golf-meta-row b{color:var(--text);font-weight:600}
+/* Table */
+.golf-wrap{overflow-x:hidden}
+.golf-tbl{width:100%;border-collapse:collapse;table-layout:fixed}
+.golf-tbl th{font-size:17px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.7px;padding:10px 14px;border-bottom:2px solid var(--border);background:var(--bg);text-align:center;white-space:nowrap;position:sticky;top:0;z-index:2}
+.golf-tbl th.left{text-align:left}
+.golf-tbl th:nth-child(1){width:70px}   /* Pos */
+.golf-tbl th:nth-child(2){width:340px;text-align:left}  /* Player */
+.golf-tbl th:nth-child(3){width:90px}   /* Total */
+.golf-tbl th:nth-child(4){width:90px}   /* Today */
+.golf-tbl th:nth-child(5){width:80px}   /* Thru */
+.golf-tbl th:nth-child(6),.golf-tbl th:nth-child(7),.golf-tbl th:nth-child(8),.golf-tbl th:nth-child(9){width:70px}
+.golf-row{border-bottom:1px solid rgba(30,32,48,.8);outline:none;transition:background .12s}
+.golf-row:focus{background:rgba(52,211,153,.07);outline:2px solid var(--green);outline-offset:-2px}
+.golf-row:hover{background:var(--card)}
+.golf-row.is-cut{opacity:.55}
+.golf-row td{padding:12px 14px;font-size:22px;text-align:center;vertical-align:middle}
+.golf-row td.left{text-align:left}
+/* Pos cell */
+.g-pos{font-family:'JetBrains Mono',monospace;font-size:20px;color:var(--dim);font-weight:600}
+.g-pos.top3{color:var(--gold);font-weight:800}
+/* Player cell */
+.g-player{display:flex;align-items:center;gap:12px}
+.g-headshot{width:44px;height:44px;border-radius:50%;object-fit:cover;background:var(--border);flex-shrink:0;border:2px solid var(--border)}
+.g-name{font-size:22px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.g-ctry{font-size:16px;color:var(--dim);margin-top:2px}
+.g-amateur{font-size:14px;color:var(--gold);font-weight:700;margin-left:6px}
+/* Score cells */
+.g-total{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:900}
+.g-total.under{color:#f87171}
+.g-total.over{color:var(--text)}
+.g-total.even{color:var(--dim)}
+.g-total.leader{color:var(--green)}
+.g-today{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700}
+.g-today.under{color:#f87171}
+.g-today.over{color:var(--text)}
+.g-today.even{color:var(--dim)}
+.g-thru{font-family:'JetBrains Mono',monospace;font-size:18px;color:var(--dim)}
+.g-rd{font-family:'JetBrains Mono',monospace;font-size:19px;color:var(--dim)}
+/* Cut divider */
+.golf-cut-row td{background:rgba(248,113,113,.06);color:rgba(248,113,113,.7);font-size:18px;padding:6px 14px;border-top:1px solid rgba(248,113,113,.25);border-bottom:1px solid rgba(248,113,113,.25);text-align:center;font-family:'JetBrains Mono',monospace;letter-spacing:.5px}
+/* Tournament tabs */
+.golf-tabs{display:flex;gap:10px;margin-bottom:14px;flex-wrap:nowrap;flex-shrink:0;overflow-x:auto;scrollbar-width:none}
+.golf-tabs::-webkit-scrollbar{display:none}
+/* Golf player modal */
+.golf-modal-head{display:flex;align-items:center;gap:24px;margin-bottom:20px}
+.golf-modal-hs{width:96px;height:96px;border-radius:50%;object-fit:cover;border:3px solid var(--border);background:var(--border);flex-shrink:0}
+.golf-modal-title{flex:1}
+.golf-modal-name{font-size:38px;font-weight:800;color:var(--text);line-height:1.1}
+.golf-modal-ctry{font-size:22px;color:var(--dim);margin-top:4px}
+.golf-modal-pos{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:800;color:var(--gold)}
+.golf-modal-score{font-family:'JetBrains Mono',monospace;font-size:52px;font-weight:900;line-height:1}
+.golf-modal-score.under{color:#f87171}
+.golf-modal-score.over{color:var(--text)}
+.golf-modal-score.even{color:var(--dim)}
+.golf-modal-rounds{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0}
+.golf-modal-rd{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center}
+.golf-modal-rd-lbl{font-size:17px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.golf-modal-rd-score{font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:800;color:var(--text)}
+.golf-modal-rd-rel{font-family:'JetBrains Mono',monospace;font-size:20px;margin-top:2px}
+.golf-modal-rd-rel.under{color:#f87171}
+.golf-modal-rd-rel.over{color:var(--text)}
+.golf-modal-rd-rel.even{color:var(--dim)}
+.golf-modal-stats{display:flex;gap:16px;flex-wrap:wrap}
+.golf-modal-stat{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 20px;font-size:22px}
+.golf-modal-stat strong{color:var(--gold)}
+/* Golf hole scorecard */
+.golf-sc-section{margin-top:20px}
+.golf-sc-round-hdr{font-size:20px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.7px;margin:16px 0 8px;display:flex;align-items:center;gap:12px}
+.golf-sc-round-hdr .sc-rd-pill{font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:700;padding:3px 12px;border-radius:6px;background:var(--bg);border:1px solid var(--border)}
+.golf-sc-round-hdr .sc-rd-pill.under{color:#f87171}
+.golf-sc-round-hdr .sc-rd-pill.over{color:var(--text)}
+.golf-sc-round-hdr .sc-rd-pill.even{color:var(--dim)}
+.golf-holes{display:grid;grid-template-columns:repeat(9,1fr);gap:5px;margin-bottom:8px}
+.golf-hole{border-radius:8px;overflow:hidden;text-align:center;min-width:0}
+.golf-hole-num{font-size:13px;color:var(--dim);padding:2px 0;background:rgba(0,0,0,.25);font-family:'JetBrains Mono',monospace}
+.golf-hole-par{font-size:12px;color:var(--dim);padding:1px 0;background:rgba(0,0,0,.15)}
+.golf-hole-score{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:800;padding:7px 0}
+.golf-hole.eagle .golf-hole-score{background:rgba(240,180,41,.3);color:var(--gold)}
+.golf-hole.birdie .golf-hole-score{background:rgba(248,113,113,.22);color:#f87171}
+.golf-hole.par .golf-hole-score{background:rgba(30,32,48,.9);color:var(--dim)}
+.golf-hole.bogey .golf-hole-score{background:rgba(96,165,250,.18);color:var(--blue)}
+.golf-hole.double .golf-hole-score{background:rgba(96,165,250,.32);color:#93c5fd}
+.golf-hole.worse .golf-hole-score{background:rgba(167,139,250,.28);color:var(--purple)}
+.golf-hole.empty .golf-hole-score{background:rgba(30,32,48,.4);color:rgba(107,109,128,.3)}
+.golf-hole-rel{font-family:'JetBrains Mono',monospace;font-size:12px;padding:2px 0;text-align:center;opacity:.8}
+.golf-hole.eagle .golf-hole-rel{color:var(--gold)}
+.golf-hole.birdie .golf-hole-rel{color:#f87171}
+.golf-hole.par .golf-hole-rel{color:var(--dim)}
+.golf-hole.bogey .golf-hole-rel{color:var(--blue)}
+.golf-hole.double .golf-hole-rel,.golf-hole.worse .golf-hole-rel{color:#93c5fd}
+.golf-inout{display:flex;gap:10px;margin-bottom:6px;flex-wrap:wrap}
+.golf-inout-chip{font-family:'JetBrains Mono',monospace;font-size:17px;padding:4px 14px;border-radius:7px;background:var(--bg);border:1px solid var(--border);color:var(--dim)}
+.golf-inout-chip strong{color:var(--text)}
+.golf-sc-loading{color:var(--dim);font-size:20px;font-style:italic;padding:16px 0}
+.golf-sc-legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.golf-sc-legend-item{display:flex;align-items:center;gap:6px;font-size:16px;color:var(--dim)}
+.golf-sc-legend-dot{width:14px;height:14px;border-radius:3px}
 
 /* HISTORY TILES */
 .hl{padding:0 4px}
@@ -174,14 +292,14 @@ body::before{content:'';position:fixed;inset:-50%;width:200%;height:200%;backgro
 <div id="home">
   <div class="hdr"><h1>TV Hub</h1><div class="clk" id="clk"></div></div>
   <div class="grid" id="homeGrid">
+    <div class="tile" tabindex="0" data-id="golf"><div class="t-icon">⛳</div><div class="t-lbl">Golf</div><div class="t-sub">Live Scores</div></div>
     <div class="tile" tabindex="0" data-id="racing"><div class="t-icon">🏇</div><div class="t-lbl">Horse Racing</div><div class="t-sub">Live Results</div></div>
     <div class="tile" tabindex="0" data-id="movies"><div class="t-icon">🎬</div><div class="t-lbl">Trending Movies</div><div class="t-sub">TMDB</div></div>
     <div class="tile" tabindex="0" data-id="tvshows"><div class="t-icon">📺</div><div class="t-lbl">TV Shows</div><div class="t-sub">Popular Now</div></div>
     <div class="tile" tabindex="0" data-id="nasa"><div class="t-icon">🚀</div><div class="t-lbl">NASA</div><div class="t-sub">Gallery</div></div>
     <div class="tile" tabindex="0" data-id="upcoming"><div class="t-icon">📅</div><div class="t-lbl">Upcoming TV</div><div class="t-sub">Next Episode</div></div>
     <div class="tile" tabindex="0" data-id="history"><div class="t-icon">📜</div><div class="t-lbl">This Day</div><div class="t-sub">In History</div></div>
-    <div class="tile" tabindex="0" data-id="riddle"><div class="t-icon">🧩</div><div class="t-lbl">Riddle</div><div class="t-sub">Of the Day</div></div>
-    <div class="tile" tabindex="0" data-id="joke"><div class="t-icon">😂</div><div class="t-lbl">Joke</div><div class="t-sub">Of the Day</div></div>
+    <div class="tile" tabindex="0" data-id="fun"><div class="t-icon">🎭</div><div class="t-lbl">Joke & Riddle</div><div class="t-sub">Daily Fun</div></div>
   </div>
 </div>
 
@@ -217,9 +335,13 @@ body::before{content:'';position:fixed;inset:-50%;width:200%;height:200%;backgro
 <div class="scr" id="scr-upcoming">
   <div class="sh">
     <button class="bk" tabindex="0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>Back</button>
-    <div class="st" style="color:var(--pink)">📅 Upcoming TV Shows</div>
+    <div class="st" style="color:var(--pink)">📅 TV Shows</div>
     <div id="upcomingCacheLabel" style="font-size:18px;color:var(--dim);font-family:'JetBrains Mono',monospace;margin-right:8px"></div>
     <button class="rl" tabindex="0" id="rl-upcoming"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>Reload</button>
+  </div>
+  <div class="uptabs" id="upcomingTabs">
+    <button class="uptab active" tabindex="0" data-uptab="upcoming">📅 Coming Up <span class="uptab-count" id="uptab-count-upcoming">—</span></button>
+    <button class="uptab" tabindex="0" data-uptab="aired">✅ Recently Aired <span class="uptab-count" id="uptab-count-aired">—</span></button>
   </div>
   <div class="sb" id="upcomingBody"></div>
 </div>
@@ -230,17 +352,28 @@ body::before{content:'';position:fixed;inset:-50%;width:200%;height:200%;backgro
   <button class="rl" tabindex="0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>Reload</button>
 </div><div class="sb" id="historyBody"></div></div>
 
-<div class="scr" id="scr-riddle"><div class="sh">
-  <button class="bk" tabindex="0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>Back</button>
-  <div class="st" style="color:var(--orange)">🧩 Riddle of the Day</div>
-  <button class="rl" tabindex="0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>New Riddle</button>
-</div><div class="sb" id="riddleBody"></div></div>
+<div class="scr" id="scr-fun">
+  <div class="sh">
+    <button class="bk" tabindex="0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>Back</button>
+    <div class="st" style="color:var(--orange)">🎭 Daily Fun</div>
+    <button class="rl" tabindex="0" id="rl-fun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>New</button>
+  </div>
+  <div class="uptabs" id="funTabs" style="--tab-color:var(--orange)">
+    <button class="funtab active" tabindex="0" data-funtab="joke">😂 Joke</button>
+    <button class="funtab" tabindex="0" data-funtab="riddle">🧩 Riddle</button>
+  </div>
+  <div class="sb" id="funBody"></div>
+</div>
 
-<div class="scr" id="scr-joke"><div class="sh">
-  <button class="bk" tabindex="0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>Back</button>
-  <div class="st" style="color:var(--green)">😂 Joke of the Day</div>
-  <button class="rl" tabindex="0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>New Joke</button>
-</div><div class="sb" id="jokeBody"></div></div>
+<div class="scr" id="scr-golf" style="overflow:hidden">
+  <div class="sh">
+    <button class="bk" tabindex="0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>Back</button>
+    <div class="st" style="color:var(--green)">⛳ Golf Leaderboard</div>
+    <button class="rl" tabindex="0" id="rl-golf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>Reload</button>
+  </div>
+  <div class="golf-tabs" id="golfTabs"></div>
+  <div class="sb" id="golfBody"></div>
+</div>
 
 <!-- MODAL -->
 <div class="mo" id="mOverlay"><div class="md" id="mContent"></div></div>
@@ -255,7 +388,7 @@ const NASA_KEY='cQVDvwpdFz0u34enmqgkBxLMEwTq6Kdkg6hWluJG';
 
 // ═══════ NAVIGATION ═══════
 let curScr=null,lastFocus=null;
-const loaders={racing:loadRacing,movies:loadMovies,tvshows:loadTVShows,nasa:loadNasa,upcoming:loadUpcoming,history:loadHistory,riddle:loadRiddle,joke:loadJoke};
+const loaders={racing:loadRacing,movies:loadMovies,tvshows:loadTVShows,nasa:loadNasa,upcoming:loadUpcoming,history:loadHistory,fun:loadFun,golf:loadGolf};
 
 function openScr(id){
   document.getElementById('home').style.display='none';
@@ -405,8 +538,101 @@ document.addEventListener('keydown', e=>{
     hdr[0]?.focus();return;
   }
 
-  // General screens — detect grid type and column count
-  const sb=scr.querySelector('.sb');
+  // Upcoming: header → tabs → grid (5 cols)
+  if(curScr==='upcoming'){
+    const tabs=[...scr.querySelectorAll('.uptab')];
+    const body=[...scr.querySelectorAll('.sb .up-card')];
+    const cur=document.activeElement;
+    const inHdr=hdr.includes(cur),inTabs=tabs.includes(cur);
+    const bi=body.indexOf(cur);
+    const sb=scr.querySelector('.sb');
+    if(inHdr){
+      const hi=hdr.indexOf(cur);
+      if(e.key==='ArrowRight'&&hi+1<hdr.length){hdr[hi+1].focus();return}
+      if(e.key==='ArrowLeft'&&hi>0){hdr[hi-1].focus();return}
+      if(e.key==='ArrowDown'){(tabs.length?tabs[0]:body[0])?.focus();return}
+      return;
+    }
+    if(inTabs){
+      const ti=tabs.indexOf(cur);
+      if(e.key==='ArrowRight'&&ti+1<tabs.length){tabs[ti+1].focus();return}
+      if(e.key==='ArrowLeft'&&ti>0){tabs[ti-1].focus();return}
+      if(e.key==='ArrowUp'){hdr[0]?.focus();return}
+      if(e.key==='ArrowDown'&&body.length){scrollFocus(body[0],sb);return}
+      return;
+    }
+    if(bi!==-1){
+      const cols=5;let ni=-1;
+      if(e.key==='ArrowRight'){ni=bi+1;if(ni>=body.length||Math.floor(ni/cols)!==Math.floor(bi/cols))return}
+      else if(e.key==='ArrowLeft'){ni=bi-1;if(ni<0||Math.floor(ni/cols)!==Math.floor(bi/cols))return}
+      else if(e.key==='ArrowDown'){ni=bi+cols;}
+      else if(e.key==='ArrowUp'){ni=bi-cols;if(ni<0){(tabs.length?tabs[0]:hdr[0])?.focus();return}}
+      if(ni>=0&&ni<body.length)scrollFocus(body[ni],sb);
+      return;
+    }
+    hdr[0]?.focus();return;
+  }
+
+  // Fun: header → tabs → .rv button (single col)
+  if(curScr==='fun'){
+    const tabs=[...scr.querySelectorAll('.funtab')];
+    const body=[...scr.querySelectorAll('.sb .rv')];
+    const cur=document.activeElement;
+    const inHdr=hdr.includes(cur),inTabs=tabs.includes(cur),inBody=body.includes(cur);
+    if(inHdr){
+      const hi=hdr.indexOf(cur);
+      if(e.key==='ArrowRight'&&hi+1<hdr.length){hdr[hi+1].focus();return}
+      if(e.key==='ArrowLeft'&&hi>0){hdr[hi-1].focus();return}
+      if(e.key==='ArrowDown'){tabs[0]?.focus();return}
+      return;
+    }
+    if(inTabs){
+      const ti=tabs.indexOf(cur);
+      if(e.key==='ArrowRight'&&ti+1<tabs.length){tabs[ti+1].focus();return}
+      if(e.key==='ArrowLeft'&&ti>0){tabs[ti-1].focus();return}
+      if(e.key==='ArrowUp'){hdr[0]?.focus();return}
+      if(e.key==='ArrowDown'&&body.length){body[0].focus();return}
+      return;
+    }
+    if(inBody){
+      if(e.key==='ArrowUp'){tabs[0]?.focus();return}
+      return;
+    }
+    hdr[0]?.focus();return;
+  }
+
+  // Golf: header → tour tabs → leaderboard rows (single col)
+  if(curScr==='golf'){
+    const tabs=[...scr.querySelectorAll('.rtab')];
+    const body=[...scr.querySelectorAll('.sb .golf-row')];
+    const sb=scr.querySelector('.sb');
+    const cur=document.activeElement;
+    const inHdr=hdr.includes(cur),inTabs=tabs.includes(cur);
+    const bi=body.indexOf(cur);
+    if(inHdr){
+      const hi=hdr.indexOf(cur);
+      if(e.key==='ArrowRight'&&hi+1<hdr.length){hdr[hi+1].focus();return}
+      if(e.key==='ArrowLeft'&&hi>0){hdr[hi-1].focus();return}
+      if(e.key==='ArrowDown'){(tabs.length?tabs[0]:body[0])?.focus();return}
+      return;
+    }
+    if(inTabs){
+      const ti=tabs.indexOf(cur);
+      if(e.key==='ArrowRight'&&ti+1<tabs.length){tabs[ti+1].focus();return}
+      if(e.key==='ArrowLeft'&&ti>0){tabs[ti-1].focus();return}
+      if(e.key==='ArrowUp'){hdr[0]?.focus();return}
+      if(e.key==='ArrowDown'&&body.length){scrollFocus(body[0],sb);return}
+      return;
+    }
+    if(bi!==-1){
+      let ni=-1;
+      if(e.key==='ArrowDown'){ni=bi+1;}
+      else if(e.key==='ArrowUp'){ni=bi-1;if(ni<0){(tabs.length?tabs[0]:hdr[0])?.focus();return}}
+      if(ni>=0&&ni<body.length)scrollFocus(body[ni],sb);
+      return;
+    }
+    hdr[0]?.focus();return;
+  }
   let bodyItems=[],cols=1;
   if(sb){
     const rc=[...sb.querySelectorAll('.rc')];
@@ -725,9 +951,13 @@ async function loadUpcoming(){
   btn?.classList.add('spin');
   if(upcomingCache&&Date.now()-upcomingCacheTime<1800000){
     updateUpcomingCacheLabel(upcomingCache);
-    renderUpcoming(b,upcomingCache);
+    // Re-render with current tab state
+    renderUpcoming(document.getElementById('upcomingBody'),upcomingCache);
     btn?.classList.remove('spin');return;
   }
+  activeUpTab='upcoming';
+  // Reset tab UI
+  document.querySelectorAll('.uptab').forEach((b2,i)=>b2.classList.toggle('active',i===0));
   b.innerHTML='<div class="ld"><div class="ld-s"></div><div class="ld-t">Loading upcoming shows...</div></div>';
   try{
     const r=await fetch(UPCOMING_API+'/?format=json');
@@ -756,11 +986,42 @@ function updateUpcomingCacheLabel(json){
 
 // Flat list of all show objects for modal lookup — upcoming first, then recently aired
 let upcomingShows=[];
+let upcomingJson=null;
+let activeUpTab='upcoming';
 
 function renderUpcoming(b,json){
+  upcomingJson=json;
   const upcoming=json.shows||[];
   const aired=json.recentlyAired||[];
   upcomingShows=[...upcoming,...aired];
+
+  // Update tab counts
+  const cu=document.getElementById('uptab-count-upcoming');
+  const ca=document.getElementById('uptab-count-aired');
+  if(cu)cu.textContent=upcoming.length;
+  if(ca)ca.textContent=aired.length;
+
+  // Wire tab buttons
+  document.querySelectorAll('.uptab').forEach(btn=>{
+    btn.onclick=()=>{
+      activeUpTab=btn.dataset.uptab;
+      document.querySelectorAll('.uptab').forEach(b2=>b2.classList.remove('active'));
+      btn.classList.add('active');
+      renderUpcomingGrid(b,json);
+      btn.focus();
+    };
+  });
+
+  renderUpcomingGrid(b,json);
+}
+
+function renderUpcomingGrid(b,json){
+  const upcoming=json.shows||[];
+  const aired=json.recentlyAired||[];
+  const isAiredTab=activeUpTab==='aired';
+  const items=isAiredTab?aired:upcoming;
+
+  if(!items.length){b.innerHTML='<div class="err">No shows found.</div>';return}
 
   const cardHtml=(s,i,isAired)=>{
     const imgHtml=s.img?`<img class="up-thumb" src="${s.img}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`:'' ;
@@ -771,7 +1032,8 @@ function renderUpcoming(b,json){
     const rankBadge=isAired
       ?`<div class="up-aired-badge">✓ Aired</div>`
       :`<div class="up-rank">${i+1}</div>`;
-    return `<div class="up-card" tabindex="0" data-show="${upcomingShows.indexOf(s)}">
+    const globalIdx=upcomingShows.indexOf(s);
+    return `<div class="up-card" tabindex="0" data-show="${globalIdx}">
       <div style="position:relative">
         ${imgHtml}
         <div class="up-thumb-placeholder" style="${phStyle}">📺</div>
@@ -789,15 +1051,9 @@ function renderUpcoming(b,json){
   };
 
   let h='<div class="up-grid">';
-  if(upcoming.length){
-    h+=`<div class="up-section-hdr"><div class="up-section-txt">📅 Coming Up</div><div class="up-section-line"></div></div>`;
-    upcoming.forEach((s,i)=>h+=cardHtml(s,i,false));
-  }
-  if(aired.length){
-    h+=`<div class="up-section-hdr"><div class="up-section-txt">✅ Recently Aired</div><div class="up-section-line"></div></div>`;
-    aired.forEach((s,i)=>h+=cardHtml(s,i,true));
-  }
+  items.forEach((s,i)=>h+=cardHtml(s,i,isAiredTab));
   b.innerHTML=h+'</div>';
+  b.scrollTop=0;
 }
 
 document.addEventListener('click',e=>{
@@ -940,63 +1196,431 @@ function showHistoryDetail(idx){
   setTimeout(()=>{mc.querySelector('.md-x')?.focus()},50);
 }
 
-// ═══════ RIDDLE ═══════
-async function loadRiddle(){
-  const b=document.getElementById('riddleBody');
-  b.innerHTML='<div class="ld"><div class="ld-s"></div><div class="ld-t">Loading riddle...</div></div>';
+// ═══════ FUN (Joke + Riddle combined) ═══════
+let activeFunTab='joke';
+
+async function loadFun(){
+  // Wire tab buttons on first open
+  document.querySelectorAll('.funtab').forEach(btn=>{
+    btn.onclick=()=>{
+      activeFunTab=btn.dataset.funtab;
+      document.querySelectorAll('.funtab').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      renderFun();
+      btn.focus();
+    };
+  });
+  renderFun();
+}
+
+async function renderFun(){
+  const b=document.getElementById('funBody');
+  b.innerHTML='<div class="ld"><div class="ld-s"></div><div class="ld-t">Loading...</div></div>';
+  if(activeFunTab==='joke') await doJoke(b);
+  else await doRiddle(b);
+}
+
+document.getElementById('rl-fun')?.addEventListener('click',()=>renderFun());
+
+async function doJoke(b){
   try{
-    // riddles.one API — returns {riddle, answer}
+    const r=await fetch('https://official-joke-api.appspot.com/random_joke');
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    const d=await r.json();
+    if(!d.setup)throw new Error('No joke');
+    const pid='pl_'+Date.now();
+    b.innerHTML=`<div class="fc"><div class="be">😂</div><div class="ft" style="color:var(--green)">${d.setup}</div><div id="${pid}" style="display:none"><div class="fb" style="color:var(--gold);font-size:34px;font-weight:700;margin-top:20px">${d.punchline}</div></div><button class="rv" tabindex="0" style="background:linear-gradient(135deg,#0a2a1a,#102520);border-color:rgba(52,211,153,.3);color:var(--green)" onclick="document.getElementById('${pid}').style.display='block';this.style.display='none'">Show Punchline</button></div>`;
+    setTimeout(()=>b.querySelector('.rv')?.focus(),100);
+  }catch(_){
+    const f=[{s:"Why don't scientists trust atoms?",p:"Because they make up everything!"},{s:"How do you organise a space party?",p:"You planet!"}][Math.floor(Math.random()*2)];
+    const pid='pl_'+Date.now();
+    b.innerHTML=`<div class="fc"><div class="be">😂</div><div class="ft" style="color:var(--green)">${f.s}</div><div id="${pid}" style="display:none"><div class="fb" style="color:var(--gold);font-size:34px;font-weight:700;margin-top:20px">${f.p}</div></div><button class="rv" tabindex="0" style="background:linear-gradient(135deg,#0a2a1a,#102520);border-color:rgba(52,211,153,.3);color:var(--green)" onclick="document.getElementById('${pid}').style.display='block';this.style.display='none'">Show Punchline</button></div>`;
+    setTimeout(()=>b.querySelector('.rv')?.focus(),100);
+  }
+}
+
+async function doRiddle(b){
+  try{
     const r=await fetch('https://riddles-api.vercel.app/random');
     if(!r.ok)throw new Error('HTTP '+r.status);
     const d=await r.json();
-    const q=d.riddle||d.question||'';
-    const a=d.answer||'';
-    if(!q)throw new Error('No riddle data');
+    const q=d.riddle||d.question||'';const a=d.answer||'';
+    if(!q)throw new Error('No riddle');
     b.innerHTML=`<div class="fc"><div class="be">🧩</div><div class="ft" style="color:var(--orange)">${q}</div><div id="ra" style="display:none"><div class="fb" style="color:var(--green);font-size:36px;font-weight:700;margin-top:20px">${a}</div></div><button class="rv" tabindex="0" onclick="document.getElementById('ra').style.display='block';this.style.display='none'">Reveal Answer</button></div>`;
     setTimeout(()=>b.querySelector('.rv')?.focus(),100);
-  }catch(ex){
-    // Fallback to a local riddle if API fails
-    const fallbacks=[
-      {q:"I have cities, but no houses. Mountains, but no trees. Water, but no fish.",a:"A map"},
-      {q:"The more you take, the more you leave behind.",a:"Footsteps"},
-      {q:"What is so fragile that saying its name breaks it?",a:"Silence"},
-      {q:"I speak without a mouth and hear without ears.",a:"An echo"},
-      {q:"What can run but never walks, has a mouth but never talks?",a:"A river"}
-    ];
-    const f=fallbacks[Math.floor(Math.random()*fallbacks.length)];
+  }catch(_){
+    const f=[{q:"I have cities, but no houses. Mountains, but no trees. Water, but no fish.",a:"A map"},{q:"What is so fragile that saying its name breaks it?",a:"Silence"}][Math.floor(Math.random()*2)];
     b.innerHTML=`<div class="fc"><div class="be">🧩</div><div class="ft" style="color:var(--orange)">${f.q}</div><div id="ra" style="display:none"><div class="fb" style="color:var(--green);font-size:36px;font-weight:700;margin-top:20px">${f.a}</div></div><button class="rv" tabindex="0" onclick="document.getElementById('ra').style.display='block';this.style.display='none'">Reveal Answer</button></div>`;
     setTimeout(()=>b.querySelector('.rv')?.focus(),100);
   }
 }
 
-// ═══════ JOKE ═══════
-async function loadJoke(){
-  const b=document.getElementById('jokeBody');
-  b.innerHTML='<div class="ld"><div class="ld-s"></div><div class="ld-t">Loading joke...</div></div>';
+// ═══════ GOLF LEADERBOARD ═══════
+let golfData=null;
+let activeGolfEvent=null;
+const GOLF_PROXY='https://golf-scores.kavanagh-m-rob.workers.dev/golf/all';
+
+async function loadGolf(){
+  const b=document.getElementById('golfBody'),btn=document.getElementById('rl-golf');
+  btn?.classList.add('spin');
+  b.innerHTML='<div class="ld"><div class="ld-s"></div><div class="ld-t">Loading leaderboard...</div></div>';
   try{
-    // Official Joke API — returns {setup, punchline}
-    const r=await fetch('https://official-joke-api.appspot.com/random_joke');
-    if(!r.ok)throw new Error('HTTP '+r.status);
-    const d=await r.json();
-    const setup=d.setup||'';
-    const punchline=d.punchline||'';
-    if(!setup)throw new Error('No joke data');
-    const pid='pl_'+Date.now();
-    b.innerHTML=`<div class="fc"><div class="be">😂</div><div class="ft" style="color:var(--green)">${setup}</div><div id="${pid}" style="display:none"><div class="fb" style="color:var(--gold);font-size:34px;font-weight:700;margin-top:20px">${punchline}</div></div><button class="rv" tabindex="0" style="background:linear-gradient(135deg,#0a2a1a,#102520);border-color:rgba(52,211,153,.3);color:var(--green)" onclick="document.getElementById('${pid}').style.display='block';this.style.display='none'">Show Punchline</button></div>`;
-    setTimeout(()=>b.querySelector('.rv')?.focus(),100);
-  }catch(ex){
-    const fallbacks=[
-      {s:"Why don't scientists trust atoms?",p:"Because they make up everything!"},
-      {s:"I'm reading a book about anti-gravity.",p:"It's impossible to put down!"},
-      {s:"Why did the scarecrow win an award?",p:"Because he was outstanding in his field!"},
-      {s:"What do you call a fake noodle?",p:"An impasta!"},
-      {s:"How do you organise a space party?",p:"You planet!"}
-    ];
-    const f=fallbacks[Math.floor(Math.random()*fallbacks.length)];
-    const pid='pl_'+Date.now();
-    b.innerHTML=`<div class="fc"><div class="be">😂</div><div class="ft" style="color:var(--green)">${f.s}</div><div id="${pid}" style="display:none"><div class="fb" style="color:var(--gold);font-size:34px;font-weight:700;margin-top:20px">${f.p}</div></div><button class="rv" tabindex="0" style="background:linear-gradient(135deg,#0a2a1a,#102520);border-color:rgba(52,211,153,.3);color:var(--green)" onclick="document.getElementById('${pid}').style.display='block';this.style.display='none'">Show Punchline</button></div>`;
-    setTimeout(()=>b.querySelector('.rv')?.focus(),100);
+    const r=await fetch(GOLF_PROXY,{cache:'no-store'});
+    if(!r.ok)throw new Error('Golf API '+r.status);
+    const json=await r.json();
+    const events=json.events||[];
+    if(!events.length)throw new Error('No golf events available right now.');
+    golfData=events;
+    if(!activeGolfEvent||!events.find(ev=>ev.id===activeGolfEvent))activeGolfEvent=events[0].id;
+    buildGolfTabs(events);
+    renderGolfLeaderboard();
+  }catch(e){b.innerHTML=`<div class="err">${e.message}</div>`}
+  btn?.classList.remove('spin');
+}
+
+function buildGolfTabs(events){
+  const wrap=document.getElementById('golfTabs');
+  wrap.innerHTML=events.map(ev=>`<button class="rtab${ev.id===activeGolfEvent?' active':''}" tabindex="0" data-evid="${ev.id}">${ev.shortName||ev.name||'Event'}</button>`).join('');
+  wrap.querySelectorAll('.rtab').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      activeGolfEvent=btn.dataset.evid;
+      wrap.querySelectorAll('.rtab').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      renderGolfLeaderboard();
+      btn.focus();
+    });
+  });
+}
+
+function gScoreClass(displayValue){
+  if(!displayValue||displayValue==='E')return 'even';
+  if(displayValue.startsWith('-'))return 'under';
+  if(displayValue.startsWith('+'))return 'over';
+  return 'even';
+}
+
+function renderGolfLeaderboard(){
+  const b=document.getElementById('golfBody');
+  const ev=golfData?.find(ev=>ev.id===activeGolfEvent);
+  if(!ev){b.innerHTML='<div class="err">Event not found.</div>';return}
+
+  const comp=ev.competitions?.[0];
+  const competitors=[...(comp?.competitors||[])];
+  if(!competitors.length){b.innerHTML='<div class="err">No leaderboard data yet.</div>';return}
+
+  // Sort by sortOrder (ESPN's correct leaderboard order)
+  competitors.sort((a,b)=>a.sortOrder-b.sortOrder);
+
+  const statusDetail=comp?.status?.type?.shortDetail||'';
+  const isLive=comp?.status?.type?.state==='in';
+  const isPost=comp?.status?.type?.state==='post';
+  const isMajor=ev.tournament?.major;
+
+  // Header
+  let h=`<div class="golf-header">
+    <div class="golf-event-name">
+      ${isMajor?'🏆 ':'⛳ '}${ev.name||ev.shortName||'Golf'}
+      ${isLive?`<span class="golf-status-badge live">● LIVE</span>`:''}
+      ${isPost&&!isLive?`<span class="golf-status-badge post">${statusDetail}</span>`:''}
+    </div>
+    <div class="golf-meta-row">
+      ${statusDetail&&!isLive?`<span><b>${statusDetail}</b></span>`:''}
+      ${ev.season?.year?`<span>${ev.season.year}</span>`:''}
+      ${ev.league?.abbreviation?`<span>${ev.league.abbreviation}</span>`:''}
+    </div>
+  </div>`;
+
+  // Table
+  h+=`<div class="golf-wrap"><table class="golf-tbl">
+    <thead><tr>
+      <th>POS</th>
+      <th class="left">PLAYER</th>
+      <th>TOTAL</th>
+      <th>TODAY</th>
+      <th>THRU</th>
+      <th>R1</th><th>R2</th><th>R3</th><th>R4</th>
+    </tr></thead><tbody>`;
+
+  let cutInserted=false;
+  competitors.forEach(c=>{
+    const isCut=c.status?.type?.name==='STATUS_CUT';
+    const isWD=c.status?.type?.name==='STATUS_WITHDRAWN';
+
+    // Insert cut divider before first CUT player
+    if(!cutInserted&&(isCut||isWD)){
+      h+=`<tr class="golf-cut-row"><td colspan="9">✂ &nbsp; CUT LINE</td></tr>`;
+      cutInserted=true;
+    }
+
+    const pos=c.status?.position?.displayName||'—';
+    const posNum=parseInt(c.status?.position?.id)||999;
+    const isTop3=posNum<=3&&!isCut&&!isWD;
+
+    const athlete=c.athlete||{};
+    const name=athlete.displayName||athlete.shortName||'Unknown';
+    const ctry=athlete.flag?.alt||'';
+    const headshot=athlete.headshot?.href||'';
+    const isAmateur=c.amateur;
+
+    // Total score from score.displayValue (e.g. "-12", "+6", "E")
+    const totalDisp=c.score?.displayValue||'—';
+    const totalClass=gScoreClass(totalDisp);
+
+    // Round scores — linescores sorted by period
+    const ls=(c.linescores||[]).filter(l=>l.period&&l.period<=4).sort((a,b)=>a.period-b.period);
+    const r1=ls.find(l=>l.period===1);
+    const r2=ls.find(l=>l.period===2);
+    const r3=ls.find(l=>l.period===3);
+    const r4=ls.find(l=>l.period===4);
+
+    // Today = current active round score
+    const activeRound=ls.filter(l=>l.value!==undefined).at(-1);
+    const todayDisp=activeRound?.displayValue||'—';
+    const todayClass=gScoreClass(todayDisp);
+
+    // Thru
+    const thruDisp=c.status?.displayThru||c.status?.detail||'—';
+    const thruClean=thruDisp==='F'||thruDisp==='18'?'F':thruDisp;
+
+    h+=`<tr class="golf-row${isCut||isWD?' is-cut':''}" tabindex="0" data-golfid="${c.id}" data-evid="${activeGolfEvent}">
+      <td><span class="g-pos${isTop3?' top3':''}">${isCut?'CUT':isWD?'WD':pos}</span></td>
+      <td class="left">
+        <div class="g-player">
+          ${headshot?`<img class="g-headshot" src="${headshot}" loading="lazy" onerror="this.style.display='none'">`:''}
+          <div>
+            <div class="g-name">${name}${isAmateur?`<span class="g-amateur">AM</span>`:''}</div>
+            ${ctry?`<div class="g-ctry">${ctry}</div>`:''}
+          </div>
+        </div>
+      </td>
+      <td><span class="g-total ${totalClass}">${totalDisp}</span></td>
+      <td><span class="g-today ${todayClass}">${isCut||isWD?'—':todayDisp}</span></td>
+      <td class="g-thru">${isCut||isWD?'—':thruClean}</td>
+      <td class="g-rd">${r1?.value??'—'}</td>
+      <td class="g-rd">${r2?.value??'—'}</td>
+      <td class="g-rd">${r3?.value??'—'}</td>
+      <td class="g-rd">${r4?.value??'—'}</td>
+    </tr>`;
+  });
+
+  h+=`</tbody></table></div>`;
+  b.innerHTML=h;
+  b.scrollTop=0;
+}
+
+// Augusta National par values per hole
+const MASTERS_PARS=[4,5,4,3,4,3,4,5,4,4,4,3,5,4,5,3,4,4]; // holes 1-18
+
+document.addEventListener('click',e=>{
+  const row=e.target.closest('.golf-row[data-golfid]');
+  if(row)showGolfModal(row.dataset.golfid,row.dataset.evid);
+});
+
+async function showGolfModal(competitorId,eventId){
+  const ev=golfData?.find(ev=>ev.id===eventId);
+  const comp=ev?.competitions?.[0];
+  const c=comp?.competitors?.find(c=>c.id===competitorId);
+  if(!c||!ev)return;
+
+  lastFocus=document.activeElement;
+  modalState='open';
+  modalOpenTime=Date.now();
+
+  const athlete=c.athlete||{};
+  const name=athlete.displayName||'Unknown';
+  const ctry=athlete.flag?.alt||'';
+  const headshot=athlete.headshot?.href||'';
+  const isCut=c.status?.type?.name==='STATUS_CUT';
+  const isWD=c.status?.type?.name==='STATUS_WITHDRAWN';
+  const pos=c.status?.position?.displayName||'—';
+  const totalDisp=c.score?.displayValue||'E';
+  const totalClass=gScoreClass(totalDisp);
+  const mov=c.movement||0;
+  const movHtml=mov>0?`<span style="color:var(--green);font-size:20px">▲${mov}</span>`:
+                mov<0?`<span style="color:#f87171;font-size:20px">▼${Math.abs(mov)}</span>`:
+                `<span style="color:var(--dim);font-size:20px">—</span>`;
+  const ls=(c.linescores||[]).filter(l=>l.period&&l.period<=4).sort((a,b)=>a.period-b.period);
+  const activeRound=ls.filter(l=>l.value!==undefined).at(-1);
+  const todayDisp=activeRound?.displayValue||'—';
+  const isLive=c.status?.type?.state==='in';
+  const thruDisp=c.status?.displayThru||'—';
+  const earningsStat=c.statistics?.find(s=>s.name==='officialAmount');
+  const earnings=earningsStat?.displayValue&&earningsStat.displayValue!=='--'?earningsStat.displayValue:null;
+  const rounds=[1,2,3,4].map(p=>{const l=ls.find(l=>l.period===p);return{period:p,score:l?.value,disp:l?.displayValue,out:l?.outScore,in:l?.inScore,has:l?.value!==undefined};});
+  // Most recent round first
+  const roundsSorted=[...rounds].reverse();
+
+  const roundsHtml=roundsSorted.map(r=>`
+    <div class="golf-modal-rd"${!r.has?' style="opacity:.35"':''}>
+      <div class="golf-modal-rd-lbl">Round ${r.period}</div>
+      <div class="golf-modal-rd-score">${r.score??'—'}</div>
+      ${r.disp?`<div class="golf-modal-rd-rel ${gScoreClass(r.disp)}">${r.disp}</div>`:'<div class="golf-modal-rd-rel even">—</div>'}
+      ${r.has&&r.out!==undefined?`<div style="font-size:14px;color:var(--dim);margin-top:4px">Out:${r.out} · In:${r.in}</div>`:''}
+    </div>`).join('');
+
+  const o=document.getElementById('mOverlay'),mc=document.getElementById('mContent');
+  mc.className='md';
+  mc.innerHTML=`
+    <button class="md-x" tabindex="0">✕</button>
+    <div class="md-body" style="gap:0;width:100%;overflow-y:auto;max-height:80vh">
+      <div class="golf-modal-head">
+        ${headshot?`<img class="golf-modal-hs" src="${headshot}" onerror="this.style.display='none'">`:''}
+        <div class="golf-modal-title">
+          <div class="golf-modal-name">${name}${c.amateur?'<span class="g-amateur" style="font-size:18px;margin-left:10px">AM</span>':''}</div>
+          ${ctry?`<div class="golf-modal-ctry">🏴 ${ctry}</div>`:''}
+          <div style="display:flex;align-items:center;gap:16px;margin-top:8px">
+            <div class="golf-modal-pos">${isCut?'CUT':isWD?'WD':pos}</div>
+            ${movHtml}
+            ${isLive?`<span style="color:var(--green);font-size:18px;font-weight:700;animation:pulse 1.5s ease-in-out infinite">● Playing</span>`:''}
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div class="golf-modal-score ${totalClass}">${totalDisp}</div>
+          <div style="font-size:16px;color:var(--dim);margin-top:4px;font-family:'JetBrains Mono',monospace">${ev.name||'Golf'}</div>
+        </div>
+      </div>
+      <div class="golf-modal-rounds">${roundsHtml}</div>
+      <div class="golf-modal-stats">
+        ${!isCut&&!isWD?`<div class="golf-modal-stat">Today <strong>${todayDisp}</strong></div>`:''}
+        ${!isCut&&!isWD?`<div class="golf-modal-stat">Thru <strong>${thruDisp==='18'?'F':thruDisp}</strong></div>`:''}
+        ${earnings?`<div class="golf-modal-stat">Earnings <strong>${earnings}</strong></div>`:''}
+        ${isCut?`<div class="golf-modal-stat" style="color:#f87171">✂ Missed Cut</div>`:''}
+        ${isWD?`<div class="golf-modal-stat" style="color:#f87171">Withdrawn</div>`:''}
+      </div>
+      <div id="golf-scorecard-area" class="golf-sc-section">
+        <div class="golf-sc-loading">Loading hole scores…</div>
+      </div>
+    </div>`;
+  o.classList.add('show');
+  setTimeout(()=>{mc.querySelector('.md-x')?.focus()},50);
+
+  // Fetch hole-by-hole scorecard asynchronously — pass rounds sorted recent first
+  fetchGolfScorecard(eventId, competitorId, rounds, roundsSorted, ev);
+}
+
+async function fetchGolfScorecard(eventId, competitorId, rounds, roundsSorted, ev){
+  const area=document.getElementById('golf-scorecard-area');
+  if(!area)return;
+  try{
+    const url=`https://golf-scores.kavanagh-m-rob.workers.dev/golf/scorecard?event=${eventId}&player=${competitorId}`;
+    const r=await fetch(url,{cache:'no-store'});
+    if(!r.ok)throw new Error('no scorecard');
+    const json=await r.json();
+    renderHoleScores(area, json, rounds, roundsSorted);
+  }catch(_){
+    renderInOutFallback(area, roundsSorted);
   }
+}
+
+function holeClass(playerScore, par){
+  if(playerScore===null||playerScore===undefined)return 'empty';
+  const diff=playerScore-par;
+  if(diff<=-2)return 'eagle';
+  if(diff===-1)return 'birdie';
+  if(diff===0)return 'par';
+  if(diff===1)return 'bogey';
+  if(diff===2)return 'double';
+  return 'worse';
+}
+
+function holeCell(holeNum, par, playerScore){
+  const cls=playerScore!==undefined&&playerScore!==null?holeClass(playerScore,par):'empty';
+  const relScore=playerScore!==undefined&&playerScore!==null
+    ?(playerScore-par===0?'E':playerScore-par>0?`+${playerScore-par}`:String(playerScore-par))
+    :'';
+  return `<div class="golf-hole ${cls}">
+    <div class="golf-hole-num">${holeNum}</div>
+    <div class="golf-hole-par">Par ${par}</div>
+    <div class="golf-hole-score">${playerScore??'·'}</div>
+    ${relScore?`<div class="golf-hole-rel">${relScore}</div>`:''}
+  </div>`;
+}
+
+function renderHoleScores(area, json, rounds, roundsSorted){
+  const scRounds=json.rounds||json.scorecard?.rounds||[];
+  if(!scRounds.length){renderInOutFallback(area,roundsSorted);return}
+
+  // Sort scorecard rounds most recent first
+  const sorted=[...scRounds].sort((a,b)=>(b.period||b.round||0)-(a.period||a.round||0));
+
+  let h='';
+  sorted.forEach(rd=>{
+    const holes=rd.holes||rd.linescores||[];
+    if(!holes.length)return;
+    const rdPeriod=rd.period||rd.round;
+    const rdMeta=rounds.find(r=>r.period===rdPeriod);
+    const pill=rdMeta?.disp?`<span class="sc-rd-pill ${gScoreClass(rdMeta.disp)}">${rdMeta.disp}</span>`:'';
+    const outIn=rdMeta?.out!==undefined?`<span style="font-size:16px;color:var(--dim);font-weight:400">Out: ${rdMeta.out} · In: ${rdMeta.in}</span>`:'';
+    h+=`<div class="golf-sc-round-hdr">Round ${rdPeriod} ${pill} ${outIn}</div>`;
+
+    // Front 9
+    h+=`<div class="golf-holes">`;
+    holes.slice(0,9).forEach(hole=>{
+      const sc=hole.score??hole.value;
+      const par=hole.par??hole.parValue??MASTERS_PARS[(hole.number||hole.hole||1)-1]??4;
+      h+=holeCell(hole.number||hole.hole||'',par,sc);
+    });
+    h+=`</div>`;
+
+    // Back 9
+    if(holes.length>9){
+      h+=`<div class="golf-holes" style="margin-top:5px">`;
+      holes.slice(9,18).forEach(hole=>{
+        const sc=hole.score??hole.value;
+        const par=hole.par??hole.parValue??MASTERS_PARS[(hole.number||hole.hole||1)-1]??4;
+        h+=holeCell(hole.number||hole.hole||'',par,sc);
+      });
+      h+=`</div>`;
+    }
+  });
+
+  h+=legend();
+  area.innerHTML=h;
+}
+
+function renderInOutFallback(area, roundsSorted){
+  const played=roundsSorted.filter(r=>r.has);
+  if(!played.length){area.innerHTML='<div class="golf-sc-loading" style="opacity:.5">Hole scores unavailable</div>';return}
+
+  let h='';
+  played.forEach(r=>{
+    const pill=`<span class="sc-rd-pill ${gScoreClass(r.disp)}">${r.disp}</span>`;
+    const outIn=r.out!==undefined?`<span style="font-size:16px;color:var(--dim);font-weight:400">Out: ${r.out} · In: ${r.in} · Total: ${r.score}</span>`:'';
+    h+=`<div class="golf-sc-round-hdr">Round ${r.period} ${pill} ${outIn}</div>`;
+
+    // Front 9 — colour-code using Masters pars, player score estimated from out total
+    h+=`<div class="golf-holes">`;
+    MASTERS_PARS.slice(0,9).forEach((par,i)=>{
+      h+=holeCell(i+1,par,undefined);
+    });
+    h+=`</div><div class="golf-holes" style="margin-top:5px">`;
+    MASTERS_PARS.slice(9,18).forEach((par,i)=>{
+      h+=holeCell(i+10,par,undefined);
+    });
+    h+=`</div>`;
+    if(r.out!==undefined){
+      h+=`<div class="golf-inout" style="margin-top:8px">
+        <div class="golf-inout-chip">Out (1–9) <strong>${r.out}</strong></div>
+        <div class="golf-inout-chip">In (10–18) <strong>${r.in}</strong></div>
+        <div class="golf-inout-chip">Total <strong>${r.score}</strong></div>
+      </div>`;
+    }
+  });
+
+  h+=legend();
+  h+=`<div style="font-size:15px;color:var(--dim);margin-top:10px;font-style:italic">Individual hole scores available once /scorecard worker route is added</div>`;
+  area.innerHTML=h;
+}
+
+function legend(){
+  return `<div class="golf-sc-legend">
+    <div class="golf-sc-legend-item"><div class="golf-sc-legend-dot" style="background:rgba(240,180,41,.35)"></div>Eagle−</div>
+    <div class="golf-sc-legend-item"><div class="golf-sc-legend-dot" style="background:rgba(248,113,113,.25)"></div>Birdie</div>
+    <div class="golf-sc-legend-item"><div class="golf-sc-legend-dot" style="background:rgba(30,32,48,.9)"></div>Par</div>
+    <div class="golf-sc-legend-item"><div class="golf-sc-legend-dot" style="background:rgba(96,165,250,.2)"></div>Bogey</div>
+    <div class="golf-sc-legend-item"><div class="golf-sc-legend-dot" style="background:rgba(96,165,250,.35)"></div>Double+</div>
+    <div class="golf-sc-legend-item"><div class="golf-sc-legend-dot" style="background:rgba(167,139,250,.3)"></div>Triple+</div>
+  </div>`;
 }
 </script>
 </body>
