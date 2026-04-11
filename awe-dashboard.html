@@ -89,10 +89,17 @@ body::before{content:'';position:fixed;inset:-50%;width:200%;height:200%;backgro
 /* MODAL */
 .mo{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:100;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
 .mo.show{opacity:1;pointer-events:all}
-.md{background:var(--card);border:1px solid var(--border);border-radius:20px;max-width:100%;width:96%;height:88vh;overflow:hidden;display:flex;gap:28px;padding:36px;position:relative}
-.md.md-golf{align-items:flex-start}
-.md-body{flex:1;display:flex;flex-direction:column;gap:10px;overflow-y:auto;height:100%;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
-.md-body::-webkit-scrollbar{width:6px}.md-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.md{background:var(--card);border:1px solid var(--border);border-radius:20px;max-width:100%;width:96%;max-height:88vh;overflow-y:auto;display:flex;gap:28px;padding:36px;position:relative}
+/* Golf modal — card layout: fixed header + scrollable rounds */
+.md.md-golf{height:80vh;padding:0;gap:0;flex-direction:column;overflow:hidden}
+.md-golf-header{flex-shrink:0;padding:24px 28px 20px;background:var(--card);border-bottom:2px solid var(--border);border-radius:20px 20px 0 0;display:flex;align-items:flex-start;gap:0}
+.md-golf-header .md-x{margin-left:20px;margin-top:0;align-self:flex-start}
+.md-golf-header .golf-modal-head{flex:1;margin-bottom:0}
+.md-golf-body{flex:1;overflow-y:auto;padding:24px 36px 28px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.md-golf-body::-webkit-scrollbar{width:6px}.md-golf-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.md-golf-body:focus{outline:none}
+/* focus ring on the scroll zone when navigated to */
+.md-golf-body.kbd-focus{outline:2px solid rgba(96,165,250,.4);outline-offset:-2px;border-radius:0 0 20px 20px}
 .md-poster{width:280px;flex-shrink:0;border-radius:14px;object-fit:cover}
 .md-body{flex:1;display:flex;flex-direction:column;gap:10px}
 .md-title{font-size:30px;font-weight:800;line-height:1.2}
@@ -101,7 +108,7 @@ body::before{content:'';position:fixed;inset:-50%;width:200%;height:200%;backgro
 .md-stat{background:var(--bg);padding:6px 14px;border-radius:10px;font-size:25px}
 .md-stat strong{color:var(--gold)}
 .md-ov{font-size:25px;line-height:1.6;color:var(--dim)}
-.md-x{position:absolute;top:16px;right:16px;background:var(--bg);border:2px solid var(--border);color:var(--text);width:48px;height:48px;border-radius:12px;cursor:pointer;font-size:25px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.md-x{background:var(--bg);border:3px solid var(--border);color:var(--text);width:56px;height:56px;border-radius:14px;cursor:pointer;font-size:26px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
 .md-x:focus{outline:none;border-color:var(--red);color:var(--red);box-shadow:0 0 20px rgba(248,113,113,.25)}
 .md-genres{display:flex;gap:8px;flex-wrap:wrap}
 .md-genre{background:rgba(167,139,250,.1);color:var(--purple);padding:4px 12px;border-radius:6px;font-size:25px;font-weight:500}
@@ -192,8 +199,15 @@ body::before{content:'';position:fixed;inset:-50%;width:200%;height:200%;backgro
 .golf-tbl th:nth-child(6){width:80px;color:var(--text)}   /* Thru — bold white */
 .golf-tbl th:nth-child(7),.golf-tbl th:nth-child(8),.golf-tbl th:nth-child(9),.golf-tbl th:nth-child(10){width:70px}
 /* Row star — display only, not interactive */
-.g-row-star{font-size:22px;display:block;text-align:center;line-height:1;color:var(--dim);opacity:.35}
+.g-row-star{font-size:22px;display:block;text-align:center;line-height:1;color:var(--dim);opacity:.35;transition:color .2s,opacity .2s,transform .2s}
 .g-row-star.on{color:var(--gold);opacity:1}
+.g-row-star.pop{animation:starPop .4s ease-out forwards}
+@keyframes starPop{
+  0%  {transform:scale(1)}
+  30% {transform:scale(2.2) rotate(-15deg);color:var(--gold);opacity:1}
+  60% {transform:scale(1.5) rotate(10deg)}
+  100%{transform:scale(1) rotate(0deg)}
+}
 /* Modal fav button */
 .g-modal-star{background:rgba(107,109,128,.1);border:2px solid rgba(107,109,128,.3);color:var(--dim);font-size:20px;font-weight:700;padding:10px 22px;border-radius:12px;cursor:pointer;transition:all .2s;white-space:nowrap}
 .g-modal-star:hover,.g-modal-star:focus{background:rgba(240,180,41,.15);border-color:rgba(240,180,41,.5);color:var(--gold);outline:none;transform:scale(1.04)}
@@ -536,40 +550,81 @@ document.addEventListener('keydown', e=>{
   if(e.key==='Enter'||e.keyCode===13){
     e.preventDefault();
 
-    // Inside modal: if a non-close button is focused, activate it; else close
+    // Inside modal: activate focused button if not close, else close
     if(modal){
       const focused=document.activeElement;
       const mc=document.getElementById('mContent');
-      if(focused&&mc?.contains(focused)&&!focused.classList.contains('md-x')){
-        focused.click();
-      } else if(Date.now()-modalOpenTime>400){
-        closeModal();
+      const isGolfModal=mc?.classList.contains('md-golf');
+      if(isGolfModal){
+        // In scroll body zone — Enter does nothing (just scrolling)
+        if(focused?.id==='golfModalBody')return;
+        // On a non-close button — activate it
+        if(focused&&mc?.contains(focused)&&!focused.classList.contains('md-x')){
+          focused.click();return;
+        }
+      } else {
+        if(focused&&mc?.contains(focused)&&!focused.classList.contains('md-x')){
+          focused.click();return;
+        }
       }
+      if(Date.now()-modalOpenTime>400){closeModal();}
       return;
     }
 
-    // Outside modal: only fire on keydown (not repeat) — long press handled by keyup timer
-    if(!e.repeat){
-      const el=document.activeElement;
-      if(el&&el!==document.body)el.click();
-    }
+    // Outside modal: click the focused element
+    const el=document.activeElement;
+    if(el&&el!==document.body)el.click();
     return;
   }
 
   if(!['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key))return;
   e.preventDefault();e.stopPropagation();
 
-  // In modal — navigate between focusable buttons (close, fav star, etc.)
+  // In modal — two zones: header buttons and scroll body
   if(modal){
-    const focusable=[...document.querySelectorAll('#mContent button[tabindex="0"]')];
-    const ci=focusable.indexOf(document.activeElement);
-    if(e.key==='ArrowRight'||e.key==='ArrowDown'){
-      const ni=(ci+1)%focusable.length;
-      focusable[ni]?.focus();
-    } else if(e.key==='ArrowLeft'||e.key==='ArrowUp'){
-      const ni=(ci-1+focusable.length)%focusable.length;
-      focusable[ni]?.focus();
+    const mc=document.getElementById('mContent');
+    const isGolfModal=mc?.classList.contains('md-golf');
+    if(isGolfModal){
+      const headerBtns=[...document.querySelectorAll('.md-golf-header button[tabindex="0"]')];
+      const body=document.getElementById('golfModalBody');
+      const inHeader=headerBtns.includes(document.activeElement);
+      const inBody=document.activeElement===body;
+
+      if(inHeader){
+        const ci=headerBtns.indexOf(document.activeElement);
+        if(e.key==='ArrowRight'){headerBtns[Math.min(ci+1,headerBtns.length-1)]?.focus();return}
+        if(e.key==='ArrowLeft'){headerBtns[Math.max(ci-1,0)]?.focus();return}
+        if(e.key==='ArrowDown'){
+          body?.focus();
+          body?.classList.add('kbd-focus');
+          return;
+        }
+        return;
+      }
+      if(inBody||(!inHeader&&body)){
+        if(e.key==='ArrowDown'){body.scrollTop+=140;return}
+        if(e.key==='ArrowUp'){
+          if(body.scrollTop<=0){
+            body.classList.remove('kbd-focus');
+            headerBtns[0]?.focus();
+          } else {
+            body.scrollTop-=140;
+          }
+          return;
+        }
+        return;
+      }
+      // Nothing focused — go to first header button
+      headerBtns[0]?.focus();
+      return;
     }
+    // Non-golf modal: left/right cycle buttons, up/down scroll
+    const focusable=[...document.querySelectorAll('#mContent button[tabindex="0"]')];
+    const body2=mc?.querySelector('.md-body');
+    if(e.key==='ArrowRight'){const ci=focusable.indexOf(document.activeElement);focusable[(ci+1)%focusable.length]?.focus();}
+    else if(e.key==='ArrowLeft'){const ci=focusable.indexOf(document.activeElement);focusable[(ci-1+focusable.length)%focusable.length]?.focus();}
+    else if(e.key==='ArrowDown'&&body2)body2.scrollTop+=120;
+    else if(e.key==='ArrowUp'&&body2)body2.scrollTop-=120;
     return;
   }
 
@@ -775,48 +830,6 @@ document.addEventListener('keydown', e=>{
   (hdr[0]||bodyItems[0])?.focus();
 
 }, true); // ← capture phase: fires before scroll containers can intercept
-
-// ── LONG-PRESS OK on golf rows → toggle fav ──────────────────────────
-// Uses a keydown hold timer. On keydown: start 600ms timer.
-// If keyup fires before 600ms → short press → normal click (modal opens).
-// If 600ms elapses before keyup → long press → toggle fav, suppress click.
-{
-  let _holdTimer=null;
-  let _holdFired=false;
-  let _holdRow=null;
-
-  document.addEventListener('keydown',e=>{
-    if(e.key!=='Enter'&&e.keyCode!==13)return;
-    if(isModalOpen()||curScr!=='golf')return;
-    const el=document.activeElement;
-    const row=el?.closest?.('.golf-row[data-golfid]')||(el?.classList?.contains('golf-row')?el:null);
-    if(!row?.dataset?.golfid)return;
-    if(e.repeat)return; // ignore key-repeat, we use the timer
-    _holdFired=false;
-    _holdRow=row;
-    _holdTimer=setTimeout(()=>{
-      _holdFired=true;
-      const gid=_holdRow.dataset.golfid;
-      toggleFav(gid);
-      // Pulse star for feedback
-      const star=document.querySelector(`.golf-row[data-golfid="${gid}"] .g-row-star`);
-      if(star){star.style.transition='transform .2s';star.style.transform='scale(2)';setTimeout(()=>star.style.transform='',300);}
-    },600);
-  },true);
-
-  document.addEventListener('keyup',e=>{
-    if(e.key!=='Enter'&&e.keyCode!==13)return;
-    clearTimeout(_holdTimer);
-    if(_holdFired){
-      // Long press fired — swallow this event so click/modal doesn't trigger
-      _holdFired=false;
-      _holdRow=null;
-      e.stopImmediatePropagation();
-      e.preventDefault();
-    }
-    _holdRow=null;
-  },true);
-}
 
 // Smooth scroll helper — focuses element and adjusts scroll container
 function scrollFocus(el,sb){
@@ -1450,11 +1463,18 @@ function toggleFav(playerId){
   if(golfFavs.has(playerId))golfFavs.delete(playerId);
   else golfFavs.add(playerId);
   saveFavs();
-  // Re-render preserving scroll so modal stays usable
+  const isNowFav=golfFavs.has(playerId);
   const sb=document.getElementById('golfBody');
   const scrollPos=sb?.scrollTop||0;
   renderGolfLeaderboard();
   if(sb)sb.scrollTop=scrollPos;
+  // Animate star when adding to favs
+  if(isNowFav){
+    requestAnimationFrame(()=>{
+      const star=document.querySelector(`.golf-row[data-golfid="${playerId}"] .g-row-star`);
+      if(star){star.classList.remove('pop');void star.offsetWidth;star.classList.add('pop');star.addEventListener('animationend',()=>star.classList.remove('pop'),{once:true});}
+    });
+  }
 }
 
 // Modal star button click — toggle fav without closing modal
@@ -1475,7 +1495,11 @@ document.addEventListener('click',e=>{
     // Update the star cell in the leaderboard behind the modal
     const rowStar=document.querySelector(`.g-row-star[data-golfid="${pid}"]`)||
                   document.querySelector(`.golf-row[data-golfid="${pid}"] .g-row-star`);
-    if(rowStar){rowStar.classList.toggle('on',isFavNow);}
+    if(rowStar){
+      rowStar.classList.toggle('on',isFavNow);
+      // Animate when adding
+      if(isFavNow){rowStar.classList.remove('pop');void rowStar.offsetWidth;rowStar.classList.add('pop');rowStar.addEventListener('animationend',()=>rowStar.classList.remove('pop'),{once:true});}
+    }
     // Schedule a silent leaderboard re-order for when the modal closes
     modalStar._pendingRerender=true;
   }
@@ -1712,20 +1736,19 @@ async function showGolfModal(competitorId,eventId){
   const o=document.getElementById('mOverlay'),mc=document.getElementById('mContent');
   mc.className='md md-golf';
   mc.innerHTML=`
-    <button class="md-x" tabindex="0">✕</button>
-    <div class="md-body" style="gap:0">
+    <div class="md-golf-header">
       <div class="golf-modal-head">
         ${headshot?`<img class="golf-modal-hs" src="${headshot}" onerror="this.style.display='none'">`:''}
         <div class="golf-modal-title">
           <div class="golf-modal-name">${name}${c.amateur?'<span class="g-amateur" style="font-size:18px;margin-left:10px">AM</span>':''}</div>
           ${ctry?`<div class="golf-modal-ctry">🏴 ${ctry}</div>`:''}
-          <div style="display:flex;align-items:center;gap:16px;margin-top:8px">
+          <div style="display:flex;align-items:center;gap:16px;margin-top:10px">
             <div class="golf-modal-pos">${isCut?'CUT':isWD?'WD':pos}</div>
             ${movHtml}
             ${isLive?`<span style="color:var(--green);font-size:18px;font-weight:700;animation:pulse 1.5s ease-in-out infinite">● Playing</span>`:''}
           </div>
         </div>
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:12px">
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px;margin-right:4px">
           <div class="golf-modal-score ${totalClass}">${totalDisp}</div>
           <div style="font-size:16px;color:var(--dim);font-family:'JetBrains Mono',monospace">${ev.name||'Golf'}</div>
           <button class="g-modal-star${isFavNow?' on':''}" id="modalStarBtn" data-starid="${c.id}" tabindex="0">
@@ -1733,6 +1756,9 @@ async function showGolfModal(competitorId,eventId){
           </button>
         </div>
       </div>
+      <button class="md-x" tabindex="0">✕</button>
+    </div>
+    <div class="md-golf-body" id="golfModalBody" tabindex="0">
       <div class="golf-modal-rounds">${roundsHtml}</div>
       <div class="golf-modal-stats">
         ${!isCut&&!isWD?`<div class="golf-modal-stat">Today <strong>${todayDisp}</strong></div>`:''}
@@ -1746,7 +1772,7 @@ async function showGolfModal(competitorId,eventId){
       </div>
     </div>`;
   o.classList.add('show');
-  setTimeout(()=>{mc.querySelector('.md-x')?.focus()},50);
+  setTimeout(()=>{document.querySelector('.md-golf-header .md-x')?.focus()},50);
 
   // Fetch hole-by-hole scorecard asynchronously — pass rounds sorted recent first
   fetchGolfScorecard(eventId, competitorId, rounds, roundsSorted, ev);
