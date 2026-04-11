@@ -113,7 +113,7 @@ body::before{content:'';position:fixed;inset:-50%;width:200%;height:200%;backgro
 .md-genres{display:flex;gap:8px;flex-wrap:wrap}
 .md-genre{background:rgba(167,139,250,.1);color:var(--purple);padding:4px 12px;border-radius:6px;font-size:25px;font-weight:500}
 /* NASA modal - large image */
-.md-nasa-img{max-width:100%;max-height:60vh;border-radius:14px;object-fit:contain;margin:0 auto;display:block}
+.md-nasa-img{max-width:100%;max-height:46vh;border-radius:14px;object-fit:contain;margin:0 auto;display:block;flex-shrink:0}
 /* Racing modal text overrides */
 .md.race-modal .rtm{font-size:32px!important}
 .md.race-modal .rcn{font-size:34px!important}
@@ -934,7 +934,7 @@ function showNasaDetail(url,title,explanation,date){
       <img class="md-nasa-img" src="${url}" alt="${title}">
       <div class="md-title" style="text-align:center">${title}</div>
       <div class="nasa-date" style="text-align:center">${date}</div>
-      <div class="md-ov">${explanation?explanation.substring(0,600)+(explanation.length>600?'...':''):''}</div>
+      <div class="md-ov" style="flex-shrink:0;line-height:1.7">${explanation?explanation.substring(0,800)+(explanation.length>800?'...':''):''}</div>
     </div>`;
   o.classList.add('show');
   setTimeout(()=>{mc.querySelector('.md-x')?.focus()},50);
