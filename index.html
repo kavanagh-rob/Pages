@@ -1092,30 +1092,63 @@ function showUpcomingDetail(idx){
 }
 
 // ═══════ NASA GALLERY (30 images, always fresh) ═══════
+const NASA_WORKER='https://nasa.kavanagh-m-rob.workers.dev/';
+
 let nasaData=[];
+let nasaStaleCache=null; // kept in memory across reloads within same session
+
 async function loadNasa(){
   const b=document.getElementById('nasaBody');
   b.innerHTML='<div class="ld"><div class="ld-s"></div><div class="ld-t">Loading NASA gallery...</div></div>';
   try{
-    // Dynamically compute start_date as 40 days before today
-    // No end_date needed — NASA API defaults to today
-    const start=new Date();
-    start.setDate(start.getDate()-40);
-    const sd=`${start.getFullYear()}-${String(start.getMonth()+1).padStart(2,'0')}-${String(start.getDate()).padStart(2,'0')}`;
-    const r=await fetch(`https://api.nasa.gov/planetary/apod?api_key=${NASA_KEY}&start_date=${sd}`,{
-      cache:'no-store',
-      headers:{'Cache-Control':'no-cache','Pragma':'no-cache'}
-    });
-    if(!r.ok)throw new Error('NASA API returned '+r.status+(r.status===429?' — rate limited, try again in a minute':''));
-    let raw=await r.json();
-    if(!Array.isArray(raw))raw=[raw];
-    // Filter images only, sort newest first, take top 30
+    // Try worker first (worker handles caching + fallback server-side)
+    let raw=null;
+    try{
+      const r=await fetch(NASA_WORKER,{cache:'no-store'});
+      if(r.ok){
+        const json=await r.json();
+        raw=Array.isArray(json)?json:(json.data||json.results||null);
+      }
+    }catch(_){}
+
+    // If worker unavailable, fall back to direct NASA API
+    if(!raw){
+      const start=new Date();
+      start.setDate(start.getDate()-40);
+      const sd=`${start.getFullYear()}-${String(start.getMonth()+1).padStart(2,'0')}-${String(start.getDate()).padStart(2,'0')}`;
+      const r=await fetch(`https://api.nasa.gov/planetary/apod?api_key=${NASA_KEY}&start_date=${sd}`,{
+        cache:'no-store',headers:{'Cache-Control':'no-cache','Pragma':'no-cache'}
+      });
+      if(!r.ok)throw new Error('NASA API '+r.status+(r.status===429?' — rate limited':''));
+      const json=await r.json();
+      raw=Array.isArray(json)?json:[json];
+    }
+
+    if(!raw||!raw.length)throw new Error('No NASA data returned');
+
     nasaData=raw
       .filter(d=>d.media_type==='image')
       .sort((a,b)=>b.date.localeCompare(a.date))
       .slice(0,30);
+
+    if(nasaData.length){
+      nasaStaleCache=nasaData; // save for offline fallback
+    }
     renderNasaGrid(b);
-  }catch(e){b.innerHTML=`<div class="err">${e.message}</div>`}
+  }catch(e){
+    // Use stale in-memory cache if available
+    if(nasaStaleCache?.length){
+      nasaData=nasaStaleCache;
+      renderNasaGrid(b);
+      // Add a subtle stale indicator
+      const note=document.createElement('div');
+      note.style.cssText='text-align:center;padding:8px;font-size:18px;color:var(--dim);font-style:italic';
+      note.textContent='Showing cached images — '+e.message;
+      b.appendChild(note);
+    }else{
+      b.innerHTML=`<div class="err">${e.message}</div>`;
+    }
+  }
 }
 function renderNasaGrid(b){
   if(!nasaData||!nasaData.length){b.innerHTML='<div class="err">No NASA images available.</div>';return}
