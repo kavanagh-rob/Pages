@@ -833,8 +833,8 @@ const TMDB = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIxNDY3YzQ0NjNmZTY2Zjg1NTc3MDAwZDAyN
 const NASA_KEY = 'cQVDvwpdFz0u34enmqgkBxLMEwTq6Kdkg6hWluJG';
 const NASA_WORKER = 'https://nasa.kavanagh-m-rob.workers.dev/';
 const UPCOMING_API = 'https://rx4up4hm0e.execute-api.eu-west-1.amazonaws.com';
-const GOLF_PROXY = 'https://golf-scores.kavanagh-m-rob.workers.dev/';
-const SCORECARD_PROXY = 'https://golf-scorecard.kavanagh-m-rob.workers.dev/';
+const GOLF_PROXY = 'https://golf-scores.kavanagh-m-rob.workers.dev/golf/all';
+const SCORECARD_PROXY = 'https://golf-scores.kavanagh-m-rob.workers.dev/golf/scorecard';
 const MASTERS_PARS = [4,5,4,3,4,3,4,5,4, 4,4,3,5,4,5,3,4,4];
 
 // ── Clock ──
@@ -1534,7 +1534,7 @@ async function showGolfDetail(pid) {
 
   // Load scorecard
   try {
-    const r = await fetch(`${SCORECARD_PROXY}?playerId=${pid}&eventId=${activeGolfEvent}`, { cache: 'no-store' });
+    const r = await fetch(`${SCORECARD_PROXY}?event=${activeGolfEvent}&player=${pid}`, { cache: 'no-store' });
     if (r.ok) {
       const json = await r.json();
       const area = document.getElementById('golfscorecardArea');
