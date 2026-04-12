@@ -1,0 +1,1652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Hub</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg: #080810;
+  --surface: #0f1018;
+  --card: #13141f;
+  --card2: #191a27;
+  --border: #1e2035;
+  --border2: #252640;
+  --text: #e8e8f0;
+  --dim: #5a5c78;
+  --dim2: #8a8ca8;
+  --gold: #f0b429;
+  --green: #34d399;
+  --blue: #60a5fa;
+  --red: #f87171;
+  --purple: #a78bfa;
+  --cyan: #22d3ee;
+  --orange: #fb923c;
+  --pink: #f472b6;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bot: env(safe-area-inset-bottom, 0px);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html { height: 100%; }
+
+body {
+  font-family: 'Syne', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100%;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 20% 10%, rgba(96,165,250,.04), transparent),
+    radial-gradient(ellipse 50% 60% at 80% 90%, rgba(240,180,41,.04), transparent);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── HOME ── */
+#home {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding: 0 0 calc(16px + var(--safe-bot));
+}
+
+.home-header {
+  padding: calc(16px + var(--safe-top)) 20px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.home-title {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  background: linear-gradient(135deg, #fff 30%, #6b6d8a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1.1;
+}
+
+.home-title span {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: linear-gradient(90deg, var(--dim2), var(--dim));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 2px;
+}
+
+.clk {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--dim);
+  letter-spacing: 1px;
+  line-height: 1;
+  padding-top: 6px;
+}
+
+.home-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 0 16px;
+  flex: 1;
+}
+
+.tile {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 20px 16px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: background .15s, border-color .15s, transform .12s;
+  min-height: 100px;
+  user-select: none;
+}
+
+.tile:active {
+  background: var(--card2);
+  transform: scale(0.97);
+}
+
+.tile::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  background: radial-gradient(ellipse at 0% 0%, rgba(255,255,255,.04), transparent 60%);
+  pointer-events: none;
+}
+
+.tile-icon { font-size: 28px; line-height: 1; }
+
+.tile-info {}
+.tile-label { font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.2; }
+.tile-sub { font-size: 11px; font-weight: 500; color: var(--dim); text-transform: uppercase; letter-spacing: .8px; margin-top: 2px; }
+
+/* colour accents per tile */
+.tile[data-id="golf"] { border-color: rgba(52,211,153,.15); }
+.tile[data-id="golf"]::before { content:''; position:absolute; top:-20px; right:-20px; width:80px; height:80px; border-radius:50%; background:rgba(52,211,153,.06); }
+.tile[data-id="racing"] { border-color: rgba(240,180,41,.15); }
+.tile[data-id="racing"]::before { content:''; position:absolute; top:-20px; right:-20px; width:80px; height:80px; border-radius:50%; background:rgba(240,180,41,.06); }
+.tile[data-id="movies"] { border-color: rgba(248,113,113,.15); }
+.tile[data-id="movies"]::before { content:''; position:absolute; top:-20px; right:-20px; width:80px; height:80px; border-radius:50%; background:rgba(248,113,113,.06); }
+.tile[data-id="tvshows"] { border-color: rgba(96,165,250,.15); }
+.tile[data-id="tvshows"]::before { content:''; position:absolute; top:-20px; right:-20px; width:80px; height:80px; border-radius:50%; background:rgba(96,165,250,.06); }
+.tile[data-id="nasa"] { border-color: rgba(34,211,238,.15); }
+.tile[data-id="nasa"]::before { content:''; position:absolute; top:-20px; right:-20px; width:80px; height:80px; border-radius:50%; background:rgba(34,211,238,.06); }
+.tile[data-id="upcoming"] { border-color: rgba(244,114,182,.15); }
+.tile[data-id="upcoming"]::before { content:''; position:absolute; top:-20px; right:-20px; width:80px; height:80px; border-radius:50%; background:rgba(244,114,182,.06); }
+.tile[data-id="history"] { border-color: rgba(167,139,250,.15); }
+.tile[data-id="history"]::before { content:''; position:absolute; top:-20px; right:-20px; width:80px; height:80px; border-radius:50%; background:rgba(167,139,250,.06); }
+.tile[data-id="fun"] { border-color: rgba(251,146,60,.15); }
+.tile[data-id="fun"]::before { content:''; position:absolute; top:-20px; right:-20px; width:80px; height:80px; border-radius:50%; background:rgba(251,146,60,.06); }
+
+/* ── SCREENS ── */
+.scr {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 10;
+  display: none;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform .28s cubic-bezier(.4,0,.2,1);
+}
+.scr.on { display: flex; }
+.scr.visible { transform: translateX(0); }
+
+/* screen header */
+.sh {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: calc(12px + var(--safe-top)) 16px 12px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(8,8,16,.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  flex-shrink: 0;
+  z-index: 2;
+}
+
+.bk {
+  background: var(--card);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 8px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  transition: background .15s;
+}
+.bk:active { background: var(--card2); }
+.bk svg { width: 16px; height: 16px; }
+
+.st {
+  font-size: 16px;
+  font-weight: 800;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rl {
+  background: transparent;
+  border: 1px solid rgba(52,211,153,.25);
+  color: var(--green);
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  transition: background .15s;
+}
+.rl:active { background: rgba(52,211,153,.08); }
+.rl svg { width: 15px; height: 15px; }
+.rl.spin svg { animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.sb {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 16px 16px calc(16px + var(--safe-bot));
+}
+
+/* ── LOADER / ERROR ── */
+.ld { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 200px; gap: 12px; }
+.ld-s { width: 36px; height: 36px; border: 2.5px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin .7s linear infinite; }
+.ld-t { font-size: 14px; color: var(--dim); }
+.err { text-align: center; padding: 32px 16px; color: var(--red); font-size: 14px; }
+
+/* ── TABS (reusable) ── */
+.tabs-row {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex-shrink: 0;
+}
+.tabs-row::-webkit-scrollbar { display: none; }
+.tab-btn {
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--dim2);
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 7px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .15s;
+  flex-shrink: 0;
+}
+.tab-btn.active { border-color: var(--tab-accent, var(--gold)); color: var(--tab-accent, var(--gold)); background: rgba(255,255,255,.04); }
+.tab-btn:active { opacity: .75; }
+.tab-count { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; background: var(--border); color: var(--dim); padding: 1px 6px; border-radius: 5px; margin-left: 4px; }
+.tab-btn.active .tab-count { background: rgba(255,255,255,.08); color: var(--tab-accent, var(--gold)); }
+
+/* ── RACING ── */
+.race-list { display: flex; flex-direction: column; gap: 12px; }
+.rc {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px 14px 12px;
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
+}
+.rc:active { background: var(--card2); border-color: rgba(240,180,41,.3); }
+.rch { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 8px; }
+.rtm { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; color: var(--green); background: rgba(52,211,153,.1); padding: 3px 8px; border-radius: 6px; flex-shrink: 0; }
+.rcn { font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: .5px; flex: 1; margin-left: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rs { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; padding: 3px 8px; border-radius: 5px; flex-shrink: 0; }
+.rs.wi { background: rgba(52,211,153,.15); color: var(--green); }
+.rs.up { background: rgba(240,180,41,.15); color: var(--gold); }
+.rm { font-size: 12px; color: var(--dim2); margin-bottom: 8px; line-height: 1.4; }
+.hr { display: flex; align-items: center; gap: 8px; padding: 4px 0; }
+.hp { width: 22px; height: 22px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; flex-shrink: 0; }
+.hp.p1 { background: rgba(240,180,41,.2); color: var(--gold); }
+.hp.p2 { background: rgba(192,192,192,.15); color: #c0c0c0; }
+.hp.p3 { background: rgba(205,127,50,.15); color: #cd7f32; }
+.hc { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--dim); width: 14px; text-align: center; flex-shrink: 0; }
+.hn { flex: 1; font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hn.fv { color: var(--gold); }
+.ho { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; color: var(--dim2); flex-shrink: 0; }
+.rd { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
+.rd span { font-size: 10px; color: var(--dim); text-transform: uppercase; letter-spacing: .5px; }
+.rd strong { font-size: 12px; color: var(--text); font-weight: 600; margin-left: 2px; }
+
+/* ── MOVIES / TV (poster cards) ── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.cc {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all .15s;
+}
+.cc:active { border-color: rgba(240,180,41,.4); transform: scale(0.97); }
+.cp { width: 100%; aspect-ratio: 2/3; object-fit: cover; background: var(--border); display: block; }
+.cp-ph { width: 100%; aspect-ratio: 2/3; display: flex; align-items: center; justify-content: center; font-size: 28px; background: var(--card2); }
+.ci { padding: 8px; }
+.ct { font-size: 11px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cm { display: flex; justify-content: space-between; margin-top: 3px; }
+.cy { font-size: 10px; color: var(--dim); }
+.cr { font-size: 10px; font-weight: 700; color: var(--gold); }
+
+/* ── NASA ── */
+.nasa-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.nasa-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all .15s;
+}
+.nasa-card:active { border-color: rgba(34,211,238,.4); transform: scale(0.97); }
+.nasa-img-thumb { width: 100%; aspect-ratio: 16/10; object-fit: cover; background: var(--border); display: block; }
+.nasa-info { padding: 8px 10px; }
+.nasa-title { font-size: 11px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nasa-date { font-size: 10px; color: var(--dim); font-family: 'JetBrains Mono', monospace; margin-top: 2px; }
+
+/* ── UPCOMING TV ── */
+.up-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.up-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  transition: all .15s;
+}
+.up-card:active { border-color: rgba(244,114,182,.4); transform: scale(0.97); }
+.up-thumb-wrap { position: relative; }
+.up-thumb { width: 100%; aspect-ratio: 16/10; object-fit: cover; background: var(--border); display: block; }
+.up-thumb-ph { width: 100%; aspect-ratio: 16/10; display: flex; align-items: center; justify-content: center; font-size: 28px; background: var(--card2); }
+.up-rank { position: absolute; top: 6px; left: 6px; background: rgba(0,0,0,.75); color: var(--dim2); font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; padding: 2px 6px; border-radius: 6px; backdrop-filter: blur(4px); }
+.up-aired-badge { position: absolute; top: 6px; right: 6px; background: rgba(52,211,153,.2); color: var(--green); font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 5px; backdrop-filter: blur(4px); }
+.up-body { padding: 8px 10px; flex: 1; display: flex; flex-direction: column; gap: 3px; }
+.up-title { font-size: 11px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.up-meta { font-size: 10px; color: var(--dim2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.up-row { display: flex; justify-content: space-between; align-items: center; margin-top: 2px; }
+.up-premiere { font-size: 10px; color: var(--orange); font-weight: 700; }
+.up-rating { font-size: 10px; color: var(--gold); font-weight: 700; }
+
+/* ── HISTORY ── */
+.h-date-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.h-date-txt { font-size: 15px; font-weight: 800; color: var(--purple); white-space: nowrap; }
+.h-date-line { flex: 1; height: 1px; background: linear-gradient(90deg, rgba(167,139,250,.3), transparent); }
+.history-list { display: flex; flex-direction: column; gap: 10px; }
+.hi {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-left: 3px solid rgba(167,139,250,.4);
+  border-radius: 14px;
+  padding: 12px 14px;
+  cursor: pointer;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  transition: all .15s;
+}
+.hi:active { background: var(--card2); border-left-color: var(--purple); }
+.hy-wrap { flex-shrink: 0; }
+.hy { font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 800; color: var(--purple); line-height: 1; }
+.hy-ago { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--dim); margin-top: 2px; }
+.ht { font-size: 13px; line-height: 1.55; color: var(--text); }
+
+/* ── FUN ── */
+.fun-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 32px 16px;
+  gap: 16px;
+}
+.fun-emoji { font-size: 56px; }
+.fun-setup { font-size: 18px; font-weight: 700; line-height: 1.5; }
+.fun-answer { font-size: 16px; line-height: 1.6; }
+.fun-btn {
+  background: var(--card2);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  font-family: 'Syne', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 14px 28px;
+  border-radius: 16px;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: all .15s;
+}
+.fun-btn:active { transform: scale(0.97); }
+
+/* ── GOLF ── */
+.golf-header { flex-shrink: 0; padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--surface); }
+.golf-event-name { font-size: 15px; font-weight: 800; color: var(--green); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.golf-status-badge { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; font-family: 'JetBrains Mono', monospace; }
+.golf-status-badge.live { background: rgba(52,211,153,.15); color: var(--green); animation: pulse 1.5s ease-in-out infinite; }
+.golf-status-badge.post { background: rgba(107,109,128,.15); color: var(--dim); }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+.golf-meta-row { display: flex; gap: 12px; margin-top: 5px; font-size: 11px; color: var(--dim); font-family: 'JetBrains Mono', monospace; flex-wrap: wrap; }
+.golf-meta-row b { color: var(--text); font-weight: 600; }
+
+.golf-list { display: flex; flex-direction: column; gap: 8px; }
+.golf-row {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 12px 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all .15s;
+}
+.golf-row:active { background: var(--card2); border-color: rgba(52,211,153,.3); }
+.golf-row.is-fav { border-color: rgba(240,180,41,.3); background: rgba(240,180,41,.03); }
+.golf-row.is-cut { opacity: .5; }
+.g-pos { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; color: var(--dim); width: 28px; text-align: center; flex-shrink: 0; }
+.g-pos.top3 { color: var(--gold); font-weight: 800; }
+.g-headshot { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border); background: var(--border); flex-shrink: 0; }
+.g-info { flex: 1; min-width: 0; }
+.g-name { font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.g-ctry { font-size: 11px; color: var(--dim2); }
+.g-scores { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex-shrink: 0; }
+.g-total { font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 900; }
+.g-total.under { color: #f87171; }
+.g-total.over { color: var(--text); }
+.g-total.even { color: var(--dim); }
+.g-total.leader { color: var(--green); }
+.g-thru-today { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--dim2); }
+.g-row-star { font-size: 16px; color: var(--dim); opacity: .4; flex-shrink: 0; }
+.g-row-star.on { color: var(--gold); opacity: 1; }
+.golf-cut-row { text-align: center; padding: 6px; color: rgba(248,113,113,.6); font-size: 11px; font-family: 'JetBrains Mono', monospace; letter-spacing: .5px; }
+.golf-fav-div { text-align: left; padding: 8px 0 4px; color: var(--gold); font-size: 11px; font-family: 'JetBrains Mono', monospace; letter-spacing: .5px; font-weight: 700; }
+
+/* Golf tabs */
+.golf-tabs {
+  display: flex;
+  gap: 8px;
+  padding: 10px 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+}
+.golf-tabs::-webkit-scrollbar { display: none; }
+.golf-tab-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--dim2);
+  font-family: 'Syne', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all .15s;
+}
+.golf-tab-btn.active { border-color: var(--green); color: var(--green); background: rgba(52,211,153,.06); }
+
+/* ── MODAL ── */
+.mo {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.85);
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s;
+}
+.mo.show { opacity: 1; pointer-events: all; }
+.md {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 24px 24px 0 0;
+  width: 100%;
+  max-height: 90dvh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 0 calc(20px + var(--safe-bot));
+  transform: translateY(100%);
+  transition: transform .28s cubic-bezier(.4,0,.2,1);
+}
+.mo.show .md { transform: translateY(0); }
+.md-handle { width: 36px; height: 4px; background: var(--border2); border-radius: 2px; margin: 12px auto 0; }
+.md-inner { padding: 16px 20px 0; }
+.md-close-row { display: flex; justify-content: flex-end; margin-bottom: 8px; }
+.md-x {
+  background: var(--card);
+  border: 1px solid var(--border2);
+  color: var(--dim2);
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.md-x:active { background: rgba(248,113,113,.15); color: var(--red); }
+.md-poster { width: 100%; max-width: 160px; border-radius: 12px; object-fit: cover; float: left; margin: 0 16px 8px 0; aspect-ratio: 2/3; }
+.md-title { font-size: 20px; font-weight: 800; line-height: 1.25; margin-bottom: 4px; }
+.md-tag { font-size: 13px; color: var(--dim2); font-style: italic; margin-bottom: 8px; }
+.md-stats { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; clear: left; }
+.md-stat { background: var(--card); padding: 4px 10px; border-radius: 8px; font-size: 12px; }
+.md-stat strong { color: var(--gold); }
+.md-genres { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+.md-genre { background: rgba(167,139,250,.1); color: var(--purple); padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; }
+.md-ov { font-size: 13px; line-height: 1.7; color: var(--dim2); margin-top: 8px; }
+.md-nasa-img { width: 100%; border-radius: 12px; object-fit: contain; max-height: 40dvh; display: block; margin: 8px 0; }
+
+/* Golf modal */
+.md-golf-head { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; }
+.md-golf-hs { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); background: var(--border); flex-shrink: 0; }
+.md-golf-name { font-size: 19px; font-weight: 800; line-height: 1.2; }
+.md-golf-ctry { font-size: 12px; color: var(--dim2); }
+.md-golf-score { font-family: 'JetBrains Mono', monospace; font-size: 36px; font-weight: 900; }
+.md-golf-score.under { color: #f87171; }
+.md-golf-score.over { color: var(--text); }
+.md-golf-score.even { color: var(--dim); }
+.md-golf-rounds { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin: 12px 0; }
+.md-golf-rd { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px; text-align: center; }
+.md-golf-rd-lbl { font-size: 10px; color: var(--dim); text-transform: uppercase; letter-spacing: .5px; font-weight: 700; }
+.md-golf-rd-score { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 800; margin-top: 4px; }
+.md-golf-rd-rel { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; margin-top: 2px; }
+.md-golf-rd-rel.under { color: #f87171; }
+.md-golf-rd-rel.over { color: var(--text); }
+.md-golf-rd-rel.even { color: var(--dim); }
+.g-modal-star {
+  background: var(--card);
+  border: 1px solid var(--border2);
+  color: var(--dim2);
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 12px;
+  transition: all .15s;
+}
+.g-modal-star.on { background: rgba(240,180,41,.12); border-color: rgba(240,180,41,.4); color: var(--gold); }
+.g-modal-star:active { opacity: .75; }
+
+/* Hole scorecard */
+.golf-sc-round-hdr { font-size: 12px; font-weight: 800; color: var(--text); text-transform: uppercase; letter-spacing: .5px; margin: 14px 0 8px; display: flex; align-items: center; gap: 8px; }
+.sc-rd-pill { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 5px; background: var(--card); border: 1px solid var(--border); }
+.sc-rd-pill.under { color: #f87171; }
+.sc-rd-pill.over { color: var(--text); }
+.sc-rd-pill.even { color: var(--dim); }
+.golf-holes { display: grid; grid-template-columns: repeat(9,1fr); gap: 3px; margin-bottom: 3px; }
+.golf-hole { border-radius: 5px; overflow: hidden; text-align: center; min-width: 0; }
+.golf-hole-num { font-size: 9px; color: var(--dim); padding: 2px 0; background: rgba(0,0,0,.3); font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+.golf-hole-par { font-size: 9px; color: var(--dim); padding: 1px 0; background: rgba(0,0,0,.15); }
+.golf-hole-score { font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 900; padding: 5px 0; }
+.golf-hole.eagle .golf-hole-score { background: rgba(240,180,41,.3); color: var(--gold); }
+.golf-hole.birdie .golf-hole-score { background: rgba(52,211,153,.22); color: var(--green); }
+.golf-hole.par .golf-hole-score { background: rgba(30,32,48,.9); color: var(--dim); }
+.golf-hole.bogey .golf-hole-score { background: rgba(248,113,113,.3); color: #f87171; }
+.golf-hole.double .golf-hole-score { background: rgba(200,40,40,.5); color: #fca5a5; }
+.golf-hole.worse .golf-hole-score { background: rgba(160,20,20,.65); color: #fecaca; }
+.golf-hole.empty .golf-hole-score { background: rgba(30,32,48,.4); color: rgba(107,109,128,.3); }
+.golf-hole-rel { font-family: 'JetBrains Mono', monospace; font-size: 9px; padding: 2px 0; font-weight: 700; }
+.golf-hole.eagle .golf-hole-rel { color: var(--gold); }
+.golf-hole.birdie .golf-hole-rel { color: var(--green); }
+.golf-hole.par .golf-hole-rel { color: var(--dim); }
+.golf-hole.bogey .golf-hole-rel { color: #f87171; }
+.golf-hole.double .golf-hole-rel, .golf-hole.worse .golf-hole-rel { color: #fca5a5; }
+.golf-sc-legend { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+.golf-sc-legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--dim); }
+.golf-sc-legend-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+
+/* Race modal */
+.race-modal-full { display: flex; flex-direction: column; gap: 6px; }
+.rm-header { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
+.rm-full-card { margin-top: 8px; }
+.rm-card-title { font-size: 11px; font-weight: 700; color: var(--dim); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
+.rm-runner { display: flex; align-items: center; gap: 8px; padding: 7px 0; border-bottom: 1px solid var(--border); }
+.rm-runner:last-child { border-bottom: none; }
+
+/* Upcoming show detail */
+.up-modal-img { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 12px; margin-bottom: 12px; display: block; }
+
+/* History modal */
+.hm-year { font-family: 'JetBrains Mono', monospace; font-size: 42px; font-weight: 900; color: var(--purple); line-height: 1; }
+.hm-ago { font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--dim); margin-top: 4px; }
+.hm-text { font-size: 16px; font-weight: 600; line-height: 1.6; margin-top: 12px; }
+.hm-pages { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.hm-page { background: rgba(167,139,250,.1); color: var(--purple); padding: 4px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; }
+
+/* Cache label */
+.cache-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--dim); flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<!-- ─── HOME ─── -->
+<div id="home">
+  <div class="home-header">
+    <div class="home-title">
+      <span>AWE</span>Hub
+    </div>
+    <div class="clk" id="clk"></div>
+  </div>
+
+  <div class="home-grid" id="homeGrid">
+    <div class="tile" data-id="golf">
+      <div class="tile-icon">⛳</div>
+      <div class="tile-info">
+        <div class="tile-label">Golf</div>
+        <div class="tile-sub">Live Scores</div>
+      </div>
+    </div>
+    <div class="tile" data-id="racing">
+      <div class="tile-icon">🏇</div>
+      <div class="tile-info">
+        <div class="tile-label">Horse Racing</div>
+        <div class="tile-sub">Live Results</div>
+      </div>
+    </div>
+    <div class="tile" data-id="movies">
+      <div class="tile-icon">🎬</div>
+      <div class="tile-info">
+        <div class="tile-label">Movies</div>
+        <div class="tile-sub">Trending</div>
+      </div>
+    </div>
+    <div class="tile" data-id="tvshows">
+      <div class="tile-icon">📺</div>
+      <div class="tile-info">
+        <div class="tile-label">TV Shows</div>
+        <div class="tile-sub">Popular Now</div>
+      </div>
+    </div>
+    <div class="tile" data-id="nasa">
+      <div class="tile-icon">🚀</div>
+      <div class="tile-info">
+        <div class="tile-label">NASA</div>
+        <div class="tile-sub">Gallery</div>
+      </div>
+    </div>
+    <div class="tile" data-id="upcoming">
+      <div class="tile-icon">📅</div>
+      <div class="tile-info">
+        <div class="tile-label">Upcoming TV</div>
+        <div class="tile-sub">Next Episode</div>
+      </div>
+    </div>
+    <div class="tile" data-id="history">
+      <div class="tile-icon">📜</div>
+      <div class="tile-info">
+        <div class="tile-label">This Day</div>
+        <div class="tile-sub">In History</div>
+      </div>
+    </div>
+    <div class="tile" data-id="fun">
+      <div class="tile-icon">🎭</div>
+      <div class="tile-info">
+        <div class="tile-label">Joke & Riddle</div>
+        <div class="tile-sub">Daily Fun</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── SCREENS ─── -->
+
+<!-- Racing -->
+<div class="scr" id="scr-racing">
+  <div class="sh">
+    <button class="bk" onclick="goHome()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>Back</button>
+    <div class="st" style="color:var(--gold)">🏇 Racing</div>
+    <button class="rl" id="rl-racing" onclick="loadRacing()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>Reload</button>
+  </div>
+  <div class="tabs-row" id="racingTabs" style="--tab-accent:var(--gold)"></div>
+  <div class="sb" id="racingBody"></div>
+</div>
+
+<!-- Movies -->
+<div class="scr" id="scr-movies">
+  <div class="sh">
+    <button class="bk" onclick="goHome()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>Back</button>
+    <div class="st" style="color:var(--red)">🎬 Movies</div>
+    <button class="rl" onclick="loadMovies()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>Reload</button>
+  </div>
+  <div class="sb" id="moviesBody"></div>
+</div>
+
+<!-- TV Shows -->
+<div class="scr" id="scr-tvshows">
+  <div class="sh">
+    <button class="bk" onclick="goHome()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>Back</button>
+    <div class="st" style="color:var(--blue)">📺 TV Shows</div>
+    <button class="rl" onclick="loadTVShows()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>Reload</button>
+  </div>
+  <div class="sb" id="tvshowsBody"></div>
+</div>
+
+<!-- NASA -->
+<div class="scr" id="scr-nasa">
+  <div class="sh">
+    <button class="bk" onclick="goHome()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>Back</button>
+    <div class="st" style="color:var(--cyan)">🚀 NASA Gallery</div>
+    <button class="rl" onclick="loadNasa()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>Reload</button>
+  </div>
+  <div class="sb" id="nasaBody"></div>
+</div>
+
+<!-- Upcoming -->
+<div class="scr" id="scr-upcoming">
+  <div class="sh">
+    <button class="bk" onclick="goHome()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>Back</button>
+    <div class="st" style="color:var(--pink)">📅 TV Shows</div>
+    <div class="cache-label" id="upcomingCacheLabel"></div>
+    <button class="rl" id="rl-upcoming" onclick="loadUpcoming()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>Reload</button>
+  </div>
+  <div class="tabs-row" id="upcomingTabs" style="--tab-accent:var(--pink)">
+    <button class="tab-btn active" data-uptab="upcoming">📅 Coming Up <span class="tab-count" id="uptab-count-upcoming">—</span></button>
+    <button class="tab-btn" data-uptab="aired">✅ Recently Aired <span class="tab-count" id="uptab-count-aired">—</span></button>
+  </div>
+  <div class="sb" id="upcomingBody"></div>
+</div>
+
+<!-- History -->
+<div class="scr" id="scr-history">
+  <div class="sh">
+    <button class="bk" onclick="goHome()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>Back</button>
+    <div class="st" style="color:var(--purple)">📜 This Day</div>
+    <button class="rl" onclick="loadHistory()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>Reload</button>
+  </div>
+  <div class="sb" id="historyBody"></div>
+</div>
+
+<!-- Fun -->
+<div class="scr" id="scr-fun">
+  <div class="sh">
+    <button class="bk" onclick="goHome()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>Back</button>
+    <div class="st" style="color:var(--orange)">🎭 Daily Fun</div>
+    <button class="rl" id="rl-fun" onclick="renderFun()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>New</button>
+  </div>
+  <div class="tabs-row" id="funTabs" style="--tab-accent:var(--orange)">
+    <button class="tab-btn active" data-funtab="joke">😂 Joke</button>
+    <button class="tab-btn" data-funtab="riddle">🧩 Riddle</button>
+  </div>
+  <div class="sb" id="funBody"></div>
+</div>
+
+<!-- Golf -->
+<div class="scr" id="scr-golf">
+  <div class="sh">
+    <button class="bk" onclick="goHome()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>Back</button>
+    <div class="st" style="color:var(--green)">⛳ Golf</div>
+    <button class="rl" id="rl-golf" onclick="loadGolf()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>Reload</button>
+  </div>
+  <div class="golf-tabs" id="golfTabs"></div>
+  <div class="golf-header" id="golfInfo" style="display:none"></div>
+  <div class="sb" id="golfBody" style="padding-top:12px"></div>
+</div>
+
+<!-- ─── MODAL ─── -->
+<div class="mo" id="mOverlay">
+  <div class="md" id="mContent">
+    <div class="md-handle"></div>
+    <div class="md-inner" id="mInner"></div>
+  </div>
+</div>
+
+<script>
+const PROXY = 'https://racing-results.kavanagh-m-rob.workers.dev';
+const TMDB = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIxNDY3YzQ0NjNmZTY2Zjg1NTc3MDAwZDAyNTFiNjllZiIsIm5iZiI6MTc3NDk4NjA1NS4wODUsInN1YiI6IjY5Y2MyMzQ3OWI4NWMxYWU3MGFjNGRmOSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.BDkR-1aZk5emqpi3HAAeVIU1hkVAOaFIs2V27XZ_mvo';
+const NASA_KEY = 'cQVDvwpdFz0u34enmqgkBxLMEwTq6Kdkg6hWluJG';
+const NASA_WORKER = 'https://nasa.kavanagh-m-rob.workers.dev/';
+const UPCOMING_API = 'https://rx4up4hm0e.execute-api.eu-west-1.amazonaws.com';
+const GOLF_PROXY = 'https://golf-scores.kavanagh-m-rob.workers.dev/';
+const SCORECARD_PROXY = 'https://golf-scorecard.kavanagh-m-rob.workers.dev/';
+const MASTERS_PARS = [4,5,4,3,4,3,4,5,4, 4,4,3,5,4,5,3,4,4];
+
+// ── Clock ──
+!function ck(){
+  const n=new Date();
+  document.getElementById('clk').textContent=[n.getHours(),n.getMinutes()].map(v=>String(v).padStart(2,'0')).join(':');
+  setTimeout(ck,10000);
+}();
+
+// ── Navigation ──
+let curScr = null;
+const loaders = {
+  racing: loadRacing,
+  movies: loadMovies,
+  tvshows: loadTVShows,
+  nasa: loadNasa,
+  upcoming: loadUpcoming,
+  history: loadHistory,
+  fun: loadFun,
+  golf: loadGolf
+};
+
+document.querySelectorAll('.tile').forEach(t => {
+  t.addEventListener('click', () => openScr(t.dataset.id));
+});
+
+function openScr(id) {
+  document.getElementById('home').style.display = 'none';
+  const s = document.getElementById('scr-' + id);
+  s.style.display = 'flex';
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => s.classList.add('visible'));
+  });
+  curScr = id;
+  loaders[id]?.();
+}
+
+function goHome() {
+  if (!curScr) return;
+  const s = document.getElementById('scr-' + curScr);
+  s.classList.remove('visible');
+  s.addEventListener('transitionend', () => {
+    s.style.display = 'none';
+  }, { once: true });
+  document.getElementById('home').style.display = 'flex';
+  curScr = null;
+}
+
+// Android back bridge
+window.androidBack = function() {
+  if (isModalOpen()) { closeModal(); return true; }
+  if (curScr) { goHome(); return true; }
+  return false;
+};
+
+// Swipe back gesture
+let touchStartX = 0;
+document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+document.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  if (dx > 80 && touchStartX < 40) {
+    if (isModalOpen()) closeModal();
+    else if (curScr) goHome();
+  }
+}, { passive: true });
+
+// ── Modal ──
+let modalState = 'closed';
+function isModalOpen() { return modalState !== 'closed'; }
+function openModal(html) {
+  modalState = 'open';
+  document.getElementById('mInner').innerHTML = html;
+  document.getElementById('mOverlay').classList.add('show');
+}
+function closeModal() {
+  if (modalState === 'closed') return;
+  modalState = 'closed';
+  document.getElementById('mOverlay').classList.remove('show');
+}
+document.getElementById('mOverlay').addEventListener('click', e => {
+  if (e.target.id === 'mOverlay') closeModal();
+});
+document.addEventListener('click', e => {
+  if (e.target.closest('.md-x')) closeModal();
+});
+
+// ── Racing ──
+let raceData = [];
+let activeCourse = 'all';
+
+async function loadRacing() {
+  const btn = document.getElementById('rl-racing');
+  btn?.classList.add('spin');
+  activeCourse = 'all';
+  document.getElementById('racingBody').innerHTML = '<div class="ld"><div class="ld-s"></div><div class="ld-t">Loading races...</div></div>';
+  try {
+    const r = await fetch(PROXY);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const data = await r.json();
+    if (!Array.isArray(data) || !data.length) { document.getElementById('racingBody').innerHTML = '<div class="err">No race data.</div>'; btn?.classList.remove('spin'); return; }
+    raceData = data;
+    buildRacingTabs();
+    renderRacing();
+  } catch(e) { document.getElementById('racingBody').innerHTML = `<div class="err">${e.message}</div>`; }
+  btn?.classList.remove('spin');
+}
+
+function buildRacingTabs() {
+  const courses = ['all', ...[...new Set(raceData.map(r => r.courseName || 'Unknown'))].sort()];
+  const tabs = document.getElementById('racingTabs');
+  tabs.innerHTML = courses.map(c =>
+    `<button class="tab-btn${c === activeCourse ? ' active' : ''}" data-course="${c}">${c === 'all' ? 'All Courses' : c}</button>`
+  ).join('');
+  tabs.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeCourse = btn.dataset.course;
+      tabs.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderRacing();
+    });
+  });
+}
+
+function renderRacing() {
+  const b = document.getElementById('racingBody');
+  const filtered = activeCourse === 'all' ? raceData : raceData.filter(r => (r.courseName||'Unknown') === activeCourse);
+  if (!filtered.length) { b.innerHTML = '<div class="err">No races for this course.</div>'; return; }
+  let h = '<div class="race-list">';
+  filtered.forEach((race, idx) => {
+    const gi = raceData.indexOf(race);
+    let t = race.time || '';
+    if (t && /^\d{2}:\d{2}$/.test(t)) { let[hr,mn]=t.split(':').map(Number); hr=(hr+1)%24; t=String(hr).padStart(2,'0')+':'+String(mn).padStart(2,'0'); }
+    const st = (race.status||'').toLowerCase(); let sc='up', sx=race.status||'Upcoming';
+    if (st.includes('weighed')||st.includes('result')||st.includes('final')) { sc='wi'; }
+    h += `<div class="rc" data-race="${gi}">
+      <div class="rch">
+        <span class="rtm">${t}</span>
+        <span class="rcn">${race.courseName||''}</span>
+        <span class="rs ${sc}">${sx}</span>
+      </div>`;
+    if (race.name) h += `<div class="rm">${race.name}${race.distance?' · '+race.distance:''}${race.race_class?' · C'+race.race_class:''}</div>`;
+    (race.top_horses||[]).forEach(ho => {
+      const pc = ho.position===1?'p1':ho.position===2?'p2':'p3';
+      h += `<div class="hr"><div class="hp ${pc}">${ho.position}</div><div class="hc">${ho.saddlecloth_number||''}</div><div class="hn${ho.favourite?' fv':''}">${ho.horse_name||''}</div><div class="ho">${ho.odds||''}</div></div>`;
+    });
+    const ds = [];
+    if (race.runners) ds.push({l:'Runners',v:race.runners});
+    if (race.going) ds.push({l:'Going',v:race.going});
+    if (race.winning_jockeys?.length) ds.push({l:'Jockey',v:race.winning_jockeys[0].name});
+    if (ds.length) { h += '<div class="rd">'; ds.forEach(d => h += `<span>${d.l}</span><strong>${d.v}</strong>`); h += '</div>'; }
+    h += '</div>';
+  });
+  b.innerHTML = h + '</div>';
+}
+
+document.addEventListener('click', e => {
+  const rc = e.target.closest('.rc[data-race]');
+  if (rc) showRaceDetail(Number(rc.dataset.race));
+});
+
+function showRaceDetail(idx) {
+  const race = raceData[idx]; if (!race) return;
+  let t = race.time || '';
+  if (t && /^\d{2}:\d{2}$/.test(t)) { let[hr,mn]=t.split(':').map(Number); hr=(hr+1)%24; t=String(hr).padStart(2,'0')+':'+String(mn).padStart(2,'0'); }
+  const st = (race.status||'').toLowerCase(); let sc='up', sx=race.status||'Upcoming';
+  if (st.includes('weighed')||st.includes('result')||st.includes('final')) sc='wi';
+  const extras = [];
+  if (race.runners) extras.push({l:'Runners',v:race.runners});
+  if (race.distances) extras.push({l:'Dist',v:race.distances});
+  if (race.going) extras.push({l:'Going',v:race.going});
+  if (race.prize) extras.push({l:'Prize',v:race.prize});
+  if (race.winning_jockeys?.length) extras.push({l:'Jockey',v:race.winning_jockeys[0].name});
+  if (race.winning_trainers?.length) extras.push({l:'Trainer',v:race.winning_trainers[0].name});
+  const extrasHtml = extras.length ? `<div class="rd" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">${extras.map(d=>`<span>${d.l}</span><strong>${d.v}</strong>`).join('')}</div>` : '';
+  const horses = race.runners_detail?.length ? race.runners_detail : (race.top_horses||[]);
+  let runnersHtml = '';
+  if (horses.length) {
+    runnersHtml = '<div class="rm-full-card"><div class="rm-card-title">Runners</div>';
+    horses.forEach(h => {
+      const pc = h.position===1?'p1':h.position===2?'p2':h.position===3?'p3':'';
+      runnersHtml += `<div class="rm-runner">
+        ${pc ? `<div class="hp ${pc}">${h.position}</div>` : `<div style="width:22px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim)">${h.saddlecloth_number||''}</div>`}
+        <div class="hn${h.favourite?' fv':''}" style="flex:1">${h.horse_name||''}</div>
+        <div class="ho">${h.odds||''}</div>
+      </div>`;
+    });
+    runnersHtml += '</div>';
+  }
+  openModal(`
+    <div class="md-close-row"><button class="md-x">✕</button></div>
+    <div class="race-modal-full">
+      <div class="rm-header">
+        <span class="rtm">${t}</span>
+        <span class="rcn">${race.courseName||''}</span>
+        <span class="rs ${sc}">${sx}</span>
+      </div>
+      ${race.name ? `<div class="rm" style="font-size:13px">${race.name}${race.distance?' · '+race.distance:''}${race.race_class?' · Class '+race.race_class:''}</div>` : ''}
+      ${extrasHtml}
+      ${runnersHtml}
+    </div>
+  `);
+}
+
+// ── Movies / TV Shows ──
+async function tmdbFetch(ep) {
+  const r = await fetch('https://api.themoviedb.org/3' + ep, { headers: { 'Authorization': 'Bearer ' + TMDB, 'Content-Type': 'application/json' } });
+  if (!r.ok) throw new Error('TMDB ' + r.status);
+  return r.json();
+}
+
+function renderCards(items, type, containerId) {
+  const b = document.getElementById(containerId);
+  let h = '<div class="card-grid">';
+  items.forEach(i => {
+    const title = type === 'movie' ? i.title : i.name;
+    const date = type === 'movie' ? i.release_date : i.first_air_date;
+    const year = date ? date.substring(0,4) : '';
+    const poster = i.poster_path ? 'https://image.tmdb.org/t/p/w342' + i.poster_path : '';
+    const rating = i.vote_average ? i.vote_average.toFixed(1) : '—';
+    const mt = type === 'movie' ? 'movie' : 'tv';
+    h += `<div class="cc" data-tid="${i.id}" data-tt="${mt}">
+      ${poster ? `<img class="cp" src="${poster}" loading="lazy">` : '<div class="cp-ph">🎬</div>'}
+      <div class="ci">
+        <div class="ct">${title||''}</div>
+        <div class="cm"><span class="cy">${year}</span><span class="cr">★ ${rating}</span></div>
+      </div>
+    </div>`;
+  });
+  b.innerHTML = h + '</div>';
+}
+
+async function loadMovies() {
+  const b = document.getElementById('moviesBody');
+  b.innerHTML = '<div class="ld"><div class="ld-s"></div><div class="ld-t">Loading...</div></div>';
+  try { const d = await tmdbFetch('/trending/movie/week?language=en-US'); renderCards(d.results||[], 'movie', 'moviesBody'); }
+  catch(e) { b.innerHTML = `<div class="err">${e.message}</div>`; }
+}
+
+async function loadTVShows() {
+  const b = document.getElementById('tvshowsBody');
+  b.innerHTML = '<div class="ld"><div class="ld-s"></div><div class="ld-t">Loading...</div></div>';
+  try { const d = await tmdbFetch('/trending/tv/week?language=en-US'); renderCards(d.results||[], 'tv', 'tvshowsBody'); }
+  catch(e) { b.innerHTML = `<div class="err">${e.message}</div>`; }
+}
+
+document.addEventListener('click', e => {
+  const cc = e.target.closest('.cc[data-tid]');
+  if (cc) showDetail(cc.dataset.tid, cc.dataset.tt);
+});
+
+async function showDetail(id, type) {
+  openModal('<div class="ld"><div class="ld-s"></div></div>');
+  try {
+    const d = await tmdbFetch(`/${type}/${id}?language=en-US`);
+    const poster = d.poster_path ? 'https://image.tmdb.org/t/p/w500' + d.poster_path : '';
+    const title = d.title || d.name || '';
+    const year = (d.release_date || d.first_air_date || '').substring(0,4);
+    const rating = d.vote_average ? d.vote_average.toFixed(1) : '—';
+    const runtime = d.runtime ? d.runtime + 'min' : d.number_of_seasons ? d.number_of_seasons + ' seasons' : '';
+    const genres = (d.genres||[]).map(g => `<span class="md-genre">${g.name}</span>`).join('');
+    document.getElementById('mInner').innerHTML = `
+      <div class="md-close-row"><button class="md-x">✕</button></div>
+      ${poster ? `<img class="md-poster" src="${poster}">` : ''}
+      <div class="md-title">${title}</div>
+      ${d.tagline ? `<div class="md-tag">"${d.tagline}"</div>` : ''}
+      <div class="md-stats">
+        <div class="md-stat">★ <strong>${rating}</strong>/10</div>
+        ${year ? `<div class="md-stat">${year}</div>` : ''}
+        ${runtime ? `<div class="md-stat">${runtime}</div>` : ''}
+        ${d.status ? `<div class="md-stat">${d.status}</div>` : ''}
+      </div>
+      ${genres ? `<div class="md-genres">${genres}</div>` : ''}
+      <div class="md-ov">${d.overview||''}</div>
+    `;
+  } catch(e) {
+    document.getElementById('mInner').innerHTML = `<div class="md-close-row"><button class="md-x">✕</button></div><div class="err">${e.message}</div>`;
+  }
+}
+
+// ── NASA ──
+let nasaData = [];
+async function loadNasa() {
+  const b = document.getElementById('nasaBody');
+  b.innerHTML = '<div class="ld"><div class="ld-s"></div><div class="ld-t">Loading NASA...</div></div>';
+  try {
+    let raw = null;
+    try {
+      const r = await fetch(NASA_WORKER, { cache: 'no-store' });
+      if (r.ok) { const json = await r.json(); raw = Array.isArray(json) ? json : (json.data||json.results||null); }
+    } catch(_) {}
+    if (!raw) {
+      const start = new Date(); start.setDate(start.getDate()-40);
+      const sd = `${start.getFullYear()}-${String(start.getMonth()+1).padStart(2,'0')}-${String(start.getDate()).padStart(2,'0')}`;
+      const r = await fetch(`https://api.nasa.gov/planetary/apod?api_key=${NASA_KEY}&start_date=${sd}`, { cache: 'no-store' });
+      if (!r.ok) throw new Error('NASA ' + r.status);
+      const json = await r.json(); raw = Array.isArray(json) ? json : [json];
+    }
+    nasaData = raw.filter(d => d.media_type === 'image').sort((a,b) => b.date.localeCompare(a.date)).slice(0,30);
+    let h = '<div class="nasa-grid">';
+    nasaData.forEach((d,i) => {
+      h += `<div class="nasa-card" data-nasa="${i}">
+        <img class="nasa-img-thumb" src="${d.url}" loading="lazy">
+        <div class="nasa-info">
+          <div class="nasa-title">${d.title||''}</div>
+          <div class="nasa-date">${d.date||''}</div>
+        </div>
+      </div>`;
+    });
+    b.innerHTML = h + '</div>';
+  } catch(e) { b.innerHTML = `<div class="err">${e.message}</div>`; }
+}
+
+document.addEventListener('click', e => {
+  const nc = e.target.closest('.nasa-card[data-nasa]');
+  if (nc) { const d = nasaData[nc.dataset.nasa]; if (d) showNasaDetail(d); }
+});
+
+function showNasaDetail(d) {
+  openModal(`
+    <div class="md-close-row"><button class="md-x">✕</button></div>
+    <img class="md-nasa-img" src="${d.hdurl||d.url}" alt="${d.title||''}">
+    <div class="md-title" style="text-align:center;margin-top:8px">${d.title||''}</div>
+    <div class="nasa-date" style="text-align:center;font-size:11px;margin-top:4px">${d.date||''}</div>
+    <div class="md-ov" style="margin-top:10px">${(d.explanation||'').substring(0,600)}${d.explanation?.length>600?'...':''}</div>
+  `);
+}
+
+// ── Upcoming TV ──
+let upcomingCache = null, upcomingCacheTime = 0, upcomingShows = [], activeUpTab = 'upcoming';
+
+async function loadUpcoming() {
+  const btn = document.getElementById('rl-upcoming');
+  btn?.classList.add('spin');
+  if (upcomingCache && Date.now() - upcomingCacheTime < 1800000) {
+    updateUpcomingCacheLabel(upcomingCache);
+    renderUpcoming(upcomingCache);
+    btn?.classList.remove('spin'); return;
+  }
+  activeUpTab = 'upcoming';
+  document.querySelectorAll('#upcomingTabs .tab-btn').forEach((b,i) => b.classList.toggle('active', i===0));
+  document.getElementById('upcomingBody').innerHTML = '<div class="ld"><div class="ld-s"></div><div class="ld-t">Loading shows...</div></div>';
+  try {
+    const r = await fetch(UPCOMING_API + '/?format=json');
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const json = await r.json();
+    if (!json.shows?.length) throw new Error('No shows');
+    upcomingCache = json; upcomingCacheTime = Date.now();
+    updateUpcomingCacheLabel(json);
+    renderUpcoming(json);
+  } catch(e) { document.getElementById('upcomingBody').innerHTML = `<div class="err">${e.message}</div>`; }
+  btn?.classList.remove('spin');
+}
+
+function updateUpcomingCacheLabel(json) {
+  const el = document.getElementById('upcomingCacheLabel');
+  if (!el) return;
+  if (json?.cachedAtFormatted) {
+    const hrs = json.cacheAgeHours||0;
+    el.textContent = hrs < 1 ? 'live' : `${hrs}h ago`;
+  } else {
+    const mins = Math.floor((Date.now() - upcomingCacheTime)/60000);
+    el.textContent = mins < 1 ? 'live' : `${mins}m ago`;
+  }
+}
+
+function renderUpcoming(json) {
+  const upcoming = json.shows||[], aired = json.recentlyAired||[];
+  upcomingShows = [...upcoming, ...aired];
+  const cu = document.getElementById('uptab-count-upcoming');
+  const ca = document.getElementById('uptab-count-aired');
+  if (cu) cu.textContent = upcoming.length;
+  if (ca) ca.textContent = aired.length;
+  document.querySelectorAll('#upcomingTabs .tab-btn').forEach(btn => {
+    btn.onclick = () => {
+      activeUpTab = btn.dataset.uptab;
+      document.querySelectorAll('#upcomingTabs .tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderUpcomingGrid(json);
+    };
+  });
+  renderUpcomingGrid(json);
+}
+
+function renderUpcomingGrid(json) {
+  const b = document.getElementById('upcomingBody');
+  const items = activeUpTab === 'aired' ? (json.recentlyAired||[]) : (json.shows||[]);
+  const isAired = activeUpTab === 'aired';
+  if (!items.length) { b.innerHTML = '<div class="err">No shows.</div>'; return; }
+  let h = '<div class="up-grid">';
+  items.forEach((s, i) => {
+    const gi = upcomingShows.indexOf(s);
+    const imgHtml = s.img ? `<img class="up-thumb" src="${s.img}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : '';
+    const phStyle = s.img ? 'display:none' : '';
+    const genres = (s.genres||[]).slice(0,2).join(', ');
+    h += `<div class="up-card" data-show="${gi}">
+      <div class="up-thumb-wrap">
+        ${imgHtml}
+        <div class="up-thumb-ph" style="${phStyle}">📺</div>
+        ${isAired ? '<div class="up-aired-badge">✓</div>' : `<div class="up-rank">${i+1}</div>`}
+      </div>
+      <div class="up-body">
+        <div class="up-title">${s.name||''}</div>
+        ${genres ? `<div class="up-meta">${genres}</div>` : ''}
+        <div class="up-row">
+          ${s.premiereIn ? `<div class="up-premiere" style="${isAired?'color:var(--green)':''}">${s.premiereIn}</div>` : '<div></div>'}
+          ${s.rating ? `<div class="up-rating">★ ${s.rating}</div>` : ''}
+        </div>
+      </div>
+    </div>`;
+  });
+  b.innerHTML = h + '</div>';
+}
+
+document.addEventListener('click', e => {
+  const uc = e.target.closest('.up-card[data-show]');
+  if (uc) showUpcomingDetail(Number(uc.dataset.show));
+});
+
+function showUpcomingDetail(idx) {
+  const s = upcomingShows[idx]; if (!s) return;
+  const isAired = s.status === 'aired';
+  const genres = (s.genres||[]).map(g => `<span class="md-genre" style="background:rgba(244,114,182,.1);color:var(--pink)">${g}</span>`).join('');
+  openModal(`
+    <div class="md-close-row"><button class="md-x">✕</button></div>
+    ${s.img ? `<img class="up-modal-img" src="${s.img}">` : ''}
+    ${isAired ? '<div style="background:rgba(52,211,153,.15);color:var(--green);font-size:12px;font-weight:700;padding:4px 10px;border-radius:8px;display:inline-block;margin-bottom:8px">✓ Aired</div>' : ''}
+    <div class="md-title">${s.name||''}</div>
+    ${genres ? `<div class="md-genres" style="margin-top:6px">${genres}</div>` : ''}
+    <div class="md-stats">
+      ${s.premiereIn ? `<div class="md-stat" style="color:${isAired?'var(--green)':'var(--orange)'}">⏱ <strong>${s.premiereIn}</strong></div>` : ''}
+      ${s.channel ? `<div class="md-stat">${s.channel}</div>` : ''}
+    </div>
+    <div class="md-ov">${s.summary||'<em>No summary available.</em>'}</div>
+  `);
+}
+
+// ── History ──
+let historyEvents = [];
+async function loadHistory() {
+  const b = document.getElementById('historyBody');
+  b.innerHTML = '<div class="ld"><div class="ld-s"></div><div class="ld-t">Loading...</div></div>';
+  try {
+    const n = new Date(), mo = String(n.getMonth()+1).padStart(2,'0'), da = String(n.getDate()).padStart(2,'0');
+    const r = await fetch(`https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/${mo}/${da}`);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const d = await r.json(), ev = (d.events||[]).slice(0,30);
+    if (!ev.length) { b.innerHTML = '<div class="err">No events found.</div>'; return; }
+    historyEvents = ev;
+    const ms = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const curYear = n.getFullYear();
+    let h = `<div class="h-date-banner"><div class="h-date-line"></div><div class="h-date-txt">📜 ${ms[n.getMonth()]} ${n.getDate()}</div><div class="h-date-line"></div></div><div class="history-list">`;
+    ev.forEach((e, i) => {
+      const yr = parseInt(e.year)||0, ago = yr > 0 ? `${curYear-yr}y ago` : '';
+      h += `<div class="hi" data-idx="${i}">
+        <div class="hy-wrap">
+          <div class="hy">${e.year||'?'}</div>
+          ${ago ? `<div class="hy-ago">${ago}</div>` : ''}
+        </div>
+        <div class="ht">${e.text||''}</div>
+      </div>`;
+    });
+    b.innerHTML = h + '</div>';
+  } catch(e) { b.innerHTML = `<div class="err">${e.message}</div>`; }
+}
+
+document.addEventListener('click', e => {
+  const hi = e.target.closest('.hi[data-idx]');
+  if (hi) showHistoryDetail(Number(hi.dataset.idx));
+});
+
+function showHistoryDetail(idx) {
+  const ev = historyEvents[idx]; if (!ev) return;
+  const curYear = new Date().getFullYear();
+  const yr = parseInt(ev.year)||0, ago = yr > 0 ? `${curYear-yr} years ago` : '';
+  const pages = (ev.pages||[]).slice(0,4).map(p => `<span class="hm-page">${p.title||p.displayTitle||''}</span>`).join('');
+  openModal(`
+    <div class="md-close-row"><button class="md-x">✕</button></div>
+    <div class="hm-year">${ev.year||'?'}</div>
+    ${ago ? `<div class="hm-ago">${ago}</div>` : ''}
+    <div class="hm-text">${ev.text||''}</div>
+    ${pages ? `<div class="hm-pages">${pages}</div>` : ''}
+  `);
+}
+
+// ── Fun ──
+let activeFunTab = 'joke';
+function loadFun() {
+  document.querySelectorAll('#funTabs .tab-btn').forEach(btn => {
+    btn.onclick = () => {
+      activeFunTab = btn.dataset.funtab;
+      document.querySelectorAll('#funTabs .tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderFun();
+    };
+  });
+  renderFun();
+}
+
+async function renderFun() {
+  const b = document.getElementById('funBody');
+  b.innerHTML = '<div class="ld"><div class="ld-s"></div><div class="ld-t">Loading...</div></div>';
+  if (activeFunTab === 'joke') await doJoke(b);
+  else await doRiddle(b);
+}
+
+async function doJoke(b) {
+  try {
+    const r = await fetch('https://official-joke-api.appspot.com/random_joke');
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const d = await r.json();
+    if (!d.setup) throw new Error('No joke');
+    const pid = 'pl_' + Date.now();
+    b.innerHTML = `<div class="fun-center">
+      <div class="fun-emoji">😂</div>
+      <div class="fun-setup" style="color:var(--green)">${d.setup}</div>
+      <div id="${pid}" style="display:none"><div class="fun-answer" style="color:var(--gold);font-weight:700">${d.punchline}</div></div>
+      <button class="fun-btn" style="border-color:rgba(52,211,153,.3);color:var(--green)" onclick="document.getElementById('${pid}').style.display='block';this.style.display='none'">Show Punchline 👀</button>
+    </div>`;
+  } catch(_) {
+    const f = [{s:"Why don't scientists trust atoms?",p:"Because they make up everything!"},{s:"How do you organise a space party?",p:"You planet!"}][Math.floor(Math.random()*2)];
+    const pid = 'pl_' + Date.now();
+    b.innerHTML = `<div class="fun-center"><div class="fun-emoji">😂</div><div class="fun-setup" style="color:var(--green)">${f.s}</div><div id="${pid}" style="display:none"><div class="fun-answer" style="color:var(--gold);font-weight:700">${f.p}</div></div><button class="fun-btn" style="border-color:rgba(52,211,153,.3);color:var(--green)" onclick="document.getElementById('${pid}').style.display='block';this.style.display='none'">Show Punchline 👀</button></div>`;
+  }
+}
+
+async function doRiddle(b) {
+  try {
+    const r = await fetch('https://riddles-api.vercel.app/random');
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const d = await r.json(); const q = d.riddle||d.question||'', a = d.answer||'';
+    if (!q) throw new Error('No riddle');
+    b.innerHTML = `<div class="fun-center"><div class="fun-emoji">🧩</div><div class="fun-setup" style="color:var(--orange)">${q}</div><div id="ra" style="display:none"><div class="fun-answer" style="color:var(--green);font-weight:700">${a}</div></div><button class="fun-btn" style="border-color:rgba(251,146,60,.3);color:var(--orange)" onclick="document.getElementById('ra').style.display='block';this.style.display='none'">Reveal Answer 🔍</button></div>`;
+  } catch(_) {
+    const f = [{q:"I have cities, but no houses. Mountains, but no trees. Water, but no fish.",a:"A map"},{q:"What is so fragile that saying its name breaks it?",a:"Silence"}][Math.floor(Math.random()*2)];
+    b.innerHTML = `<div class="fun-center"><div class="fun-emoji">🧩</div><div class="fun-setup" style="color:var(--orange)">${f.q}</div><div id="ra" style="display:none"><div class="fun-answer" style="color:var(--green);font-weight:700">${f.a}</div></div><button class="fun-btn" style="border-color:rgba(251,146,60,.3);color:var(--orange)" onclick="document.getElementById('ra').style.display='block';this.style.display='none'">Reveal Answer 🔍</button></div>`;
+  }
+}
+
+// ── Golf ──
+const GOLF_FAV_KEY = 'golf_favs_m';
+let golfFavs = new Set(JSON.parse(localStorage.getItem(GOLF_FAV_KEY)||'[]'));
+let golfData = [], activeGolfEvent = null, golfRefreshTimer = null;
+
+function saveFavs() { try { localStorage.setItem(GOLF_FAV_KEY, JSON.stringify([...golfFavs])); } catch(_) {} }
+function toggleFav(id) {
+  if (golfFavs.has(id)) golfFavs.delete(id); else golfFavs.add(id);
+  saveFavs();
+  const sb = document.getElementById('golfBody');
+  const sp = sb?.scrollTop || 0;
+  renderGolfLeaderboard();
+  if (sb) sb.scrollTop = sp;
+}
+
+async function loadGolf() {
+  const btn = document.getElementById('rl-golf');
+  btn?.classList.add('spin');
+  document.getElementById('golfBody').innerHTML = '<div class="ld"><div class="ld-s"></div><div class="ld-t">Loading golf...</div></div>';
+  document.getElementById('golfInfo').style.display = 'none';
+  try {
+    const r = await fetch(GOLF_PROXY, { cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const json = await r.json();
+    const events = json.events || [];
+    if (!events.length) throw new Error('No events');
+    golfData = events;
+    if (!activeGolfEvent || !events.find(ev => ev.id === activeGolfEvent)) activeGolfEvent = events[0].id;
+    buildGolfTabs(events);
+    renderGolfLeaderboard();
+    startGolfRefresh();
+  } catch(e) { document.getElementById('golfBody').innerHTML = `<div class="err">${e.message}</div>`; }
+  btn?.classList.remove('spin');
+}
+
+function buildGolfTabs(events) {
+  const tabs = document.getElementById('golfTabs');
+  tabs.innerHTML = events.map(ev =>
+    `<button class="golf-tab-btn${ev.id === activeGolfEvent ? ' active' : ''}" data-evid="${ev.id}">${ev.name||ev.id}</button>`
+  ).join('');
+  tabs.querySelectorAll('.golf-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeGolfEvent = btn.dataset.evid;
+      tabs.querySelectorAll('.golf-tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderGolfLeaderboard();
+    });
+  });
+}
+
+function gScoreClass(str) {
+  if (!str || str === 'E') return 'even';
+  if (str.startsWith('-') || str.startsWith('−')) return 'under';
+  if (str.startsWith('+')) return 'over';
+  return 'even';
+}
+
+function renderGolfLeaderboard() {
+  const ev = golfData.find(e => e.id === activeGolfEvent);
+  if (!ev) return;
+  const info = document.getElementById('golfInfo');
+  const isLive = (ev.status||'').toLowerCase().includes('in progress');
+  info.style.display = 'block';
+  info.innerHTML = `
+    <div class="golf-event-name">${ev.name||''}
+      <span class="golf-status-badge ${isLive?'live':'post'}">${isLive?'● LIVE':'FINAL'}</span>
+    </div>
+    <div class="golf-meta-row">
+      ${ev.venue ? `<span><b>${ev.venue}</b></span>` : ''}
+      ${ev.course ? `<span>${ev.course}</span>` : ''}
+    </div>`;
+  const players = ev.competitors || ev.players || [];
+  if (!players.length) { document.getElementById('golfBody').innerHTML = '<div class="err">No players found.</div>'; return; }
+  const favs = players.filter(p => golfFavs.has(p.id));
+  const others = players.filter(p => !golfFavs.has(p.id));
+  let h = '<div class="golf-list">';
+  if (favs.length) {
+    h += `<div class="golf-fav-div">⭐ FAVOURITES</div>`;
+    favs.forEach(p => h += golfRowHtml(p, true));
+    h += `<div class="golf-fav-div" style="color:var(--dim2);margin-top:8px">ALL PLAYERS</div>`;
+  }
+  let cutInserted = false;
+  others.forEach((p, i) => {
+    const isCut = (p.status||'').toLowerCase().includes('cut');
+    if (isCut && !cutInserted) {
+      h += `<div class="golf-cut-row">─── CUT ───</div>`;
+      cutInserted = true;
+    }
+    h += golfRowHtml(p, false, isCut);
+  });
+  h += '</div>';
+  document.getElementById('golfBody').innerHTML = h;
+}
+
+function golfRowHtml(p, isFav, isCut=false) {
+  const scoreStr = p.score !== undefined ? (p.score === 0 ? 'E' : p.score > 0 ? `+${p.score}` : String(p.score)) : '—';
+  const sc = p.score === undefined ? 'even' : p.score < 0 ? 'under' : p.score > 0 ? 'over' : 'even';
+  const pos = p.position ? (p.position <= 3 ? `<span class="g-pos top3">${p.position}</span>` : `<span class="g-pos">${p.position}</span>`) : '<span class="g-pos">—</span>';
+  const hs = p.headshot ? `<img class="g-headshot" src="${p.headshot}" loading="lazy">` : `<div class="g-headshot" style="display:flex;align-items:center;justify-content:center;font-size:16px">👤</div>`;
+  const thruToday = [p.thru ? `Thru ${p.thru}` : '', p.today !== undefined ? (p.today===0?'E':p.today>0?`+${p.today}`:String(p.today))+' today' : ''].filter(Boolean).join(' · ');
+  const starCls = isFav ? 'g-row-star on' : 'g-row-star';
+  return `<div class="golf-row${isFav?' is-fav':''}${isCut?' is-cut':''}" data-golfid="${p.id}">
+    ${pos}
+    ${hs}
+    <div class="g-info">
+      <div class="g-name">${p.name||p.full_name||''}</div>
+      <div class="g-ctry">${p.country||''}</div>
+    </div>
+    <div class="g-scores">
+      <div class="g-total ${sc}">${scoreStr}</div>
+      ${thruToday ? `<div class="g-thru-today">${thruToday}</div>` : ''}
+    </div>
+    <div class="${starCls}" data-starid="${p.id}">★</div>
+  </div>`;
+}
+
+// Golf row click
+document.addEventListener('click', e => {
+  const star = e.target.closest('.g-row-star[data-starid]');
+  if (star) { e.stopPropagation(); toggleFav(star.dataset.starid); return; }
+  const row = e.target.closest('.golf-row[data-golfid]');
+  if (row) showGolfDetail(row.dataset.golfid);
+});
+
+async function showGolfDetail(pid) {
+  const ev = golfData.find(e => e.id === activeGolfEvent);
+  const p = (ev?.competitors || ev?.players || []).find(x => x.id === pid);
+  if (!p) return;
+  const scoreStr = p.score !== undefined ? (p.score===0?'E':p.score>0?`+${p.score}`:String(p.score)) : '—';
+  const sc = p.score===undefined?'even':p.score<0?'under':p.score>0?'over':'even';
+  const isFav = golfFavs.has(pid);
+  const rounds = (p.rounds||[]).map((r,i) => {
+    const relScore = r.score !== undefined ? (r.score===0?'E':r.score>0?`+${r.score}`:String(r.score)) : '—';
+    const rsc = r.score===undefined?'even':r.score<0?'under':r.score>0?'over':'even';
+    return `<div class="md-golf-rd">
+      <div class="md-golf-rd-lbl">R${r.period||i+1}</div>
+      <div class="md-golf-rd-score">${r.strokes||'—'}</div>
+      <div class="md-golf-rd-rel ${rsc}">${relScore}</div>
+    </div>`;
+  }).join('');
+
+  openModal(`
+    <div class="md-close-row"><button class="md-x">✕</button></div>
+    <div class="md-golf-head">
+      ${p.headshot ? `<img class="md-golf-hs" src="${p.headshot}">` : `<div class="md-golf-hs" style="display:flex;align-items:center;justify-content:center;font-size:24px">👤</div>`}
+      <div>
+        <div class="md-golf-name">${p.name||p.full_name||''}</div>
+        <div class="md-golf-ctry">${p.country||''}</div>
+        ${p.position ? `<div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--gold);font-weight:800;margin-top:2px">#${p.position}</div>` : ''}
+      </div>
+      <div class="md-golf-score ${sc}" style="margin-left:auto">${scoreStr}</div>
+    </div>
+    ${rounds ? `<div class="md-golf-rounds">${rounds}</div>` : ''}
+    <button class="g-modal-star${isFav?' on':''}" data-starid="${pid}">${isFav?'★ Favourited':'☆ Add to Favourites'}</button>
+    <div id="golfscorecardArea" style="margin-top:16px">
+      <div class="ld-t" style="font-size:12px;color:var(--dim)">Loading scorecard...</div>
+    </div>
+  `);
+
+  // Load scorecard
+  try {
+    const r = await fetch(`${SCORECARD_PROXY}?playerId=${pid}&eventId=${activeGolfEvent}`, { cache: 'no-store' });
+    if (r.ok) {
+      const json = await r.json();
+      const area = document.getElementById('golfscorecardArea');
+      if (area) renderHoleScores(area, json, p.rounds||[], (p.rounds||[]).filter(r=>r.has).sort((a,b)=>b.period-a.period));
+    } else {
+      const area = document.getElementById('golfscorecardArea');
+      if (area) area.innerHTML = '';
+    }
+  } catch(_) {
+    const area = document.getElementById('golfscorecardArea');
+    if (area) area.innerHTML = '';
+  }
+}
+
+// Modal star
+document.addEventListener('click', e => {
+  const s = e.target.closest('.g-modal-star[data-starid]');
+  if (s) {
+    e.stopPropagation();
+    const pid = s.dataset.starid;
+    if (golfFavs.has(pid)) golfFavs.delete(pid); else golfFavs.add(pid);
+    saveFavs();
+    const isFav = golfFavs.has(pid);
+    s.textContent = isFav ? '★ Favourited' : '☆ Add to Favourites';
+    s.classList.toggle('on', isFav);
+  }
+});
+
+function holeClass(playerScore, par, scoreTypeName) {
+  const diff = playerScore - par;
+  if (diff <= -2) return 'eagle';
+  if (diff === -1) return 'birdie';
+  if (diff === 0) return 'par';
+  if (diff === 1) return 'bogey';
+  if (diff === 2) return 'double';
+  return 'worse';
+}
+
+function holeCell(holeNum, par, playerScore, scoreTypeName='') {
+  const hasScore = playerScore !== undefined && playerScore !== null && !isNaN(playerScore);
+  const cls = hasScore ? holeClass(playerScore, par, scoreTypeName) : 'empty';
+  const relScore = hasScore ? (playerScore-par===0?'E':playerScore-par>0?`+${playerScore-par}`:String(playerScore-par)) : '';
+  return `<div class="golf-hole ${cls}">
+    <div class="golf-hole-num">${holeNum}</div>
+    <div class="golf-hole-par">P${par}</div>
+    <div class="golf-hole-score">${hasScore?playerScore:'·'}</div>
+    ${relScore?`<div class="golf-hole-rel">${relScore}</div>`:''}
+  </div>`;
+}
+
+function legend() {
+  return `<div class="golf-sc-legend">
+    <div class="golf-sc-legend-item"><div class="golf-sc-legend-dot" style="background:rgba(240,180,41,.35)"></div>Eagle−</div>
+    <div class="golf-sc-legend-item"><div class="golf-sc-legend-dot" style="background:rgba(52,211,153,.25)"></div>Birdie</div>
+    <div class="golf-sc-legend-item"><div class="golf-sc-legend-dot" style="background:rgba(30,32,48,.9);border:1px solid #2a2a3a"></div>Par</div>
+    <div class="golf-sc-legend-item"><div class="golf-sc-legend-dot" style="background:rgba(248,113,113,.3)"></div>Bogey</div>
+    <div class="golf-sc-legend-item"><div class="golf-sc-legend-dot" style="background:rgba(200,40,40,.5)"></div>Double+</div>
+  </div>`;
+}
+
+function renderHoleScores(area, json, rounds, roundsSorted) {
+  const items = json.items||[];
+  if (!items.length) { area.innerHTML = ''; return; }
+  const roundMap = {};
+  items.forEach(item => {
+    const rdPeriod = item.period; if (!rdPeriod) return;
+    const holes = (item.linescores||[]).map(ls => ({ hole: ls.period, par: ls.par??4, score: ls.value, scoreTypeName: ls.scoreType?.name||'' })).filter(h => h.hole && h.hole >= 1 && h.hole <= 18);
+    roundMap[rdPeriod] = holes;
+  });
+  const played = roundsSorted.filter(r => r.has && roundMap[r.period]?.length);
+  if (!played.length) { area.innerHTML = ''; return; }
+  let h = '';
+  played.forEach(rdMeta => {
+    const holes = roundMap[rdMeta.period]||[];
+    const pill = `<span class="sc-rd-pill ${gScoreClass(rdMeta.disp)}">${rdMeta.disp}</span>`;
+    h += `<div class="golf-sc-round-hdr">ROUND ${rdMeta.period} ${pill}</div>`;
+    const sorted = [...holes].sort((a,b) => a.hole - b.hole);
+    h += `<div class="golf-holes">`;
+    sorted.slice(0,9).forEach(hd => h += holeCell(hd.hole, hd.par, hd.score, hd.scoreTypeName));
+    for (let i=sorted.slice(0,9).length; i<9; i++) h += holeCell(i+1, MASTERS_PARS[i], undefined, '');
+    h += `</div><div class="golf-holes" style="margin-top:3px">`;
+    sorted.slice(9,18).forEach(hd => h += holeCell(hd.hole, hd.par, hd.score, hd.scoreTypeName));
+    const bp = sorted.slice(9,18).length;
+    for (let i=bp; i<9; i++) h += holeCell(i+10, MASTERS_PARS[i+9], undefined, '');
+    h += `</div>`;
+  });
+  h += legend();
+  area.innerHTML = h;
+}
+
+// Golf auto-refresh
+function startGolfRefresh() {
+  stopGolfRefresh();
+  golfRefreshTimer = setInterval(async () => {
+    if (curScr !== 'golf' || isModalOpen()) return;
+    try {
+      const r = await fetch(GOLF_PROXY, { cache: 'no-store' });
+      if (!r.ok) return;
+      const json = await r.json();
+      const events = json.events||[];
+      if (!events.length) return;
+      golfData = events;
+      if (!activeGolfEvent || !events.find(ev => ev.id === activeGolfEvent)) activeGolfEvent = events[0].id;
+      buildGolfTabs(events);
+      const sb = document.getElementById('golfBody');
+      const sp = sb?.scrollTop || 0;
+      renderGolfLeaderboard();
+      if (sb) sb.scrollTop = sp;
+    } catch(_) {}
+  }, 60000);
+}
+function stopGolfRefresh() { if (golfRefreshTimer) { clearInterval(golfRefreshTimer); golfRefreshTimer = null; } }
+</script>
+</body>
+</html>
